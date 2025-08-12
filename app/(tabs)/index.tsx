@@ -6,42 +6,126 @@ import { Card } from '@/components/Card';
 import { SearchWidget } from '@/components/SearchWidget';
 import { ListStart, Clock, ArrowRight, Star } from 'lucide-react-native';
 import { useScalesStore } from '@/store/scales';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 export default function ScalesIndexScreen() {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const addRecentlyViewed = useScalesStore((state) => state.addRecentlyViewed);
+  const { colors, isDark } = useThemedStyles();
 
   // Categorías de escalas médicas
   const categories = useMemo(() => [
     {
       id: 'alphabetical',
       title: 'Por Nombre',
-      icon: <ListStart size={24} color="#0891b2" />,
+      icon: <ListStart size={24} color={colors.primary} />,
       route: '/scales/alfabetico',
       description: 'Ordenadas alfabéticamente'
     },
     {
       id: 'functional',
       title: 'Por Función',
-      icon: <Star size={24} color="#0d9488" />,
+      icon: <Star size={24} color={colors.primary} />,
       route: '/scales/funcional',
       description: 'Agrupadas por funcionalidad'
     },
     {
       id: 'specialty',
       title: 'Por Especialidad',
-      icon: <Clock size={24} color="#6366f1" />,
+      icon: <Clock size={24} color={colors.primary} />,
       route: '/scales/especialidad',
       description: 'Clasificadas por especialidad médica'
     },
     {
       id: 'segment',
       title: 'Por Segmento Corporal',
-      icon: <ArrowRight size={24} color="#f59e0b" />,
+      icon: <ArrowRight size={24} color={colors.primary} />,
       route: '/scales/segmento',
       description: 'Ordenadas por zona del cuerpo'
     }
   ], []);
+
+  // Estilos dinámicos basados en el tema
+  const themedStyles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    searchContainer: {
+      padding: 16,
+      backgroundColor: colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    categoryItem: {
+      width: '48%',
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    categoryIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.iconBackground,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+    },
+    categoryTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    categoryDescription: {
+      fontSize: 14,
+      color: colors.mutedText,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    seeAllText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: '500',
+    },
+    scaleCard: {
+      width: 220,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      marginRight: 12,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    scaleTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    scaleSubtitle: {
+      fontSize: 12,
+      color: colors.mutedText,
+      marginBottom: 8,
+    },
+    scaleDescription: {
+      fontSize: 14,
+      color: colors.mutedText,
+      lineHeight: 20,
+    },
+  }), [colors]);
 
   // Escalas recientes
   const recentScales = useMemo(() => [
@@ -134,12 +218,12 @@ export default function ScalesIndexScreen() {
             Evaluación estandarizada del nivel de independencia en actividades básicas de la vida diaria.
           </Text>
           <View style={styles.featuredMeta}>
-            <View style={styles.metaItem}>
-              <ListStart size={16} color="#64748b" />
+                <View style={styles.metaItem}>
+                  <ListStart size={16} color={colors.mutedText} />
               <Text style={styles.featuredMetaText}>10 items</Text>
             </View>
             <View style={styles.metaItem}>
-              <Clock size={16} color="#64748b" />
+                  <Clock size={16} color={colors.mutedText} />
               <Text style={styles.featuredMetaText}>5-15 min</Text>
             </View>
           </View>
@@ -158,7 +242,7 @@ export default function ScalesIndexScreen() {
             }}
             accessibilityHint="Comienza una nueva evaluación usando la escala de Barthel"
           >
-            <Text style={styles.featuredButtonText}>
+      <Text style={[styles.featuredButtonText, { color: colors.card }]}>
               {isButtonLoading ? 'Iniciando...' : 'Iniciar Evaluación'}
             </Text>
           </TouchableOpacity>
@@ -175,9 +259,9 @@ export default function ScalesIndexScreen() {
           headerShown: true,
         }}
       />
-      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <View style={styles.searchContainer}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
+      <SafeAreaView style={themedStyles.container} edges={['bottom']}>
+        <View style={themedStyles.searchContainer}>
           <SearchWidget
             placeholder="Buscar escalas médicas..."
             onSearch={() => {}}
@@ -194,17 +278,17 @@ export default function ScalesIndexScreen() {
             {categories.map(category => (
               <TouchableOpacity
                 key={category.id}
-                style={styles.categoryItem}
+                style={themedStyles.categoryItem}
                 onPress={() => router.push(category.route)}
                 accessibilityLabel={`Categoría ${category.title}`}
                 accessibilityHint={category.description}
                 accessibilityRole="button"
               >
-                <View style={styles.categoryIconContainer}>
+                <View style={themedStyles.categoryIconContainer}>
                   {category.icon}
                 </View>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <Text style={styles.categoryDescription} numberOfLines={1}>
+                <Text style={themedStyles.categoryTitle}>{category.title}</Text>
+                <Text style={themedStyles.categoryDescription} numberOfLines={1}>
                   {category.description}
                 </Text>
               </TouchableOpacity>
@@ -214,13 +298,13 @@ export default function ScalesIndexScreen() {
           {/* Sección de escalas recientes */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Escalas Recientes</Text>
+              <Text style={themedStyles.sectionTitle}>Escalas Recientes</Text>
               <TouchableOpacity 
                 onPress={() => router.push('/scales/recent')}
                 accessibilityLabel="Ver todas las escalas recientes"
                 accessibilityRole="button"
               >
-                <Text style={styles.seeAllText}>Ver todas</Text>
+                <Text style={themedStyles.seeAllText}>Ver todas</Text>
               </TouchableOpacity>
             </View>
             
@@ -232,7 +316,7 @@ export default function ScalesIndexScreen() {
               {recentScales.map(scale => (
                 <TouchableOpacity
                   key={scale.id}
-                  style={styles.scaleCard}
+                  style={themedStyles.scaleCard}
                   onPress={() => {
                     addRecentlyViewed(scale.id);
                     router.push(`/scales/${scale.id}`);
@@ -243,20 +327,20 @@ export default function ScalesIndexScreen() {
                 >
                   <View style={styles.scaleCardContent}>
                     <View style={styles.scaleHeader}>
-                      <Text style={styles.scaleTitle}>{scale.name}</Text>
+                      <Text style={themedStyles.scaleTitle}>{scale.name}</Text>
                       {scale.popular && (
-                        <View style={styles.popularBadge}>
-                          <Star size={12} color="#ffffff" fill="#ffffff" />
+                <View style={styles.popularBadge}>
+                  <Star size={12} color={colors.card} fill={colors.card} />
                         </View>
                       )}
                     </View>
-                    <Text style={styles.scaleAcronym}>{scale.acronym}</Text>
-                    <Text style={styles.scaleDescription} numberOfLines={2}>
+                    <Text style={themedStyles.scaleSubtitle}>{scale.acronym}</Text>
+                    <Text style={themedStyles.scaleDescription} numberOfLines={2}>
                       {scale.description}
                     </Text>
                     <View style={styles.scaleFooter}>
                       <View style={styles.timeInfo}>
-                        <Clock size={12} color="#64748b" />
+                        <Clock size={12} color={colors.mutedText} />
                         <Text style={styles.timeText}>{scale.timeToComplete}</Text>
                       </View>
                     </View>
@@ -297,12 +381,12 @@ export default function ScalesIndexScreen() {
                       <Text style={styles.categoryBadgeText}>{scale.category}</Text>
                     </View>
                     <View style={styles.timeInfo}>
-                      <Clock size={12} color="#64748b" />
+                      <Clock size={12} color={colors.mutedText} />
                       <Text style={styles.timeText}>{scale.timeToComplete}</Text>
                     </View>
                   </View>
                 </View>
-                <ArrowRight size={20} color="#64748b" />
+                <ArrowRight size={20} color={colors.mutedText} />
               </TouchableOpacity>
             ))}
           </View>

@@ -1,9 +1,13 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMemo } from 'react';
 import { useScalesStore } from '@/store/scales';
 
 export default function RecentScalesScreen() {
+  const { colors } = useScaleStyles();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const recentlyViewed = useScalesStore((state) => state.recentlyViewed);
 
   return (
@@ -29,14 +33,14 @@ export default function RecentScalesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   item: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.border,
   },
 });

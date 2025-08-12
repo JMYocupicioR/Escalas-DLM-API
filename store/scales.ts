@@ -34,6 +34,8 @@ interface ScalesState {
   // Nuevo estado
   assessments: Record<string, Assessment>;
   patients: Record<string, Patient>;
+  currentPatientId?: string;
+  lastPatientIdByScale: Record<string, string>;
   
   // Acciones existentes
   addFavorite: (id: string) => void;
@@ -50,6 +52,11 @@ interface ScalesState {
   updatePatient: (id: string, data: Partial<Patient>) => void;
   getPatient: (id: string) => Patient | undefined;
   deletePatient: (id: string) => void;
+  setCurrentPatient: (id: string) => void;
+  getCurrentPatient: () => Patient | undefined;
+  rememberPatientForScale: (scaleId: string, patientId: string) => void;
+  getPatientForScale: (scaleId: string) => Patient | undefined;
+  ensureDefaultPatient: () => Patient;
   clear: () => void;
 }
 
@@ -67,6 +74,8 @@ export const useScalesStore = create<ScalesState>()(
       recentlyViewed: [],
       assessments: {},
       patients: {},
+      currentPatientId: undefined,
+      lastPatientIdByScale: {},
       
       // Implementación de acciones existentes
       addFavorite: (id) => set((state) => ({
@@ -184,9 +193,45 @@ export const useScalesStore = create<ScalesState>()(
         
         return { 
           patients: restPatients,
-          assessments
+          assessments,
+          currentPatientId: state.currentPatientId === id ? undefined : state.currentPatientId,
+          lastPatientIdByScale: Object.fromEntries(
+            Object.entries(state.lastPatientIdByScale).filter(([, pid]) => pid !== id)
+          )
         };
       }),
+
+      // Gestión de paciente actual y por escala
+      setCurrentPatient: (id) => set({ currentPatientId: id }),
+      getCurrentPatient: () => {
+        const state = get();
+        return state.currentPatientId ? state.patients[state.currentPatientId] : undefined;
+      },
+      rememberPatientForScale: (scaleId, patientId) => set((state) => ({
+        lastPatientIdByScale: { ...state.lastPatientIdByScale, [scaleId]: patientId }
+      })),
+      getPatientForScale: (scaleId) => {
+        const state = get();
+        const pid = state.lastPatientIdByScale[scaleId] || state.currentPatientId;
+        return pid ? state.patients[pid] : undefined;
+      },
+      ensureDefaultPatient: () => {
+        const state = get();
+        const existing = Object.values(state.patients).find(p => p.name === 'Paciente Anónimo');
+        if (existing) return existing;
+        const now = Date.now();
+        const newPatient: Patient = {
+          id: generateId(),
+          name: 'Paciente Anónimo',
+          age: 0,
+          gender: 'No especificado',
+          notes: undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        set((s) => ({ patients: { ...s.patients, [newPatient.id]: newPatient } }));
+        return newPatient;
+      },
       
       clear: () => set({
         favorites: [],
@@ -203,6 +248,8 @@ export const useScalesStore = create<ScalesState>()(
         recentlyViewed: state.recentlyViewed,
         assessments: state.assessments,
         patients: state.patients,
+        currentPatientId: state.currentPatientId,
+        lastPatientIdByScale: state.lastPatientIdByScale,
       }),
     }
   )

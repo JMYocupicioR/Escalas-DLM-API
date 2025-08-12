@@ -7,6 +7,11 @@ import { Stack, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CircleAlert as AlertCircle, ArrowLeft, ArrowRight, FileText, User } from 'lucide-react-native';
 import { useScalesStore } from '@/store/scales';
+import { useScaleStyles } from '@/hooks/useScaleStyles';
+import { PatientForm } from '@/components/PatientForm';
+import { exportAssessmentPDF, printAssessmentPDF } from '@/api/export/pdf';
+import { ResultsActions } from '@/components/ResultsActions';
+import { OptionRow } from '@/components/OptionRow';
 
 // Importar las preguntas desde un archivo separado
 import { questions } from '@/data/barthel';
@@ -42,34 +47,36 @@ function useBarthelAssessment() {
   }, [answers]);
 
   const getInterpretation = useCallback((total: number) => {
+    // Usamos colores estáticos aquí ya que este hook no tiene acceso directo a useThemedStyles
+    // Los colores se pasarán desde el componente principal
     if (total < 45)
       return {
         result: 'Incapacidad funcional Severa',
         explanation: 'El paciente presenta una dependencia importante para las actividades básicas de la vida diaria.',
-        color: '#ef4444',
+        colorKey: 'scoreLow',
       };
     if (total < 60)
       return {
         result: 'Incapacidad funcional Grave',
         explanation: 'El paciente requiere asistencia regular para varias actividades básicas.',
-        color: '#f97316',
+        colorKey: 'scoreMedium',
       };
     if (total < 80)
       return {
         result: 'Incapacidad funcional Moderada',
         explanation: 'El paciente necesita asistencia en algunas áreas específicas.',
-        color: '#eab308',
+        colorKey: 'scoreGood',
       };
     if (total < 100)
       return {
         result: 'Incapacidad funcional Ligera',
         explanation: 'El paciente es mayormente independiente con mínima asistencia.',
-        color: '#22c55e',
+        colorKey: 'scoreExcellent',
       };
     return {
       result: 'Independencia completa',
       explanation: 'El paciente puede realizar todas las actividades básicas sin asistencia.',
-      color: '#15803d',
+      colorKey: 'scoreOptimal',
     };
   }, []);
 
@@ -118,6 +125,8 @@ function useBarthelAssessment() {
 
 export default function BarthelScale() {
   const router = useRouter();
+  const { colors, getScoreColor } = useScaleStyles();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const {
     patientData,
     currentStep,
@@ -222,50 +231,147 @@ export default function BarthelScale() {
     }
   }, [calculateTotal, getInterpretation, generatePDFContent]);
 
+  // Crear estilos dinámicos
+  const dynamicStyles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 20,
+    },
+    formContainer: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 20,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    inputGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.tagBackground,
+      borderRadius: 8,
+      marginBottom: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    input: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.text,
+      marginLeft: 12,
+    },
+    button: {
+      backgroundColor: colors.buttonPrimary,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    buttonSecondary: {
+      backgroundColor: colors.buttonSecondary,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    buttonSecondaryText: {
+      color: colors.buttonSecondaryText,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    resultSection: {
+      backgroundColor: colors.sectionBackground,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      shadowColor: colors.shadowColor,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    resultText: {
+      fontSize: 16,
+      color: colors.text,
+      marginBottom: 8,
+      lineHeight: 22,
+    },
+    bold: {
+      fontWeight: '600',
+    },
+  }), [colors]);
+
   // Memoizar el componente de resultados para evitar renderizados innecesarios
   const ResultsContent = useMemo(() => {
     const total = calculateTotal();
     const interpretation = getInterpretation(total);
     
     return (
-      <View style={styles.resultsContainer}>
-        <Text style={styles.title}>Resultados Escala de Barthel</Text>
-        <View style={styles.resultSection}>
-          <Text style={styles.sectionTitle}>Datos del Paciente</Text>
-          <Text style={styles.resultText}>
-            <Text style={styles.bold}>Nombre:</Text> {patientData.name}
+      <View style={dynamicStyles.container}>
+          <Text style={[dynamicStyles.title, { color: colors.text }]}>Resultados Escala de Barthel</Text>
+        <View style={dynamicStyles.resultSection}>
+          <Text style={dynamicStyles.sectionTitle}>Datos del Paciente</Text>
+          <Text style={dynamicStyles.resultText}>
+            <Text style={dynamicStyles.bold}>Nombre:</Text> {patientData.name}
           </Text>
-          <Text style={styles.resultText}>
-            <Text style={styles.bold}>Edad:</Text> {patientData.age}
+          <Text style={dynamicStyles.resultText}>
+            <Text style={dynamicStyles.bold}>Edad:</Text> {patientData.age}
           </Text>
-          <Text style={styles.resultText}>
-            <Text style={styles.bold}>Género:</Text> {patientData.gender}
+          <Text style={dynamicStyles.resultText}>
+            <Text style={dynamicStyles.bold}>Género:</Text> {patientData.gender}
           </Text>
-          <Text style={styles.resultText}>
-            <Text style={styles.bold}>Médico:</Text> {patientData.doctorName}
+          <Text style={dynamicStyles.resultText}>
+            <Text style={dynamicStyles.bold}>Médico:</Text> {patientData.doctorName}
           </Text>
         </View>
-        <View style={styles.resultSection}>
-          <Text style={styles.sectionTitle}>Puntuación</Text>
-          <Text style={styles.resultText}>
-            <Text style={styles.bold}>Total:</Text> {total}/100
+        <View style={dynamicStyles.resultSection}>
+          <Text style={[dynamicStyles.sectionTitle, { color: colors.text }]}>Puntuación</Text>
+          <Text style={[dynamicStyles.resultText, { color: colors.text }] }>
+            <Text style={dynamicStyles.bold}>Total:</Text> {total}/100
           </Text>
-          <Text style={[styles.resultText, { color: interpretation.color }]}>
+          <Text style={[styles.interpretationText, { color: colors[interpretation.colorKey] }]}>
             {interpretation.result}
           </Text>
-          <Text style={styles.resultText}>{interpretation.explanation}</Text>
+          <Text style={[dynamicStyles.resultText, { color: colors.mutedText }]}>{interpretation.explanation}</Text>
         </View>
-        <View style={styles.resultSection}>
-          <Text style={styles.sectionTitle}>Detalle de Respuestas</Text>
+        <View style={dynamicStyles.resultSection}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Detalle de Respuestas</Text>
           {questions.map(q => {
             const answer = answers[q.id];
             if (answer !== undefined) {
               const selectedOption = q.options.find(opt => opt.value === answer);
               return (
                 <View key={q.id} style={styles.detailItem}>
-                  <Text style={styles.bold}>{q.question}</Text>
+                  <Text style={[styles.bold, { color: colors.text }]}>{q.question}</Text>
                   {selectedOption && (
-                    <Text>
+                    <Text style={{ color: colors.mutedText }}>
                       {selectedOption.label} ({selectedOption.value} puntos)
                     </Text>
                   )}
@@ -275,24 +381,6 @@ export default function BarthelScale() {
             return null;
           })}
         </View>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={handleExport}
-          accessible={true}
-          accessibilityLabel="Exportar resultados como PDF"
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonText}>Imprimir/Exportar PDF</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: '#ef4444' }]} 
-          onPress={resetAssessment}
-          accessible={true}
-          accessibilityLabel="Reiniciar cuestionario"
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonText}>Reiniciar Cuestionario</Text>
-        </TouchableOpacity>
       </View>
     );
   }, [answers, calculateTotal, getInterpretation, handleExport, patientData, resetAssessment]);
@@ -310,75 +398,21 @@ export default function BarthelScale() {
               accessibilityLabel="Volver atrás"
               accessibilityRole="button"
             >
-              <ArrowLeft color="#000" size={24} />
+              <ArrowLeft color={colors.text} size={24} />
             </TouchableOpacity>
           ),
         }}
       />
       <SafeAreaView style={styles.container}>
         {currentStep === 'form' && (
-          <ScrollView contentContainerStyle={styles.content}>
-            <View style={styles.formContainer}>
-              <Text style={styles.title}>Datos del Paciente</Text>
-              <View style={styles.inputGroup}>
-                <User size={20} color="#64748b" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre del Paciente"
-                  value={patientData.name}
-                  onChangeText={handlePatientDataChange('name')}
-                  accessibilityLabel="Nombre del paciente"
-                />
-              </View>
-              <View style={styles.inputGroup}>
-                <AlertCircle size={20} color="#64748b" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Edad"
-                  keyboardType="numeric"
-                  value={patientData.age}
-                  onChangeText={handlePatientDataChange('age')}
-                  accessibilityLabel="Edad del paciente"
-                />
-              </View>
-              {/* Campo para seleccionar el género */}
-              <View style={[styles.inputGroup, { flexDirection: 'column', alignItems: 'flex-start' }]}>
-                <Text style={{ marginBottom: 8, fontSize: 16, color: '#0f172a' }}>Género:</Text>
-                <RadioButton.Group
-                  onValueChange={handlePatientDataChange('gender')}
-                  value={patientData.gender}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <RadioButton value="Masculino" />
-                    <Text style={{ fontSize: 16, color: '#0f172a' }}>Masculino</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 20 }}>
-                    <RadioButton value="Femenino" />
-                    <Text style={{ fontSize: 16, color: '#0f172a' }}>Femenino</Text>
-                  </View>
-                </RadioButton.Group>
-              </View>
-              <View style={styles.inputGroup}>
-                <FileText size={20} color="#64748b" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre del Médico/Evaluador"
-                  value={patientData.doctorName}
-                  onChangeText={handlePatientDataChange('doctorName')}
-                  accessibilityLabel="Nombre del médico o evaluador"
-                />
-              </View>
-              <TouchableOpacity
-                style={[styles.button, !validateForm() && styles.buttonDisabled]}
-                disabled={!validateForm()}
-                onPress={() => setCurrentStep('questions')}
-                accessible={true}
-                accessibilityLabel="Comenzar evaluación"
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !validateForm() }}
-              >
-                <Text style={styles.buttonText}>Comenzar Evaluación</Text>
-              </TouchableOpacity>
+          <ScrollView contentContainerStyle={dynamicStyles.content}>
+            <View style={dynamicStyles.formContainer}>
+              <Text style={dynamicStyles.title}>Datos del Paciente</Text>
+              <PatientForm
+                scaleId="barthel"
+                allowSkip
+                onContinue={() => setCurrentStep('questions')}
+              />
             </View>
           </ScrollView>
         )}
@@ -394,19 +428,27 @@ export default function BarthelScale() {
                   {questions[currentQuestion].description}
                 </Text>
                 <RadioButton.Group
-                  onValueChange={(value) =>
-                    handleAnswer(questions[currentQuestion].id, parseInt(value, 10))
-                  }
+                  onValueChange={(value) => {
+                    handleAnswer(questions[currentQuestion].id, parseInt(value, 10));
+                    setTimeout(() => nextQuestion(), 0);
+                  }}
                   value={answers[questions[currentQuestion].id]?.toString()}
                 >
                   {questions[currentQuestion].options.map(option => (
-                    <View key={option.value} style={styles.optionContainer}>
-                      <RadioButton value={option.value.toString()} />
-                      <View style={styles.optionTextContainer}>
-                        <Text style={styles.optionLabel}>{option.label}</Text>
-                        <Text style={styles.optionDescription}>{option.description}</Text>
-                      </View>
-                    </View>
+                    <OptionRow
+                      key={option.value}
+                      value={option.value.toString()}
+                      selectedValue={answers[questions[currentQuestion].id]?.toString()}
+                      label={option.label}
+                      description={option.description}
+                      onSelect={(value) => {
+                        handleAnswer(questions[currentQuestion].id, parseInt(value, 10));
+                        setTimeout(() => nextQuestion(), 0);
+                      }}
+                      containerStyle={styles.optionContainer}
+                      labelStyle={styles.optionLabel}
+                      descriptionStyle={styles.optionDescription}
+                    />
                   ))}
                 </RadioButton.Group>
                 <View style={styles.navigation}>
@@ -422,18 +464,6 @@ export default function BarthelScale() {
                       <Text style={styles.navButtonText}>Anterior</Text>
                     </TouchableOpacity>
                   )}
-                  <TouchableOpacity 
-                    style={styles.navButton} 
-                    onPress={nextQuestion}
-                    accessible={true}
-                    accessibilityLabel={currentQuestion === questions.length - 1 ? "Finalizar evaluación" : "Siguiente pregunta"}
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.navButtonText}>
-                      {currentQuestion === questions.length - 1 ? 'Finalizar' : 'Siguiente'}
-                    </Text>
-                    <ArrowRight color="#fff" size={20} />
-                  </TouchableOpacity>
                 </View>
                 <Text style={styles.progressText}>
                   Pregunta {currentQuestion + 1} de {questions.length}
@@ -446,6 +476,33 @@ export default function BarthelScale() {
         {currentStep === 'results' && (
           <ScrollView contentContainerStyle={styles.content}>
             {ResultsContent}
+            <ResultsActions
+              assessment={{
+                patientData: {
+                  name: patientData.name,
+                  age: patientData.age,
+                  gender: patientData.gender,
+                  doctorName: patientData.doctorName,
+                },
+                score: calculateTotal(),
+                interpretation: getInterpretation(calculateTotal()).result,
+                answers: questions
+                  .filter(q => answers[q.id] !== undefined)
+                  .map(q => {
+                    const val = answers[q.id];
+                    const sel = q.options.find(o => o.value === val);
+                    return {
+                      id: q.id,
+                      question: q.question,
+                      label: sel?.label,
+                      value: val,
+                      points: sel?.value,
+                    };
+                  }),
+              }}
+              scale={{ id: 'barthel', name: 'Escala de Barthel' } as any}
+              containerStyle={{ marginTop: 12 }}
+            />
           </ScrollView>
         )}
       </SafeAreaView>
@@ -453,16 +510,16 @@ export default function BarthelScale() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 20,
   },
   formContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -474,14 +531,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 20,
     textAlign: 'center',
   },
   inputGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: colors.tagBackground,
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 12,
@@ -491,25 +548,25 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     fontSize: 16,
-    color: '#0f172a',
+    color: colors.text,
   },
   button: {
-    backgroundColor: '#0891b2',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#94a3b8',
+    backgroundColor: colors.mutedText,
   },
   buttonText: {
-    color: '#ffffff',
+    color: colors.card,
     fontSize: 16,
     fontWeight: '600',
   },
   questionContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -521,12 +578,12 @@ const styles = StyleSheet.create({
   questionTitle: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 10,
   },
   questionDescription: {
     fontSize: 16,
-    color: '#475569',
+    color: colors.mutedText,
     marginBottom: 15,
   },
   optionContainer: {
@@ -540,11 +597,11 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#0f172a',
+    color: colors.text,
   },
   optionDescription: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
   },
   navigation: {
     flexDirection: 'row',
@@ -554,7 +611,7 @@ const styles = StyleSheet.create({
   },
   navButton: {
     flexDirection: 'row',
-    backgroundColor: '#0891b2',
+    backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -567,10 +624,10 @@ const styles = StyleSheet.create({
   progressText: {
     marginTop: 15,
     textAlign: 'center',
-    color: '#64748b',
+    color: colors.mutedText,
   },
   resultsContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -585,12 +642,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 10,
   },
   resultText: {
     fontSize: 16,
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 5,
   },
   bold: {

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Search as SearchIcon, SlidersHorizontal, X, ChevronRight } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 // Interfaces para mejorar el tipado
 interface Scale {
@@ -73,6 +74,8 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function SearchScreen() {
+  const { colors, isDark } = useThemedStyles();
+  
   // Obtener parámetros de la URL
   const params = useLocalSearchParams();
   const initialQuery = typeof params.q === 'string' ? params.q : '';

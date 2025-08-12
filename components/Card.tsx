@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 interface CardProps extends PressableProps {
   title: string;
@@ -27,6 +28,39 @@ const Card = memo(
     icon,
     ...props 
   }, ref) => {
+    const { colors } = useThemedStyles();
+
+    const dynamicStyles = useMemo(() => StyleSheet.create({
+      card: {
+        backgroundColor: colors.card,
+        borderRadius: 12,
+        padding: 16,
+        marginRight: 12,
+        minWidth: 140,
+        shadowColor: colors.shadowColor,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+        flexDirection: 'row',
+      },
+      title: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: textColor || colors.text,
+        marginBottom: 4,
+      },
+      subtitle: {
+        fontSize: 14,
+        color: textColor || colors.mutedText,
+      },
+      count: {
+        fontSize: 14,
+        color: textColor || colors.mutedText,
+        marginTop: 8,
+      },
+    }), [colors, textColor]);
+
     return (
       <Pressable 
         {...props}
@@ -35,12 +69,11 @@ const Card = memo(
         accessibilityLabel={title}
         accessibilityHint={subtitle}
       >
-        <View ref={ref} style={[styles.card, style]}>
+        <View ref={ref} style={[dynamicStyles.card, style]}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
           <View style={styles.textContainer}>
             <Text style={[
-              styles.title, 
-              textColor ? { color: textColor } : null,
+              dynamicStyles.title, 
               titleStyle
             ]}>
               {title}
@@ -48,8 +81,7 @@ const Card = memo(
             
             {subtitle && (
               <Text style={[
-                styles.subtitle, 
-                textColor ? { color: textColor } : null,
+                dynamicStyles.subtitle, 
                 subtitleStyle
               ]}>
                 {subtitle}
@@ -58,8 +90,7 @@ const Card = memo(
             
             {count !== undefined && (
               <Text style={[
-                styles.count, 
-                textColor ? { color: textColor } : null,
+                dynamicStyles.count, 
                 countStyle
               ]}>
                 {count} escalas
@@ -75,42 +106,11 @@ const Card = memo(
 Card.displayName = 'Card';
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginRight: 12,
-    minWidth: 140,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-    flexDirection: 'row',
-  },
   iconContainer: {
     marginRight: 12,
   },
   textContainer: {
     flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#0f172a',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  count: {
-    fontSize: 14,
-    color: '#64748b',
-    marginTop: 8,
   },
 });
 

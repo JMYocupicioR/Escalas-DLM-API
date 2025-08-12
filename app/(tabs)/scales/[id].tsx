@@ -1,8 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { useScaleStyles } from '@/hooks/useScaleStyles';
+import { useMemo } from 'react';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ScaleDetailsScreen() {
+  const { colors } = useScaleStyles();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { id } = useLocalSearchParams();
 
   return (
@@ -22,9 +26,9 @@ export default function ScaleDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
 });

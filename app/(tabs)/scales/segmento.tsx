@@ -1,5 +1,6 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Platform } from 'react-native';
+import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { SearchWidget } from '@/components/SearchWidget';
@@ -139,6 +140,8 @@ const ImageWithFallback = ({ uri, style, ...props }) => {
 };
 
 export default function BodySegmentScalesScreen() {
+  const { colors } = useScaleStyles();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = useCallback((query: string) => {
@@ -163,7 +166,7 @@ export default function BodySegmentScalesScreen() {
         <Text style={styles.scaleDescription}>{scale.description}</Text>
         <View style={styles.scaleFooter}>
           <View style={styles.timeInfo}>
-            <Clock size={16} color="#64748b" />
+            <Clock size={16} color={colors.mutedText} />
             <Text style={styles.timeText}>{scale.timeToComplete}</Text>
           </View>
           {scale.crossReferences?.length > 0 && (
@@ -177,7 +180,7 @@ export default function BodySegmentScalesScreen() {
           )}
         </View>
       </View>
-      <ArrowRight size={20} color="#64748b" />
+      <ArrowRight size={20} color={colors.mutedText} />
     </TouchableOpacity>
   ));
 
@@ -269,16 +272,16 @@ export default function BodySegmentScalesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.border,
   },
   content: {
     flex: 1,
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
   segmentTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#ffffff',
+    color: colors.card,
   },
   subsection: {
     paddingHorizontal: 16,
@@ -322,13 +325,13 @@ const styles = StyleSheet.create({
   subsectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 12,
   },
   scaleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -348,12 +351,12 @@ const styles = StyleSheet.create({
   scaleName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 4,
   },
   scaleDescription: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
     marginBottom: 8,
   },
   scaleFooter: {
@@ -368,21 +371,21 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
   },
   crossReferences: {
     flexDirection: 'row',
     gap: 8,
   },
   crossRefTag: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: colors.tagBackground,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   crossRefText: {
     fontSize: 12,
-    color: '#0891b2',
+    color: colors.primary,
     fontWeight: '500',
   },
   lastUpdate: {
@@ -391,6 +394,6 @@ const styles = StyleSheet.create({
   },
   lastUpdateText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: colors.mutedText,
   },
 });

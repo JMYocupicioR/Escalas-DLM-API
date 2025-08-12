@@ -32,7 +32,7 @@ export interface SettingsState {
 
 // Valores predeterminados para las configuraciones
 const defaultSettings = {
-  darkMode: false,
+  darkMode: true, // Modo oscuro como predeterminado
   language: 'es' as Language,
   dateFormat: '24h' as DateFormat,
   measurementSystem: 'metric' as MeasurementSystem,

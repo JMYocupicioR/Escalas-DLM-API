@@ -1,16 +1,18 @@
 import { Tabs } from 'expo-router';
 import { Search, Chrome as Home, BookMarked as BookMedical, Star, Settings } from 'lucide-react-native';
+import { useTheme } from '@react-navigation/native';
 
 export default function TabLayout() {
+  const { colors } = useTheme();
   return (
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#e5e5e5',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
         },
-        tabBarActiveTintColor: '#0891b2',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: '#94a3b8',
         headerShown: false,
       }}>
       <Tabs.Screen

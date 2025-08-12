@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { SearchWidget } from '@/components/SearchWidget';
@@ -34,6 +35,8 @@ const SCALES = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function AlphabeticalScalesScreen() {
+  const { colors } = useScaleStyles();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const groupedScales = useMemo(() => {
@@ -106,16 +109,16 @@ export default function AlphabeticalScalesScreen() {
                         <Text style={styles.scaleAcronym}>{scale.acronym}</Text>
                       </View>
                       {scale.popular && (
-                        <Star size={20} color="#eab308" fill="#eab308" />
+                        <Star size={20} color={colors.scoreGood} fill={colors.scoreGood} />
                       )}
                     </View>
                     <Text style={styles.scaleDescription}>{scale.description}</Text>
                     <View style={styles.timeInfo}>
-                      <Clock size={16} color="#64748b" />
+                      <Clock size={16} color={colors.mutedText} />
                       <Text style={styles.timeText}>{scale.timeToComplete}</Text>
                     </View>
                   </View>
-                  <ArrowRight size={20} color="#64748b" />
+                  <ArrowRight size={20} color={colors.mutedText} />
                 </TouchableOpacity>
               ))}
             </View>
@@ -132,24 +135,24 @@ export default function AlphabeticalScalesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.border,
   },
   alphabeticalIndex: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     padding: 8,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.border,
   },
   indexItem: {
     width: 32,
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
   },
   indexText: {
     fontSize: 14,
-    color: '#0891b2',
+    color: colors.primary,
     fontWeight: '500',
   },
   content: {
@@ -173,13 +176,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 16,
   },
   scaleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -205,15 +208,15 @@ const styles = StyleSheet.create({
   scaleName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
   },
   scaleAcronym: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
   },
   scaleDescription: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
     marginBottom: 8,
   },
   timeInfo: {
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.mutedText,
   },
   lastUpdate: {
     padding: 16,
@@ -231,6 +234,6 @@ const styles = StyleSheet.create({
   },
   lastUpdateText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: colors.mutedText,
   },
 });
