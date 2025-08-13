@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Search, Chrome as Home, BookMarked as BookMedical, Star, Settings } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
+import { Calculator } from 'lucide-react-native';
 
 export default function TabLayout() {
   const { colors } = useTheme();
@@ -34,6 +35,13 @@ export default function TabLayout() {
         options={{
           title: 'Scales',
           tabBarIcon: ({ size, color }) => <BookMedical size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="calculators"
+        options={{
+          title: 'Calculators',
+          tabBarIcon: ({ size, color }) => <Calculator size={size} color={color} />,
         }}
       />
       <Tabs.Screen
