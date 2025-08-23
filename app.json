@@ -4,7 +4,7 @@
     "slug": "deepluxmed-escalas",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.svg",
+    "icon": "./assets/images/icon.png",
     "scheme": "deepluxmed",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,11 +14,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.deepluxmed.escalas",
-      "icon": "./assets/images/icon.svg"
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.svg",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#0891b2"
       },
       "package": "com.deepluxmed.escalas"
@@ -26,7 +26,7 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.svg",
+      "favicon": "./assets/images/favicon.png",
       "name": "DeepLuxMed - Escalas Médicas",
       "shortName": "DeepLuxMed",
       "description": "Escalas médicas y calculadoras profesionales",
