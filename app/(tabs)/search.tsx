@@ -1,10 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Search as SearchIcon, SlidersHorizontal, X, ChevronRight } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { AdvancedSearch } from '@/components/AdvancedSearch';
+import { GetScalesParams } from '@/api/scales/types';
+import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 // Interfaces para mejorar el tipado
 interface Scale {
@@ -75,16 +78,21 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function SearchScreen() {
   const { colors, isDark } = useThemedStyles();
+  const router = useRouter();
   
   // Obtener parámetros de la URL
   const params = useLocalSearchParams();
   const initialQuery = typeof params.q === 'string' ? params.q : '';
   const initialFilter = params.filter === 'true';
+  const initialCategory = typeof params.category === 'string' ? params.category : '';
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'all');
   const [sortBy, setSortBy] = useState('popularity');
   const [showFilters, setShowFilters] = useState(initialFilter);
+  const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [scales, setScales] = useState(SCALES);
 
   // Manejar cambios en la búsqueda
   const handleSearch = useCallback((text: string) => {
@@ -111,9 +119,72 @@ export default function SearchScreen() {
     setSearchQuery('');
   }, []);
 
+  // Manejar búsqueda avanzada
+  const handleAdvancedSearch = useCallback(async (params: GetScalesParams) => {
+    setIsLoading(true);
+    
+    try {
+      // TODO: Replace with actual API call
+      // const response = await searchScales(params);
+      // setScales(response.data || []);
+      
+      // Mock search with delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Apply filters to mock data
+      let filteredResults = [...SCALES];
+
+      if (params.query) {
+        const query = params.query.toLowerCase();
+        filteredResults = filteredResults.filter(scale =>
+          scale.name.toLowerCase().includes(query) ||
+          scale.description.toLowerCase().includes(query) ||
+          scale.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+      }
+
+      if (params.category && params.category !== 'all') {
+        filteredResults = filteredResults.filter(scale => 
+          scale.category.toLowerCase() === params.category!.toLowerCase()
+        );
+      }
+
+      // Apply sorting
+      filteredResults.sort((a, b) => {
+        switch (params.sortBy) {
+          case 'name':
+            return params.sortOrder === 'desc' 
+              ? b.name.localeCompare(a.name)
+              : a.name.localeCompare(b.name);
+          case 'popularity':
+            return params.sortOrder === 'desc' 
+              ? b.popularity - a.popularity
+              : a.popularity - b.popularity;
+          default:
+            return 0;
+        }
+      });
+
+      setScales(filteredResults);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Alternar modo de búsqueda
+  const toggleSearchMode = useCallback(() => {
+    setUseAdvancedSearch(prev => !prev);
+  }, []);
+
   // Memoizar los resultados filtrados para evitar recálculos innecesarios
   const filteredScales = useMemo(() => {
-    return SCALES.filter(scale => {
+    if (useAdvancedSearch) {
+      return scales; // Advanced search handles its own filtering
+    }
+    
+    return scales.filter(scale => {
       const matchesSearch = 
         searchQuery === '' || 
         scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -130,7 +201,7 @@ export default function SearchScreen() {
       // Para 'recent', podríamos usar una fecha de actualización si estuviera disponible
       return 0;
     });
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, scales, useAdvancedSearch]);
 
   // Componente para renderizar cada escala
   const renderScaleItem = useCallback(({ item }: { item: Scale }) => (
@@ -176,50 +247,107 @@ export default function SearchScreen() {
     </View>
   ), []);
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <View style={styles.searchContainer}>
-          <SearchIcon size={20} color="#64748b" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search medical scales..."
-            value={searchQuery}
-            onChangeText={handleSearch}
-            placeholderTextColor="#94a3b8"
-            returnKeyType="search"
-            accessibilityLabel="Buscar escalas médicas"
-            accessibilityRole="search"
+  if (useAdvancedSearch) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+        {/* Header with mode toggle */}
+        <ResponsiveContainer>
+          <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+            <View style={styles.modeToggleContainer}>
+              <TouchableOpacity
+                onPress={toggleSearchMode}
+                style={[styles.modeToggle, { backgroundColor: colors.card, borderColor: colors.border }]}
+              >
+                <Text style={[styles.modeToggleText, { color: colors.primary }]}>
+                  ← Búsqueda Simple
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ResponsiveContainer>
+        
+        <ResponsiveContainer>
+          <AdvancedSearch
+            onSearch={handleAdvancedSearch}
+            isLoading={isLoading}
+            initialQuery={initialQuery}
           />
-          {searchQuery ? (
-            <Pressable 
-              onPress={clearSearch}
-              accessibilityLabel="Borrar búsqueda"
-              accessibilityRole="button"
-            >
-              <X size={20} color="#64748b" />
-            </Pressable>
-          ) : null}
-        </View>
+        </ResponsiveContainer>
+        
+        {/* Results */}
+        <ResponsiveContainer>
+          <FlatList
+            data={filteredScales}
+            renderItem={renderScaleItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.resultsGrid}
+            ListEmptyComponent={EmptyResultsComponent}
+            initialNumToRender={5}
+            maxToRenderPerBatch={3}
+            windowSize={5}
+          />
+        </ResponsiveContainer>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <ResponsiveContainer>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+          <View style={[styles.searchContainer, { backgroundColor: colors.card }]}>
+            <SearchIcon size={20} color={colors.textSecondary} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.text }]}
+              placeholder="Search medical scales..."
+              placeholderTextColor={colors.textSecondary}
+              value={searchQuery}
+              onChangeText={handleSearch}
+              returnKeyType="search"
+              accessibilityLabel="Buscar escalas médicas"
+              accessibilityRole="search"
+            />
+            {searchQuery ? (
+              <Pressable 
+                onPress={clearSearch}
+                accessibilityLabel="Borrar búsqueda"
+                accessibilityRole="button"
+              >
+                <X size={20} color={colors.textSecondary} />
+              </Pressable>
+            ) : null}
+          </View>
+        
+        <TouchableOpacity
+          onPress={toggleSearchMode}
+          style={[styles.advancedButton, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
+        >
+          <Text style={[styles.advancedButtonText, { color: colors.primary }]}> 
+            Avanzada
+          </Text>
+        </TouchableOpacity>
+        
         <Pressable 
-          style={styles.filterButton} 
+          style={[styles.filterButton, { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border }]} 
           onPress={toggleFilters}
           accessible={true}
           accessibilityLabel={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
           accessibilityRole="button"
         >
-          <SlidersHorizontal size={20} color="#64748b" />
+          <SlidersHorizontal size={20} color={colors.textSecondary} />
         </Pressable>
-      </View>
+        </View>
+      </ResponsiveContainer>
 
       {showFilters && (
-        <Animated.View 
-          entering={FadeIn}
-          exiting={FadeOut}
-          layout={Layout}
-          style={styles.filtersContainer}
-        >
-          <Text style={styles.filterTitle}>Categories</Text>
+        <ResponsiveContainer>
+          <Animated.View 
+            entering={FadeIn}
+            exiting={FadeOut}
+            layout={Layout}
+            style={[styles.filtersContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
+          >
+            <Text style={[styles.filterTitle, { color: colors.text }]}>Categories</Text>
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -250,7 +378,7 @@ export default function SearchScreen() {
             )}
           />
 
-          <Text style={styles.filterTitle}>Sort By</Text>
+          <Text style={[styles.filterTitle, { color: colors.text }]}>Sort By</Text>
           <View style={styles.sortOptions}>
             {SORT_OPTIONS.map(option => (
               <Pressable
@@ -276,19 +404,22 @@ export default function SearchScreen() {
               </Pressable>
             ))}
           </View>
-        </Animated.View>
+          </Animated.View>
+        </ResponsiveContainer>
       )}
 
-      <FlatList
-        data={filteredScales}
-        renderItem={renderScaleItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.resultsGrid}
-        ListEmptyComponent={EmptyResultsComponent}
-        initialNumToRender={5}
-        maxToRenderPerBatch={3}
-        windowSize={5}
-      />
+      <ResponsiveContainer>
+        <FlatList
+          data={filteredScales}
+          renderItem={renderScaleItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.resultsGrid}
+          ListEmptyComponent={EmptyResultsComponent}
+          initialNumToRender={5}
+          maxToRenderPerBatch={3}
+          windowSize={5}
+        />
+      </ResponsiveContainer>
     </SafeAreaView>
   );
 }
@@ -296,15 +427,36 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
   },
   header: {
     flexDirection: 'row',
     padding: 16,
     gap: 12,
-    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    alignItems: 'center',
+  },
+  modeToggleContainer: {
+    flex: 1,
+  },
+  modeToggle: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  modeToggleText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  advancedButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  advancedButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   searchContainer: {
     flex: 1,

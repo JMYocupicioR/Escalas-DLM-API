@@ -2,6 +2,7 @@
 // Exporta solo funciones relacionadas con escalas y exportación
 export * from './scales';
 export * from './export/pdf';
+export * from './export/types';
 export * from './localAssessments';
 
 // Exporta configuraciones para uso en configuración del provider

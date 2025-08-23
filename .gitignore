@@ -1,34 +1,30 @@
-# dependencies
+# Node.js
 node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
 
-# expo
+# Expo
 .expo/
 dist/
-web-build/
-expo-env.d.ts
-
-# native
-*.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
 
-# metro
-.metro-health-check*
+# Environment variables
+.env
 
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# macos
+# Operating System files
 .DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
+Thumbs.db

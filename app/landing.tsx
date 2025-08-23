@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet, Dimensions, Animated } from 'react-n
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Stethoscope, ArrowRight, Shield, Clock, CheckCircle, Activity } from 'lucide-react-native';
+import { ArrowRight, Shield, Clock, CheckCircle } from 'lucide-react-native';
+import { AppIcon } from '@/components/AppIcon';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,11 +39,9 @@ export default function LandingPage() {
       {/* Header with logo */}
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <View style={styles.logoIconContainer}>
-            <Stethoscope color="#0891b2" size={32} strokeWidth={2} />
-            <Activity color="#0891b2" size={16} strokeWidth={2} style={styles.activityIcon} />
-          </View>
-          <Text style={styles.logoText}>Escalas DLM</Text>
+          <AppIcon size={48} />
+          <Text style={styles.logoText}>DeepLuxMed</Text>
+          <Text style={styles.logoSubtext}>Escalas</Text>
         </View>
       </View>
 
@@ -135,25 +134,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  logoIconContainer: {
-    position: 'relative',
-  },
-  activityIcon: {
-    position: 'absolute',
-    top: -4,
-    right: -8,
-    opacity: 0.7,
-  },
   logoText: {
     fontSize: 24,
     fontWeight: '700',
     color: '#f8fafc',
   },
+  logoSubtext: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#94a3b8',
+    marginLeft: -8,
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: width > 600 ? 48 : 24,
-    maxWidth: 600,
+    maxWidth: 720,
     alignSelf: 'center',
     width: '100%',
   },
@@ -162,11 +158,11 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   title: {
-    fontSize: width > 400 ? 42 : 36,
+    fontSize: width > 400 ? 48 : 36,
     fontWeight: '800',
     color: '#f8fafc',
     textAlign: 'center',
-    lineHeight: width > 400 ? 48 : 42,
+    lineHeight: width > 400 ? 56 : 42,
   },
   titleAccent: {
     color: '#0891b2',

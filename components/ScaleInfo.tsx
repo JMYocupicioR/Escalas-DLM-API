@@ -107,24 +107,24 @@ export const ScaleInfo: React.FC<Props> = ({ info }) => {
 
 const createStyles = (colors: any) => StyleSheet.create({
 	container: {
-		gap: 8,
-		padding: 16,
+		gap: 12,
+		padding: 20,
 		backgroundColor: colors.sectionBackground,
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: colors.border,
 	},
 	title: {
-		fontSize: 18,
-		fontWeight: '700',
+		fontSize: 22,
+		fontWeight: '800',
 		color: colors.text,
 	},
 	description: {
-		fontSize: 14,
+		fontSize: 15,
 		color: colors.mutedText,
 	},
 	section: {
-		marginTop: 8,
+		marginTop: 12,
 		backgroundColor: colors.card,
 		borderRadius: 10,
 		borderWidth: 1,
@@ -134,12 +134,14 @@ const createStyles = (colors: any) => StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingHorizontal: 12,
-		paddingVertical: 10,
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.border,
 	},
 	sectionTitle: {
-		fontSize: 16,
-		fontWeight: '600',
+		fontSize: 17,
+		fontWeight: '700',
 		color: colors.text,
 	},
 	toggle: {
@@ -148,36 +150,36 @@ const createStyles = (colors: any) => StyleSheet.create({
 		fontWeight: '600',
 	},
 	sectionBody: {
-		paddingHorizontal: 12,
-		paddingBottom: 10,
+		paddingHorizontal: 16,
+		paddingBottom: 12,
 		gap: 6,
 	},
 	block: {
-		marginTop: 6,
+		marginTop: 8,
 	},
 	blockTitle: {
-		fontSize: 15,
+		fontSize: 16,
 		fontWeight: '600',
 		color: colors.text,
 		marginBottom: 4,
 	},
 	paragraph: {
-		fontSize: 14,
-		lineHeight: 20,
+		fontSize: 15,
+		lineHeight: 22,
 		color: colors.text,
 	},
 	referenceRow: {
-		marginTop: 4,
+		marginTop: 6,
 	},
 	referenceText: {
-		fontSize: 13,
+		fontSize: 14,
 		color: colors.text,
 	},
 	link: {
-		fontSize: 13,
+		fontSize: 14,
 		color: colors.primary,
 	},
-	foot: {
+	footer: {
 		marginTop: 8,
 		fontSize: 12,
 		color: colors.mutedText,

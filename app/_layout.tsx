@@ -13,9 +13,6 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { useSettingsStore } from '@/store/settingsStore';
 import { navigationDarkTheme, navigationLightTheme, paperDarkTheme, paperLightTheme } from '@/app/theme';
 
-// Verificamos si estamos en un entorno de desarrollo para mostrar contenido de depuración
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 export default function RootLayout() {
   useFrameworkReady();
   
@@ -50,6 +47,7 @@ export default function RootLayout() {
             <ThemeProvider value={navTheme}>
               <BottomSheetModalProvider>
                 <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
                 </Stack>
                 <StatusBar style={darkModeEnabled ? 'light' : 'dark'} />

@@ -695,6 +695,25 @@ describe('Nueva Escala', () => {
 - [ ] **API GraphQL** para queries más eficientes
 - [ ] **Dashboard web** para administradores
 - [ ] **Exportación PDF** mejorada con plantillas personalizables
+  - Servicio backend opcional con Puppeteer en `server/pdf-service`
+  - Variable `EXPO_PUBLIC_PDF_SERVICE_URL` para apuntar al servicio
+  - Fallback local con `expo-print` si el backend no está disponible
+
+### Servicio de PDF (opcional/recomendado)
+
+1) Instalar dependencias y correr localmente:
+
+```bash
+cd server/pdf-service && npm install && npm run dev
+```
+
+2) Configurar URL pública/accesible desde la app:
+
+```
+EXPO_PUBLIC_PDF_SERVICE_URL=http://localhost:8787
+```
+
+3) En producción, desplegar el microservicio (Docker/VM). Requiere Chrome/Chromium accesible (Puppeteer instala uno por defecto). Asegura flags `--no-sandbox` si usas contenedores.
 - [ ] **Notificaciones push** para recordatorios de evaluación
 
 ### **Versión 2.2.0** (Q3 2024)

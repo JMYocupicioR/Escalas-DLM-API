@@ -7,6 +7,8 @@ import { SearchWidget } from '@/components/SearchWidget';
 import { ListStart, Clock, ArrowRight, Star } from 'lucide-react-native';
 import { useScalesStore } from '@/store/scales';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { ResponsiveContainer } from '@/components/ResponsiveContainer';
+import { HeaderLogo } from '@/components/AppLogo';
 
 export default function ScalesIndexScreen() {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -51,11 +53,16 @@ export default function ScalesIndexScreen() {
       flex: 1,
       backgroundColor: colors.background,
     },
-    searchContainer: {
-      padding: 16,
+    headerContainer: {
       backgroundColor: colors.card,
+      paddingTop: 8,
+      paddingBottom: 16,
+      paddingHorizontal: 16,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
+    },
+    searchContainer: {
+      paddingTop: 16,
     },
     categoryItem: {
       width: '48%',
@@ -271,18 +278,22 @@ export default function ScalesIndexScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Escalas Médicas',
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
       <SafeAreaView style={themedStyles.container} edges={['bottom']}>
-        <View style={themedStyles.searchContainer}>
-          <SearchWidget
-            placeholder="Buscar escalas médicas..."
-            onSearch={() => {}}
-          />
-        </View>
+        <ResponsiveContainer>
+          <View style={themedStyles.headerContainer}>
+            <HeaderLogo size="medium" />
+            <View style={themedStyles.searchContainer}>
+              <SearchWidget
+                placeholder="Buscar escalas médicas..."
+                onSearch={() => {}}
+              />
+            </View>
+          </View>
+        </ResponsiveContainer>
 
         <ScrollView 
           style={styles.scrollView}
@@ -290,122 +301,128 @@ export default function ScalesIndexScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Categorías de navegación */}
-          <View style={styles.gridContainer}>
-            {categories.map(category => (
-              <TouchableOpacity
-                key={category.id}
-                style={themedStyles.categoryItem}
-                onPress={() => router.push(category.route)}
-                accessibilityLabel={`Categoría ${category.title}`}
-                accessibilityHint={category.description}
-                accessibilityRole="button"
-              >
-                <View style={themedStyles.categoryIconContainer}>
-                  {category.icon}
-                </View>
-                <Text style={themedStyles.categoryTitle}>{category.title}</Text>
-                <Text style={themedStyles.categoryDescription} numberOfLines={1}>
-                  {category.description}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ResponsiveContainer>
+            <View style={styles.gridContainer}>
+              {categories.map(category => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={themedStyles.categoryItem}
+                  onPress={() => router.push(category.route)}
+                  accessibilityLabel={`Categoría ${category.title}`}
+                  accessibilityHint={category.description}
+                  accessibilityRole="button"
+                >
+                  <View style={themedStyles.categoryIconContainer}>
+                    {category.icon}
+                  </View>
+                  <Text style={themedStyles.categoryTitle}>{category.title}</Text>
+                  <Text style={themedStyles.categoryDescription} numberOfLines={1}>
+                    {category.description}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ResponsiveContainer>
 
           {/* Sección de escalas recientes */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={themedStyles.sectionTitle}>Escalas Recientes</Text>
-              <TouchableOpacity 
-                onPress={() => router.push('/scales/recent')}
-                accessibilityLabel="Ver todas las escalas recientes"
-                accessibilityRole="button"
+          <ResponsiveContainer>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={themedStyles.sectionTitle}>Escalas Recientes</Text>
+                <TouchableOpacity 
+                  onPress={() => router.push('/scales/recent')}
+                  accessibilityLabel="Ver todas las escalas recientes"
+                  accessibilityRole="button"
+                >
+                  <Text style={themedStyles.seeAllText}>Ver todas</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.recentScrollContent}
               >
-                <Text style={themedStyles.seeAllText}>Ver todas</Text>
-              </TouchableOpacity>
+                {recentScales.map(scale => (
+                  <TouchableOpacity
+                    key={scale.id}
+                    style={themedStyles.scaleCard}
+                    onPress={() => {
+                      addRecentlyViewed(scale.id);
+                      router.push(`/scales/${scale.id}`);
+                    }}
+                    accessibilityLabel={`Escala ${scale.name}`}
+                    accessibilityHint={scale.description}
+                    accessibilityRole="button"
+                  >
+                    <View style={styles.scaleCardContent}>
+                      <View style={styles.scaleHeader}>
+                        <Text style={themedStyles.scaleTitle}>{scale.name}</Text>
+                        {scale.popular && (
+                          <View style={styles.popularBadge}>
+                            <Star size={12} color={colors.card} fill={colors.card} />
+                          </View>
+                        )}
+                      </View>
+                      <Text style={themedStyles.scaleSubtitle}>{scale.acronym}</Text>
+                      <Text style={themedStyles.scaleDescription} numberOfLines={2}>
+                        {scale.description}
+                      </Text>
+                      <View style={styles.scaleFooter}>
+                        <View style={styles.timeInfo}>
+                          <Clock size={12} color={colors.mutedText} />
+                          <Text style={styles.timeText}>{scale.timeToComplete}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
-            
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.recentScrollContent}
-            >
-              {recentScales.map(scale => (
+          </ResponsiveContainer>
+
+          {/* Sección destacada - Barthel */}
+          <ResponsiveContainer>
+            {renderFeaturedScaleSection()}
+          </ResponsiveContainer>
+
+          {/* Escalas populares */}
+          <ResponsiveContainer>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Escalas Populares</Text>
+                <TouchableOpacity onPress={() => router.push('/scales/alfabetico')}>
+                  <Text style={styles.seeAllText}>Ver todas</Text>
+                </TouchableOpacity>
+              </View>
+              {popularScales.map(scale => (
                 <TouchableOpacity
                   key={scale.id}
-                  style={themedStyles.scaleCard}
+                  style={styles.popularScaleCard}
                   onPress={() => {
                     addRecentlyViewed(scale.id);
                     router.push(`/scales/${scale.id}`);
                   }}
-                  accessibilityLabel={`Escala ${scale.name}`}
-                  accessibilityHint={scale.description}
-                  accessibilityRole="button"
                 >
-                  <View style={styles.scaleCardContent}>
-                    <View style={styles.scaleHeader}>
-                      <Text style={themedStyles.scaleTitle}>{scale.name}</Text>
-                      {scale.popular && (
-                <View style={styles.popularBadge}>
-                  <Star size={12} color={colors.card} fill={colors.card} />
-                        </View>
-                      )}
+                  <View style={styles.popularScaleContent}>
+                    <View>
+                      <Text style={styles.popularScaleTitle}>{scale.name}</Text>
+                      <Text style={styles.popularScaleDescription}>{scale.description}</Text>
                     </View>
-                    <Text style={themedStyles.scaleSubtitle}>{scale.acronym}</Text>
-                    <Text style={themedStyles.scaleDescription} numberOfLines={2}>
-                      {scale.description}
-                    </Text>
-                    <View style={styles.scaleFooter}>
+                    <View style={styles.popularScaleFooter}>
+                      <View style={styles.categoryBadge}>
+                        <Text style={styles.categoryBadgeText}>{scale.category}</Text>
+                      </View>
                       <View style={styles.timeInfo}>
                         <Clock size={12} color={colors.mutedText} />
                         <Text style={styles.timeText}>{scale.timeToComplete}</Text>
                       </View>
                     </View>
                   </View>
+                  <ArrowRight size={20} color={colors.mutedText} />
                 </TouchableOpacity>
               ))}
-            </ScrollView>
-          </View>
-
-          {/* Sección destacada - Barthel */}
-          {renderFeaturedScaleSection()}
-
-          {/* Sección de escalas populares */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Escalas Populares</Text>
-              <TouchableOpacity onPress={() => router.push('/scales/alfabetico')}>
-                <Text style={styles.seeAllText}>Ver todas</Text>
-              </TouchableOpacity>
             </View>
-            
-            {popularScales.map(scale => (
-              <TouchableOpacity
-                key={scale.id}
-                style={styles.popularScaleCard}
-                onPress={() => {
-                  addRecentlyViewed(scale.id);
-                  router.push(`/scales/${scale.id}`);
-                }}
-              >
-                <View style={styles.popularScaleContent}>
-                  <View>
-                    <Text style={styles.popularScaleTitle}>{scale.name}</Text>
-                    <Text style={styles.popularScaleDescription}>{scale.description}</Text>
-                  </View>
-                  <View style={styles.popularScaleFooter}>
-                    <View style={styles.categoryBadge}>
-                      <Text style={styles.categoryBadgeText}>{scale.category}</Text>
-                    </View>
-                    <View style={styles.timeInfo}>
-                      <Clock size={12} color={colors.mutedText} />
-                      <Text style={styles.timeText}>{scale.timeToComplete}</Text>
-                    </View>
-                  </View>
-                </View>
-                <ArrowRight size={20} color={colors.mutedText} />
-              </TouchableOpacity>
-            ))}
-          </View>
+          </ResponsiveContainer>
         </ScrollView>
       </SafeAreaView>
     </>

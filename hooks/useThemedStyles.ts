@@ -1,63 +1,104 @@
 import { useMemo } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
-import { palette } from '@/app/theme';
+import { palette, getThemeColors, medicalColors } from '@/app/theme';
+import { Appearance } from 'react-native';
 
 export const useThemedStyles = () => {
-  const darkMode = useSettingsStore((s) => s.darkMode);
+  const { darkMode, themeMode, contrastLevel, fontSize } = useSettingsStore((s) => ({
+    darkMode: s.darkMode,
+    themeMode: s.themeMode,
+    contrastLevel: s.contrastLevel,
+    fontSize: s.fontSize,
+  }));
+  
+  const systemColorScheme = Appearance.getColorScheme();
+  
+  // Determinar el modo efectivo considerando el sistema
+  const effectiveDarkMode = useMemo(() => {
+    if (themeMode === 'system') {
+      return systemColorScheme === 'dark';
+    }
+    return themeMode === 'dark' || darkMode; // fallback to darkMode for compatibility
+  }, [themeMode, darkMode, systemColorScheme]);
+  
+  const isHighContrast = contrastLevel === 'high';
+  const baseTheme = getThemeColors(effectiveDarkMode, isHighContrast);
+  
+  // Factores de tamaño de fuente
+  const fontSizeMultiplier = useMemo(() => {
+    switch (fontSize) {
+      case 'small': return 0.875;
+      case 'large': return 1.125;
+      case 'xlarge': return 1.25;
+      default: return 1;
+    }
+  }, [fontSize]);
   
   const colors = useMemo(() => ({
-    // Colores base del sistema
-    background: darkMode ? palette.dark.background : palette.light.background,
-    card: darkMode ? palette.dark.card : palette.light.card,
-    text: darkMode ? palette.dark.text : palette.light.text,
-    mutedText: darkMode ? palette.dark.mutedText : palette.light.mutedText,
-    border: darkMode ? palette.dark.border : palette.light.border,
+    // Colores base del tema con soporte para alto contraste
+    ...baseTheme,
     primary: palette.primary,
     
     // Colores extendidos para interfaces complejas
-    iconBackground: darkMode ? '#0f172a' : '#f8fafc',
-    searchBackground: darkMode ? '#1e293b' : '#ffffff',
-    shadowColor: '#000',
+    iconBackground: baseTheme.background,
+    searchBackground: baseTheme.card,
+    shadowColor: effectiveDarkMode ? '#000' : '#00000020',
     
-    // Colores específicos para escalas y formularios
-    inputBackground: darkMode ? '#1e293b' : '#ffffff',
-    inputBorder: darkMode ? '#334155' : '#e2e8f0',
-    sectionBackground: darkMode ? '#1e293b' : '#ffffff',
-    headerBackground: darkMode ? '#111827' : '#f8fafc',
+    // Colores específicos para escalas y formularios  
+    inputBackground: baseTheme.surface || baseTheme.card,
+    inputBorder: baseTheme.border,
+    sectionBackground: baseTheme.surface || baseTheme.card,
+    headerBackground: baseTheme.background,
     
-    // Estados de botones y elementos interactivos
+    // Estados de botones con contraste mejorado
     buttonPrimary: palette.primary,
     buttonPrimaryText: '#ffffff',
-    buttonSecondary: darkMode ? '#374151' : '#f1f5f9',
-    buttonSecondaryText: darkMode ? '#f8fafc' : '#0f172a',
-    buttonDanger: '#ef4444',
-    buttonSuccess: '#22c55e',
+    buttonSecondary: baseTheme.surfaceVariant || (effectiveDarkMode ? '#374151' : '#f1f5f9'),
+    buttonSecondaryText: baseTheme.onSurfaceVariant || baseTheme.text,
+    buttonDanger: isHighContrast ? (effectiveDarkMode ? '#ff6b6b' : '#dc2626') : '#ef4444',
+    buttonSuccess: isHighContrast ? (effectiveDarkMode ? '#51cf66' : '#16a34a') : '#22c55e',
     
-    // Colores de estado
-    success: '#22c55e',
-    warning: '#eab308',
-    error: '#ef4444',
-    info: '#3b82f6',
+    // Colores de estado con mejor contraste
+    success: medicalColors.good,
+    warning: medicalColors.warning,
+    error: medicalColors.critical,
+    info: palette.primary,
     
     // Colores para badges y tags
-    tagBackground: darkMode ? '#0f172a' : '#f1f5f9',
-    tagText: darkMode ? '#94a3b8' : '#64748b',
+    tagBackground: baseTheme.surfaceVariant || baseTheme.surface || baseTheme.card,
+    tagText: baseTheme.onSurfaceVariant || baseTheme.mutedText,
     
-    // Colores específicos para contenido médico
-    scoreLow: '#ef4444',      // Rojo para puntuaciones bajas/preocupantes
-    scoreMedium: '#f97316',   // Naranja para puntuaciones medias
-    scoreGood: '#eab308',     // Amarillo para puntuaciones buenas
-    scoreExcellent: '#22c55e', // Verde para puntuaciones excelentes
-    scoreOptimal: '#15803d',  // Verde oscuro para puntuaciones óptimas
+    // Colores médicos mejorados para accesibilidad
+    scoreLow: medicalColors.critical,
+    scoreMedium: medicalColors.warning,
+    scoreGood: medicalColors.caution,
+    scoreExcellent: medicalColors.good,
+    scoreOptimal: medicalColors.excellent,
+    
+    // Colores específicos por especialidad médica
+    cardio: medicalColors.cardio,
+    neuro: medicalColors.neuro,
+    ortho: medicalColors.ortho,
+    psych: medicalColors.psych,
+    general: medicalColors.general,
     
     // Colores para elementos específicos
-    iconMuted: darkMode ? '#64748b' : '#94a3b8',
+    iconMuted: baseTheme.mutedText,
     linkText: palette.primary,
-    placeholderText: darkMode ? '#64748b' : '#94a3b8',
-  }), [darkMode]);
+    placeholderText: baseTheme.mutedText,
+    
+    // Indicadores de contraste
+    isHighContrast,
+    contrastLevel,
+  }), [effectiveDarkMode, baseTheme, isHighContrast, contrastLevel]);
 
   return {
     colors,
-    isDark: darkMode,
+    isDark: effectiveDarkMode,
+    isHighContrast,
+    fontSizeMultiplier,
+    themeMode,
+    contrastLevel,
+    fontSize,
   };
 };

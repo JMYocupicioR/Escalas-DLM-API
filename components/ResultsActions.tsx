@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
-import { exportAssessmentPDF, GenericAssessmentForPDF } from '@/api/export/pdf';
+import { exportAssessmentPDF } from '@/api/export/pdf';
+import { GenericAssessmentForPDF } from '@/api/export/types';
+import { exportAssessmentServerPDF } from '@/api/export/server';
 import { Scale } from '@/types/scale';
 
 interface ResultsActionsProps {
@@ -18,7 +20,8 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors.buttonSecondary }]}
         onPress={async () => {
-          await exportAssessmentPDF(assessment, scale as Scale, { 
+          // Primero intentamos vía backend (Puppeteer) para máxima consistencia.
+          const ok = await exportAssessmentServerPDF(assessment, scale as Scale, {
             theme: isDark ? 'dark' : 'light',
             preset: 'compact',
             scale: 0.85,
@@ -26,6 +29,17 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
             headerSubtitle: scale.name,
             showPatientSummary: true,
           });
+          if (!ok) {
+            // Fallback local con expo-print
+            await exportAssessmentPDF(assessment, scale as Scale, {
+              theme: isDark ? 'dark' : 'light',
+              preset: 'compact',
+              scale: 0.85,
+              headerTitle: 'Informe de Resultados',
+              headerSubtitle: scale.name,
+              showPatientSummary: true,
+            });
+          }
         }}
         accessibilityLabel="Exportar resultados como PDF"
         accessibilityRole="button"

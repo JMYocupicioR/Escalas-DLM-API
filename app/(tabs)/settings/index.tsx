@@ -2,24 +2,78 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Platform 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { useMemo } from 'react';
-import { Globe as Globe2, Moon, Bell, Clock, Ruler, ChevronRight, Info, FileText, Shield, MessageSquareText, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { 
+  Globe as Globe2, 
+  Moon, 
+  Bell, 
+  Clock, 
+  Ruler, 
+  ChevronRight, 
+  Info, 
+  FileText, 
+  Shield, 
+  MessageSquareText, 
+  CircleHelp as HelpCircle,
+  Eye,
+  Type,
+  Palette,
+  Accessibility,
+  Settings,
+  User,
+  Database,
+  Zap
+} from 'lucide-react-native';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { HeaderLogo } from '@/components/AppLogo';
 
 export default function SettingsScreen() {
-  const darkMode = useSettingsStore((s) => s.darkMode);
-  const toggleDarkMode = useSettingsStore((s) => s.toggleDarkMode);
-  const notifications = useSettingsStore((s) => s.notifications);
-  const toggleNotifications = useSettingsStore((s) => s.toggleNotifications);
+  const { colors, isDark, themeMode, contrastLevel, fontSize } = useThemedStyles();
+  
+  // Configuraciones del store
+  const {
+    darkMode,
+    notifications,
+    themeMode: currentTheme,
+    contrastLevel: currentContrast,
+    fontSize: currentFontSize,
+    autoAdvanceQuestions,
+    showDetailedScores,
+    enableHapticFeedback,
+    reduceMotion,
+    analyticsEnabled,
+    language,
+    dateFormat,
+    measurementSystem,
+    // Acciones
+    toggleDarkMode,
+    toggleNotifications,
+    setThemeMode,
+    setContrastLevel,
+    setFontSize,
+    toggleAutoAdvance,
+    toggleDetailedScores,
+    toggleHapticFeedback,
+    toggleReduceMotion,
+    toggleAnalytics,
+  } = useSettingsStore();
 
   const themedStyles = useMemo(() => {
-    const isDark = darkMode;
     return StyleSheet.create({
       container: {
         flex: 1,
-        backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+        backgroundColor: colors.background,
       },
       content: {
         flex: 1,
+      },
+      headerContainer: {
+        backgroundColor: colors.card,
+        paddingTop: 8,
+        paddingBottom: 12,
+        paddingHorizontal: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
       },
       section: {
         marginTop: 24,
@@ -28,63 +82,126 @@ export default function SettingsScreen() {
       sectionTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: isDark ? '#94a3b8' : '#64748b',
+        color: colors.mutedText,
         textTransform: 'uppercase',
         marginBottom: 8,
+        letterSpacing: 0.5,
       },
       sectionContent: {
-        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        backgroundColor: colors.card,
         borderRadius: 16,
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor: colors.shadowColor,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
+        borderWidth: colors.isHighContrast ? 1 : 0,
+        borderColor: colors.border,
       },
       settingItem: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? '#334155' : '#f1f5f9',
+        borderBottomColor: colors.border,
+        minHeight: 72,
+      },
+      settingItemLast: {
+        borderBottomWidth: 0,
       },
       settingIcon: {
         width: 40,
         height: 40,
         borderRadius: 10,
-        backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+        backgroundColor: colors.iconBackground,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+        borderWidth: colors.isHighContrast ? 1 : 0,
+        borderColor: colors.border,
       },
-      settingContent: { flex: 1 },
-      settingTitle: { fontSize: 16, color: isDark ? '#f8fafc' : '#0f172a', marginBottom: 2 },
-      settingValue: { fontSize: 14, color: isDark ? '#94a3b8' : '#64748b' },
-      footer: { marginTop: 32, marginBottom: 24, alignItems: 'center', paddingHorizontal: 16 },
-      footerText: { fontSize: 14, color: isDark ? '#94a3b8' : '#64748b', marginBottom: 4 },
-      footerVersion: { fontSize: 12, color: isDark ? '#64748b' : '#94a3b8' },
+      settingContent: { 
+        flex: 1,
+        justifyContent: 'center',
+      },
+      settingTitle: { 
+        fontSize: 16, 
+        color: colors.text, 
+        marginBottom: 2,
+        fontWeight: '500',
+      },
+      settingValue: { 
+        fontSize: 14, 
+        color: colors.mutedText,
+        marginTop: 2,
+      },
+      switchContainer: {
+        marginLeft: 8,
+      },
+      footer: { 
+        marginTop: 32, 
+        marginBottom: 24, 
+        alignItems: 'center', 
+        paddingHorizontal: 16 
+      },
+      footerText: { 
+        fontSize: 14, 
+        color: colors.mutedText, 
+        marginBottom: 4,
+        textAlign: 'center',
+      },
+      footerVersion: { 
+        fontSize: 12, 
+        color: colors.mutedText,
+        opacity: 0.8,
+      },
     });
-  }, [darkMode]);
+  }, [colors]);
 
-  const SettingItem = ({ icon: Icon, title, value, onPress, showToggle, isToggled, showChevron = true }) => (
-    <TouchableOpacity style={themedStyles.settingItem} onPress={onPress}>
+  const SettingItem = ({ 
+    icon: Icon, 
+    title, 
+    value, 
+    onPress, 
+    showToggle, 
+    isToggled, 
+    showChevron = true,
+    isLast = false,
+    description
+  }) => (
+    <TouchableOpacity 
+      style={[themedStyles.settingItem, isLast && themedStyles.settingItemLast]} 
+      onPress={onPress}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={description}
+      accessibilityState={showToggle ? { checked: isToggled } : undefined}
+    >
       <View style={themedStyles.settingIcon}>
-        <Icon size={22} color={darkMode ? "#94a3b8" : "#64748b"} />
+        <Icon size={22} color={colors.iconMuted} />
       </View>
       <View style={themedStyles.settingContent}>
         <Text style={themedStyles.settingTitle}>{title}</Text>
         {value && <Text style={themedStyles.settingValue}>{value}</Text>}
+        {description && !value && <Text style={themedStyles.settingValue}>{description}</Text>}
       </View>
       {showToggle ? (
-        <Switch
-          value={isToggled}
-          onValueChange={onPress}
-          trackColor={{ false: '#cbd5e1', true: '#0891b2' }}
-          thumbColor={Platform.OS === 'ios' ? '#ffffff' : isToggled ? '#ffffff' : '#f1f5f9'}
-        />
+        <View style={themedStyles.switchContainer}>
+          <Switch
+            value={isToggled}
+            onValueChange={onPress}
+            trackColor={{ 
+              false: colors.border, 
+              true: colors.primary 
+            }}
+            thumbColor={Platform.OS === 'ios' ? '#ffffff' : isToggled ? '#ffffff' : colors.card}
+            accessibilityLabel={title}
+          />
+        </View>
       ) : showChevron ? (
-        <ChevronRight size={20} color={darkMode ? "#64748b" : "#94a3b8"} />
+        <ChevronRight size={20} color={colors.iconMuted} />
       ) : null}
     </TouchableOpacity>
   );
@@ -93,72 +210,203 @@ export default function SettingsScreen() {
     router.push(`/settings/${page}`);
   };
 
+  const getThemeDisplayName = (mode) => {
+    switch (mode) {
+      case 'light': return 'Claro';
+      case 'dark': return 'Oscuro';
+      case 'system': return 'Sistema';
+      default: return 'Sistema';
+    }
+  };
+
+  const getContrastDisplayName = (level) => {
+    switch (level) {
+      case 'high': return 'Alto contraste';
+      case 'normal': return 'Normal';
+      default: return 'Normal';
+    }
+  };
+
+  const getFontSizeDisplayName = (size) => {
+    switch (size) {
+      case 'small': return 'Pequeño';
+      case 'normal': return 'Normal';
+      case 'large': return 'Grande';
+      case 'xlarge': return 'Muy grande';
+      default: return 'Normal';
+    }
+  };
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Ajustes',
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <SafeAreaView style={themedStyles.container} edges={['bottom']}>
+        <View style={themedStyles.headerContainer}>
+          <HeaderLogo size="small" />
+        </View>
         <ScrollView style={themedStyles.content}>
+          
+          {/* Apariencia */}
           <View style={themedStyles.section}>
-            <Text style={themedStyles.sectionTitle}>Preferencias de Usuario</Text>
+            <Text style={themedStyles.sectionTitle}>Apariencia</Text>
             <View style={themedStyles.sectionContent}>
               <SettingItem
-                icon={Globe2}
-                title="Idioma"
-                value="Español"
-                onPress={() => navigateToSubpage('language')}
-              />
-              <SettingItem
                 icon={Moon}
-                title="Tema Oscuro"
+                title="Modo oscuro"
                 showToggle
                 isToggled={darkMode}
                 onPress={toggleDarkMode}
+                description="Cambiar entre tema claro y oscuro"
               />
               <SettingItem
-                icon={Clock}
-                title="Formato de Fecha y Hora"
-                value="24 horas"
-                onPress={() => {}}
+                icon={Eye}
+                title="Alto contraste"
+                showToggle
+                isToggled={currentContrast === 'high'}
+                onPress={() => setContrastLevel(currentContrast === 'high' ? 'normal' : 'high')}
+                description="Mejorar la legibilidad con mayor contraste"
               />
               <SettingItem
-                icon={Ruler}
-                title="Unidades de Medida"
-                value="Métrico"
-                onPress={() => {}}
+                icon={Type}
+                title="Tamaño de fuente"
+                value={getFontSizeDisplayName(currentFontSize)}
+                onPress={() => navigateToSubpage('font-size')}
+                description="Ajustar el tamaño del texto"
+                isLast
               />
             </View>
           </View>
 
+          {/* Comportamiento */}
+          <View style={themedStyles.section}>
+            <Text style={themedStyles.sectionTitle}>Comportamiento</Text>
+            <View style={themedStyles.sectionContent}>
+              <SettingItem
+                icon={Zap}
+                title="Avance automático"
+                showToggle
+                isToggled={autoAdvanceQuestions}
+                onPress={toggleAutoAdvance}
+                description="Avanzar automáticamente a la siguiente pregunta"
+              />
+              <SettingItem
+                icon={Settings}
+                title="Puntuaciones detalladas"
+                showToggle
+                isToggled={showDetailedScores}
+                onPress={toggleDetailedScores}
+                description="Mostrar información detallada de puntuación"
+              />
+              <SettingItem
+                icon={Bell}
+                title="Vibración háptica"
+                showToggle
+                isToggled={enableHapticFeedback}
+                onPress={toggleHapticFeedback}
+                description="Vibrar en interacciones importantes"
+                isLast
+              />
+            </View>
+          </View>
+
+          {/* Accesibilidad */}
+          <View style={themedStyles.section}>
+            <Text style={themedStyles.sectionTitle}>Accesibilidad</Text>
+            <View style={themedStyles.sectionContent}>
+              <SettingItem
+                icon={Accessibility}
+                title="Reducir movimiento"
+                showToggle
+                isToggled={reduceMotion}
+                onPress={toggleReduceMotion}
+                description="Minimizar animaciones y transiciones"
+                isLast
+              />
+            </View>
+          </View>
+
+          {/* Preferencias Básicas */}
+          <View style={themedStyles.section}>
+            <Text style={themedStyles.sectionTitle}>Preferencias</Text>
+            <View style={themedStyles.sectionContent}>
+              <SettingItem
+                icon={Globe2}
+                title="Idioma"
+                value={language === 'es' ? 'Español' : 'English'}
+                onPress={() => navigateToSubpage('language')}
+              />
+              <SettingItem
+                icon={Clock}
+                title="Formato de fecha"
+                value={dateFormat === '24h' ? '24 horas' : '12 horas'}
+                onPress={() => navigateToSubpage('datetime')}
+              />
+              <SettingItem
+                icon={Ruler}
+                title="Unidades de medida"
+                value={measurementSystem === 'metric' ? 'Métrico' : 'Imperial'}
+                onPress={() => navigateToSubpage('units')}
+                isLast
+              />
+            </View>
+          </View>
+
+          {/* Notificaciones */}
           <View style={themedStyles.section}>
             <Text style={themedStyles.sectionTitle}>Notificaciones</Text>
             <View style={themedStyles.sectionContent}>
               <SettingItem
                 icon={Bell}
-                title="Notificaciones Push"
+                title="Notificaciones"
                 showToggle
                 isToggled={notifications}
                 onPress={toggleNotifications}
+                description="Activar todas las notificaciones"
               />
               <SettingItem
                 icon={Bell}
-                title="Tipos de Alertas"
+                title="Configuración detallada"
                 onPress={() => navigateToSubpage('notifications')}
-              />
-              <SettingItem
-                icon={Clock}
-                title="Horarios"
-                onPress={() => {}}
+                description="Configurar tipos específicos de notificaciones"
+                isLast
               />
             </View>
           </View>
 
+          {/* Privacidad y datos */}
           <View style={themedStyles.section}>
-            <Text style={themedStyles.sectionTitle}>Información de la App</Text>
+            <Text style={themedStyles.sectionTitle}>Privacidad</Text>
+            <View style={themedStyles.sectionContent}>
+              <SettingItem
+                icon={Database}
+                title="Analíticas"
+                showToggle
+                isToggled={analyticsEnabled}
+                onPress={toggleAnalytics}
+                description="Ayudar a mejorar la app compartiendo datos de uso"
+              />
+              <SettingItem
+                icon={Shield}
+                title="Política de privacidad"
+                onPress={() => navigateToSubpage('privacy')}
+              />
+              <SettingItem
+                icon={User}
+                title="Gestión de datos"
+                onPress={() => navigateToSubpage('data-management')}
+                description="Exportar, importar o eliminar datos"
+                isLast
+              />
+            </View>
+          </View>
+
+          {/* Información */}
+          <View style={themedStyles.section}>
+            <Text style={themedStyles.sectionTitle}>Información</Text>
             <View style={themedStyles.sectionContent}>
               <SettingItem
                 icon={Info}
@@ -166,38 +414,30 @@ export default function SettingsScreen() {
                 value="1.0.0"
                 showChevron={false}
                 onPress={() => {}}
+                description="Build 100 - DeepLuxMed.mx"
               />
               <SettingItem
                 icon={FileText}
-                title="Notas de la Versión"
-                onPress={() => {}}
-              />
-              <SettingItem
-                icon={Shield}
-                title="Política de Privacidad"
-                onPress={() => navigateToSubpage('privacy')}
-              />
-              <SettingItem
-                icon={FileText}
-                title="Términos y Condiciones"
+                title="Términos y condiciones"
                 onPress={() => navigateToSubpage('terms')}
               />
               <SettingItem
                 icon={MessageSquareText}
-                title="Contacto de Soporte"
+                title="Soporte"
                 onPress={() => navigateToSubpage('support')}
               />
               <SettingItem
                 icon={HelpCircle}
-                title="Preguntas Frecuentes"
-                onPress={() => {}}
+                title="Ayuda"
+                onPress={() => navigateToSubpage('help')}
+                isLast
               />
             </View>
           </View>
 
           <View style={themedStyles.footer}>
             <Text style={themedStyles.footerText}>DeepLuxMed.mx © 2024</Text>
-            <Text style={themedStyles.footerVersion}>Versión 1.0.0 (Build 100)</Text>
+            <Text style={themedStyles.footerVersion}>Aplicación médica profesional</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
