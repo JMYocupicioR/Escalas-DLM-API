@@ -210,7 +210,6 @@ export default function BotulinumCalculator() {
         // Para nativo: usar expo-print
         await Print.printAsync({
           html,
-          base64: false,
         });
       }
     } catch (error) {

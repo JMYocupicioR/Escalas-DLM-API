@@ -1,18 +1,21 @@
 import { useWindowDimensions, Platform } from 'react-native';
 
-const WEB_BREAKPOINT = 768; // Common breakpoint for tablets/desktops
+const MOBILE_BREAKPOINT = 768;
+const TABLET_BREAKPOINT = 1024;
 
 export function useResponsiveLayout() {
   const { width } = useWindowDimensions();
 
   const isWeb = Platform.OS === 'web';
-  const isDesktop = isWeb && width >= WEB_BREAKPOINT;
-  const isMobile = !isDesktop;
+  const isMobile = width < MOBILE_BREAKPOINT;
+  const isTablet = width >= MOBILE_BREAKPOINT && width < TABLET_BREAKPOINT;
+  const isDesktop = width >= TABLET_BREAKPOINT;
 
   return {
     isWeb,
-    isDesktop,
     isMobile,
+    isTablet,
+    isDesktop,
     width,
   };
 }

@@ -11,12 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
-import { ScaleWithDetails, ScaleAssessmentRequest } from '@/api/scales/types';
+import { ScaleWithDetails, ScoringRange } from '@/api/scales/types';
 import { PatientForm } from '@/components/PatientForm';
 import { ResultsActions } from '@/components/ResultsActions';
 import LoadingState from '@/components/errors/LoadingState';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { ScoringRange } from '@/api/scales/types';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react-native';
 
 interface ScaleEvaluationProps {
