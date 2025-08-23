@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { usePatientIntake } from '@/hooks/usePatientIntake';
+import { PatientPicker } from '@/components/PatientPicker';
 
 interface PatientFormProps {
   scaleId?: string;
@@ -12,6 +13,7 @@ interface PatientFormProps {
 export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, allowSkip = true }) => {
   const { colors } = useThemedStyles();
   const { intake, setField, prefillFromRemembered, saveAsCurrentPatient, ensureAnonymousIfMissing } = usePatientIntake(scaleId);
+  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     prefillFromRemembered();
@@ -20,6 +22,15 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
   return (
     <View style={styles.container}>
       <Text style={[styles.title, { color: colors.text }]}>Datos del Paciente</Text>
+
+      <TouchableOpacity onPress={() => setShowPicker(v => !v)} style={[styles.toggle, { backgroundColor: colors.tagBackground }]}> 
+        <Text style={[styles.toggleText, { color: colors.text }]}>{showPicker ? 'Ocultar lista de pacientes' : 'Seleccionar paciente existente'}</Text>
+      </TouchableOpacity>
+      {showPicker && (
+        <View style={[styles.pickerContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <PatientPicker onSelected={() => setShowPicker(false)} />
+        </View>
+      )}
 
       <View style={[styles.inputGroup, { backgroundColor: colors.tagBackground }]}> 
         <TextInput
@@ -93,6 +104,20 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
 const styles = StyleSheet.create({
   container: {
     gap: 12,
+  },
+  toggle: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
   },
   title: {
     fontSize: 18,

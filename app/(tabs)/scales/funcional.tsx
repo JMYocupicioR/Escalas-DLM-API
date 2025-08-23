@@ -20,6 +20,13 @@ const FUNCTIONAL_SCALES = {
         category: 'ADL',
       },
       {
+        id: 'gas',
+        name: 'Escala GAS',
+        description: 'Consecución de objetivos personalizados en rehabilitación',
+        timeToComplete: '10-20 min',
+        category: 'Rehab',
+      },
+      {
         id: 'tinetti',
         name: 'Escala de Tinetti',
         description: 'Evaluación del equilibrio y la marcha',

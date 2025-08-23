@@ -138,6 +138,14 @@ export default function ScalesIndexScreen() {
       timeToComplete: '5-10 min',
     },
     {
+      id: 'gas',
+      name: 'Escala de Consecución de Objetivos',
+      acronym: 'GAS',
+      description: 'Evaluación centrada en objetivos personalizados (rehabilitación)',
+      popular: true,
+      timeToComplete: '10-20 min',
+    },
+    {
       id: 'glasgow',
       name: 'Escala de Coma de Glasgow',
       acronym: 'GCS',
@@ -164,6 +172,14 @@ export default function ScalesIndexScreen() {
       description: 'Evaluación subjetiva del dolor',
       timeToComplete: '1 min',
       category: 'Dolor'
+    },
+    {
+      id: 'gas',
+      name: 'Escala GAS',
+      acronym: 'GAS',
+      description: 'Consecución de objetivos personalizados en rehabilitación',
+      timeToComplete: '10-20 min',
+      category: 'Rehabilitación'
     },
     {
       id: 'tinetti',
