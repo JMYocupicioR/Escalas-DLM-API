@@ -5,79 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { SearchWidget } from '@/components/SearchWidget';
 import { ArrowRight, Clock } from 'lucide-react-native';
-
-const FUNCTIONAL_SCALES = {
-  evaluacion: {
-    title: 'Evaluación',
-    description: 'Escalas para valoración inicial y seguimiento',
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=60',
-    scales: [
-      {
-        id: 'barthel',
-        name: 'Índice de Barthel',
-        description: 'Evaluación de actividades básicas de la vida diaria',
-        timeToComplete: '5-10 min',
-        category: 'ADL',
-      },
-      {
-        id: 'gas',
-        name: 'Escala GAS',
-        description: 'Consecución de objetivos personalizados en rehabilitación',
-        timeToComplete: '10-20 min',
-        category: 'Rehab',
-      },
-      {
-        id: 'tinetti',
-        name: 'Escala de Tinetti',
-        description: 'Evaluación del equilibrio y la marcha',
-        timeToComplete: '10-15 min',
-        category: 'Balance',
-      },
-    ],
-  },
-  diagnostico: {
-    title: 'Diagnóstico',
-    description: 'Escalas para apoyo diagnóstico y clasificación',
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=60',
-    scales: [
-      {
-        id: 'mmse',
-        name: 'Mini-Mental State Examination',
-        description: 'Evaluación del estado cognitivo',
-        timeToComplete: '10 min',
-        category: 'Cognitive',
-      },
-    ],
-  },
-  pronostico: {
-    title: 'Pronóstico',
-    description: 'Escalas para predicción y evolución',
-    image: 'https://images.unsplash.com/photo-1576091160291-258524ab6322?w=800&auto=format&fit=crop&q=60',
-    scales: [
-      {
-        id: 'norton',
-        name: 'Escala de Norton',
-        description: 'Valoración del riesgo de úlceras por presión',
-        timeToComplete: '5 min',
-        category: 'Risk',
-      },
-    ],
-  },
-  seguimiento: {
-    title: 'Seguimiento',
-    description: 'Escalas para monitorización y control',
-    image: 'https://images.unsplash.com/photo-1576091160970-3d6d2013e80f?w=800&auto=format&fit=crop&q=60',
-    scales: [
-      {
-        id: 'vas',
-        name: 'Escala Visual Analógica',
-        description: 'Evaluación del dolor',
-        timeToComplete: '1 min',
-        category: 'Pain',
-      },
-    ],
-  },
-};
+import { functionalCategories } from '@/data/functional-categories';
+import { scalesById } from '@/data/_scales';
 
 // Componente ImageWithFallback para manejo de errores de imagen
 const ImageWithFallback = ({ uri, style, ...props }) => {
@@ -151,31 +80,43 @@ export default function FunctionalScalesScreen() {
             />
           </View>
 
-          {Object.entries(FUNCTIONAL_SCALES).map(([key, section]) => (
-            <View key={key} style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <ImageWithFallback
-                  uri={section.image}
-                  style={styles.sectionImage}
-                />
-                <View style={styles.sectionOverlay}>
-                  <Text style={styles.sectionTitle}>{section.title}</Text>
-                  <Text style={styles.sectionDescription}>{section.description}</Text>
-                </View>
-              </View>
+          {Object.entries(functionalCategories).map(([key, section]) => {
+            const filteredScales = section.scales
+              .map(id => scalesById[id])
+              .filter(
+                scale =>
+                  scale &&
+                  (scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    scale.description.toLowerCase().includes(searchQuery.toLowerCase()))
+              );
 
-              <View style={styles.scalesList}>
-                {section.scales
-                  .filter(scale =>
-                    scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    scale.description.toLowerCase().includes(searchQuery.toLowerCase())
-                  )
-                  .map(scale => (
+            if (filteredScales.length === 0) {
+              return null;
+            }
+
+            return (
+              <View key={key} style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <ImageWithFallback
+                    uri={section.image}
+                    style={styles.sectionImage}
+                  />
+                  <View style={styles.sectionOverlay}>
+                    <Text style={styles.sectionTitle}>{section.title}</Text>
+                    <Text style={styles.sectionDescription}>
+                      {section.description}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.scalesList}>
+                  {filteredScales.map(scale => (
                     <ScaleCard key={scale.id} scale={scale} />
                   ))}
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
 
           <View style={styles.lastUpdate}>
             <Text style={styles.lastUpdateText}>

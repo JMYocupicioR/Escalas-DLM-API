@@ -181,10 +181,10 @@ const generatePDFContent = (
               <p>${options?.headerSubtitle ?? `Fecha: ${today}`}</p>
               ${options?.showPatientSummary !== false ? `
                 <p class="muted">
-                  ${[patientData.name ? `Paciente: <span class='value'>${patientData.name}</span>` : '',
-                     patientData.age ? `Edad: <span class='value'>${patientData.age}</span>` : '',
-                     patientData.gender ? `Género: <span class='value'>${patientData.gender}</span>` : '',
-                     patientData.doctorName ? `Evaluador: <span class='value'>${patientData.doctorName}</span>` : ''
+                  ${[(patientData && patientData.name) ? `Paciente: <span class='value'>${patientData.name}</span>` : '',
+                     (patientData && patientData.age) ? `Edad: <span class='value'>${patientData.age}</span>` : '',
+                     (patientData && patientData.gender) ? `Género: <span class='value'>${patientData.gender}</span>` : '',
+                     (patientData && patientData.doctorName) ? `Evaluador: <span class='value'>${patientData.doctorName}</span>` : ''
                     ].filter(Boolean).join(' · ')}
                 </p>
               ` : ''}
@@ -193,10 +193,10 @@ const generatePDFContent = (
           <div class="section">
             <h2>Datos del Paciente</h2>
             <div class="grid">
-              <div class="kv"><span class="label">Nombre:</span> <span class="value">${patientData.name ?? ''}</span></div>
-              <div class="kv"><span class="label">Edad:</span> <span class="value">${patientData.age ?? ''}</span></div>
-              <div class="kv"><span class="label">Género:</span> <span class="value">${patientData.gender ?? ''}</span></div>
-              <div class="kv"><span class="label">Médico/Evaluador:</span> <span class="value">${patientData.doctorName ?? ''}</span></div>
+              <div class="kv"><span class="label">Nombre:</span> <span class="value">${(patientData && patientData.name) || ''}</span></div>
+              <div class="kv"><span class="label">Edad:</span> <span class="value">${(patientData && patientData.age) || ''}</span></div>
+              <div class="kv"><span class="label">Género:</span> <span class="value">${(patientData && patientData.gender) || ''}</span></div>
+              <div class="kv"><span class="label">Médico/Evaluador:</span> <span class="value">${(patientData && patientData.doctorName) || ''}</span></div>
             </div>
           </div>
           <div class="section">
@@ -219,6 +219,475 @@ const generatePDFContent = (
     </html>
   `;
 };
+
+export const generateBarthelReportHtml = (
+  patientData: any,
+  answers: Record<string, number>,
+  total: number,
+  interpretation: { result: string; explanation: string; color: string },
+  questions: any[]
+) => {
+  let detailHTML = '';
+  questions.forEach(q => {
+    const answer = answers[q.id];
+    if (answer !== undefined) {
+      const selectedOption = q.options.find(opt => opt.value === answer);
+      if (selectedOption) {
+        detailHTML += `
+          <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+            <h4>${q.question}</h4>
+            <p><strong>${selectedOption.label}</strong> (${selectedOption.value} puntos)</p>
+            <p>${selectedOption.description}</p>
+          </div>
+        `;
+      }
+    }
+  });
+
+  const today = new Date().toLocaleDateString();
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Resultados Escala de Barthel</title>
+        <style>
+          body { font-family: sans-serif; margin: 20px; }
+          .container { max-width: 800px; margin: 0 auto; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .section { margin-bottom: 20px; padding: 15px; border-radius: 8px; background: #f8fafc; }
+          .result { font-size: 24px; color: ${interpretation.color}; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Resultados Escala de Barthel</h1>
+            <p>${today}</p>
+          </div>
+          <div class="section">
+            <h2>Datos del Paciente</h2>
+            <p><strong>Nombre:</strong> ${(patientData && patientData.name) || 'No especificado'}</p>
+            <p><strong>Edad:</strong> ${(patientData && patientData.age) || 'No especificada'}</p>
+            <p><strong>Género:</strong> ${(patientData && patientData.gender) || 'No especificado'}</p>
+            <p><strong>Médico/Evaluador:</strong> ${(patientData && patientData.doctorName) || 'No especificado'}</p>
+          </div>
+          <div class="section">
+            <h2>Puntuación Total: ${total}/100</h2>
+            <p class="result">${interpretation.result}</p>
+            <p>${interpretation.explanation}</p>
+          </div>
+          <div class="section">
+            <h2>Detalle de Respuestas</h2>
+            ${detailHTML}
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+};
+
+export const generateFimReportHtml = (assessmentData: any) => {
+  const { patientData, totalScore, motorScore, cognitiveScore, answers, questions, fimCategories } = assessmentData;
+  
+  // Get interpretation and recommendation text
+  let interpretation = '';
+  let recommendation = '';
+  if (totalScore >= 108) {
+    interpretation = '<strong>Independencia completa o modificada:</strong> El paciente demuestra un alto grado de autonomía en las actividades de la vida diaria.';
+    recommendation = 'Mantener el nivel actual de funcionamiento. Implementar programas de prevención y mantenimiento de la independencia funcional. Revisión periódica cada 6 meses.';
+  } else if (totalScore >= 72) {
+    interpretation = '<strong>Dependencia moderada:</strong> El paciente requiere asistencia supervisada en múltiples actividades, pero mantiene cierto grado de independencia.';
+    recommendation = 'Programa de rehabilitación intensiva enfocado en las áreas deficitarias. Terapia ocupacional y fisioterapia 3-4 veces por semana. Evaluación familiar para entrenamiento en técnicas de asistencia.';
+  } else if (totalScore >= 36) {
+    interpretation = '<strong>Dependencia severa:</strong> El paciente requiere asistencia significativa en la mayoría de las actividades de la vida diaria.';
+    recommendation = 'Plan de rehabilitación multidisciplinario intensivo. Considerar adaptaciones ambientales y tecnológicas de asistencia. Soporte psicológico para paciente y familia. Evaluación médica integral.';
+  } else {
+    interpretation = '<strong>Dependencia completa:</strong> El paciente requiere asistencia total en prácticamente todas las actividades evaluadas.';
+    recommendation = 'Cuidados especializados continuos. Plan de atención médica integral. Soporte familiar extensivo. Considerar cuidados paliativos si es apropiado. Evaluación neurológica especializada.';
+  }
+
+  const categories = {
+    autocuidado: 'AUTOCUIDADO',
+    esfinteres: 'CONTROL DE ESFÍNTERES',
+    movilidad: 'MOVILIDAD / TRANSFERENCIAS',
+    locomocion: 'LOCOMOCIÓN',
+    comunicacion: 'COMUNICACIÓN',
+    cognicion: 'COGNICIÓN SOCIAL',
+  };
+
+  let tableRows = '';
+  Object.entries(categories).forEach(([categoryKey, categoryName]) => {
+    tableRows += `<tr class="category-header-print"><td colspan="2">${categoryName}</td></tr>`;
+    questions
+      .filter((q: any) => q.category === categoryKey)
+      .forEach((q: any) => {
+        const score = answers[q.id] || 0;
+        tableRows += `<tr><td>${q.question}</td><td class="score-cell">${score}</td></tr>`;
+      });
+  });
+  
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('es-ES');
+  const formattedTime = today.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <meta charset="UTF-8">
+      <title>Reporte FIM</title>
+      <style>
+          body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt; color: #333; }
+          .container { max-width: 800px; margin: auto; padding: 20px; }
+          .header { text-align: center; border-bottom: 2px solid #00796B; padding-bottom: 10px; margin-bottom: 20px; }
+          .header h1 { font-size: 18pt; color: #00796B; margin: 0; }
+          .header p { font-size: 12pt; color: #666; margin: 5px 0 0; }
+          .patient-info { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+          .info-field { font-size: 10pt; }
+          .info-field strong { color: #495057; }
+          .summary { background: #e0f2f1; border: 1px solid #00796B; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center; }
+          .summary h2 { font-size: 14pt; color: #00796B; margin: 0 0 10px 0; }
+          .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+          .score-item .number { font-size: 20pt; font-weight: bold; color: #00796B; }
+          .score-item .label { font-size: 9pt; color: #666; }
+          .interpretation-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; }
+          .recommendation-box { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin-bottom: 20px; }
+          h3 { font-size: 12pt; font-weight: bold; color: #00796B; margin: 0 0 8px 0; }
+          .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          .results-table th, .results-table td { padding: 8px; border: 1px solid #dee2e6; text-align: left; }
+          .results-table th { background: #00796B; color: white; font-size: 10pt; }
+          .results-table .category-header-print { background: #e0e0e0; font-weight: bold; text-align: center; }
+          .results-table .score-cell { text-align: center; font-weight: bold; }
+          .footer { border-top: 1px solid #dee2e6; padding-top: 10px; margin-top: 20px; font-size: 8pt; color: #6c757d; text-align: center; }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <div class="header">
+              <h1>ESCALA DE INDEPENDENCIA FUNCIONAL (FIM)</h1>
+              <p>Reporte de Evaluación Médica</p>
+          </div>
+          <div class="patient-info">
+              <div class="info-field"><strong>Paciente:</strong> ${(patientData && patientData.name) || 'No especificado'}</div>
+              <div class="info-field"><strong>Edad:</strong> ${(patientData && patientData.age) ? patientData.age + ' años' : 'No especificada'}</div>
+          </div>
+          <div class="summary">
+              <h2>Resumen de Puntuación</h2>
+              <div class="score-grid">
+                  <div class="score-item"><div class="number">${totalScore}</div><div class="label">Puntaje Total /126</div></div>
+                  <div class="score-item"><div class="number">${motorScore}</div><div class="label">Puntaje Motor /91</div></div>
+                  <div class="score-item"><div class="number">${cognitiveScore}</div><div class="label">Puntaje Cognitivo /35</div></div>
+              </div>
+          </div>
+          <div class="interpretation-box">
+              <h3>Interpretación Clínica</h3>
+              <p>${interpretation}</p>
+          </div>
+          <div class="recommendation-box">
+              <h3>Recomendaciones Terapéuticas</h3>
+              <p>${recommendation}</p>
+          </div>
+          <h3>Resultados Detallados</h3>
+          <table class="results-table">
+              <thead><tr><th>Actividad Evaluada</th><th>Puntuación</th></tr></thead>
+              <tbody>${tableRows}</tbody>
+          </table>
+          <div class="footer">
+              <p>Generado por DeepLuxMed.mx | ${formattedDate} ${formattedTime}</p>
+          </div>
+      </div>
+  </body>
+  </html>
+  `;
+};
+
+export const generateLequesneReportHtml = (assessmentData: any) => {
+  const { patientData, totalScore, answers, questions, interpretation } = assessmentData;
+  
+  // Build detailed results table
+  let detailHTML = '';
+  questions.forEach(q => {
+    const answer = answers[q.id];
+    const option = q.options.find(opt => opt.value === answer);
+    detailHTML += `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
+          <strong>${q.question}</strong><br>
+          <em style="color: #666; font-size: 12px;">${q.description}</em>
+        </td>
+        <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; text-align: center;">
+          ${option ? `${option.label} (${answer} puntos)` : 'No respondida'}
+        </td>
+      </tr>
+    `;
+  });
+
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('es-ES');
+  const formattedTime = today.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte Índice de Lequesne - DeepLuxMed</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .header {
+      text-align: center;
+      background: linear-gradient(135deg, #00796B 0%, #004D40 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 300;
+    }
+    .header .subtitle {
+      margin: 10px 0 0 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    .patient-info {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .patient-info h2 {
+      color: #00796B;
+      margin-top: 0;
+      border-bottom: 2px solid #00796B;
+      padding-bottom: 10px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 16px;
+      color: #333;
+    }
+    .score-summary {
+      background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%);
+      border: 2px solid #4CAF50;
+      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .score-summary h2 {
+      color: #2E7D32;
+      margin-top: 0;
+      font-size: 24px;
+    }
+    .total-score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #00796B;
+      margin: 20px 0;
+    }
+    .score-range {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .interpretation {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .interpretation h3 {
+      color: #00796B;
+      margin-top: 0;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+    .interpretation-text {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .recommendation {
+      background: #FFF3E0;
+      border-left: 4px solid #FF9800;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .recommendation h3 {
+      color: #E65100;
+      margin-top: 0;
+    }
+    .recommendation-text {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .results-table {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .results-table h3 {
+      color: #00796B;
+      margin-top: 0;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th {
+      background: #00796B;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 10px;
+      color: #666;
+    }
+    .footer .logo {
+      font-weight: bold;
+      color: #00796B;
+      font-size: 18px;
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .header, .patient-info, .score-summary, .interpretation, .recommendation, .results-table, .footer {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Índice de Lequesne para Osteoartritis de Rodilla</h1>
+    <p class="subtitle">Reporte de Evaluación Médica</p>
+  </div>
+
+  <div class="patient-info">
+    <h2>Información del Paciente</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Nombre:</span>
+        <span class="info-value">${patientData.name || 'No especificado'}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Edad:</span>
+        <span class="info-value">${patientData.age ? patientData.age + ' años' : 'No especificada'}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Fecha de Evaluación:</span>
+        <span class="info-value">${formattedDate}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Hora:</span>
+        <span class="info-value">${formattedTime}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="score-summary">
+    <h2>Resumen de Puntuación</h2>
+    <div class="total-score">${totalScore.toFixed(1)}</div>
+    <div class="score-range">de un máximo de 26 puntos</div>
+    <p><strong>Interpretación:</strong> ${interpretation.level}</p>
+  </div>
+
+  <div class="interpretation">
+    <h3>Análisis Clínico</h3>
+    <div class="interpretation-text">
+      <strong>Nivel de Severidad:</strong> ${interpretation.level}<br>
+      <strong>Explicación:</strong> ${interpretation.explanation}
+    </div>
+  </div>
+
+  <div class="recommendation">
+    <h3>Recomendación Clínica</h3>
+    <div class="recommendation-text">
+      ${interpretation.recommendation}
+    </div>
+  </div>
+
+  <div class="results-table">
+    <h3>Resultados Detallados por Pregunta</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 70%">Pregunta</th>
+          <th style="width: 30%">Respuesta y Puntuación</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${detailHTML}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <div class="logo">DeepLuxMed.mx</div>
+    <p>Escalas Médicas Digitales</p>
+    <p>Reporte generado el ${formattedDate} a las ${formattedTime}</p>
+    <p style="font-size: 12px; margin-top: 15px;">
+      Este reporte ha sido generado automáticamente por el sistema de evaluación Lequesne de DeepLuxMed.
+      <br>Para uso clínico profesional únicamente.
+    </p>
+  </div>
+</body>
+</html>`;
+};
+
 
 // Datos de dosis completos (importados de botulinum.ts)
 const dosisDataComplete = {

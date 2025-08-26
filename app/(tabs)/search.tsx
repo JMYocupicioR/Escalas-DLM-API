@@ -8,18 +8,11 @@ import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { AdvancedSearch } from '@/components/AdvancedSearch';
 import { GetScalesParams } from '@/api/scales/types';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
+import { useScalesStore } from '@/store/scalesStore';
+import type { Scale } from '@/types/scale';
+import { useEffect } from 'react';
 
 // Interfaces para mejorar el tipado
-interface Scale {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  imageUrl: string;
-  tags: string[];
-  popularity: number;
-}
-
 interface CategoryOption {
   id: string;
   name: string;
@@ -30,44 +23,19 @@ interface SortOption {
   name: string;
 }
 
-// Datos temporales - reemplazar con llamada a API
-const SCALES: Scale[] = [
-  {
-    id: 'barthel',
-    name: 'Escala de Barthel',
-    category: 'Functional',
-    description: 'Evaluación de independencia en actividades diarias',
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=800&auto=format&fit=crop&q=60',
-    tags: ['ADL', 'Functional', 'Independence'],
-    popularity: 98
-  },
-  {
-    id: 'mmse',
-    name: 'Mini-Mental State Examination',
-    category: 'Cognitive',
-    description: 'Evaluación del estado cognitivo',
-    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&auto=format&fit=crop&q=60',
-    tags: ['Cognitive', 'Mental Health', 'Screening'],
-    popularity: 95
-  },
-  {
-    id: 'borg',
-    name: 'Escala de Borg',
-    category: 'Respiratory',
-    description: 'Medición de esfuerzo percibido',
-    imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60',
-    tags: ['Respiratory', 'Effort', 'Exercise'],
-    popularity: 90
-  }
-];
+// We'll get scales from the store instead of hardcoded data
 
 const CATEGORIES: CategoryOption[] = [
-  { id: 'all', name: 'All Scales' },
-  { id: 'functional', name: 'Functional' },
-  { id: 'cognitive', name: 'Cognitive' },
-  { id: 'respiratory', name: 'Respiratory' },
-  { id: 'pain', name: 'Pain' },
-  { id: 'neurological', name: 'Neurological' }
+  { id: 'all', name: 'Todas las Escalas' },
+  { id: 'ADL', name: 'Actividades Diarias' },
+  { id: 'Rehab', name: 'Rehabilitación' },
+  { id: 'Balance', name: 'Equilibrio' },
+  { id: 'Cognitive', name: 'Cognitiva' },
+  { id: 'Risk', name: 'Evaluación de Riesgo' },
+  { id: 'Pain', name: 'Dolor' },
+  { id: 'Neurology', name: 'Neurología' },
+  { id: 'Orthopedics', name: 'Ortopedia' },
+  { id: 'Cardiopulmonary', name: 'Cardiopulmonar' }
 ];
 
 const SORT_OPTIONS: SortOption[] = [
@@ -79,6 +47,9 @@ const SORT_OPTIONS: SortOption[] = [
 export default function SearchScreen() {
   const { colors, isDark } = useThemedStyles();
   const router = useRouter();
+  
+  // Get scales from store
+  const allScales = useScalesStore((state) => state.scales);
   
   // Obtener parámetros de la URL
   const params = useLocalSearchParams();
@@ -92,7 +63,12 @@ export default function SearchScreen() {
   const [showFilters, setShowFilters] = useState(initialFilter);
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [scales, setScales] = useState(SCALES);
+  const [scales, setScales] = useState(allScales);
+
+  // Update scales when store changes
+  useEffect(() => {
+    setScales(allScales);
+  }, [allScales]);
 
   // Manejar cambios en la búsqueda
   const handleSearch = useCallback((text: string) => {
@@ -131,15 +107,17 @@ export default function SearchScreen() {
       // Mock search with delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Apply filters to mock data
-      let filteredResults = [...SCALES];
+      // Apply filters to actual scales data
+      let filteredResults = [...allScales];
 
       if (params.query) {
         const query = params.query.toLowerCase();
         filteredResults = filteredResults.filter(scale =>
           scale.name.toLowerCase().includes(query) ||
           scale.description.toLowerCase().includes(query) ||
-          scale.tags.some(tag => tag.toLowerCase().includes(query))
+          scale.category.toLowerCase().includes(query) ||
+          (scale.specialty && scale.specialty.toLowerCase().includes(query)) ||
+          (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(query)))
         );
       }
 
@@ -158,8 +136,8 @@ export default function SearchScreen() {
               : a.name.localeCompare(b.name);
           case 'popularity':
             return params.sortOrder === 'desc' 
-              ? b.popularity - a.popularity
-              : a.popularity - b.popularity;
+              ? (b.popularity || 0) - (a.popularity || 0)
+              : (a.popularity || 0) - (b.popularity || 0);
           default:
             return 0;
         }
@@ -189,7 +167,9 @@ export default function SearchScreen() {
         searchQuery === '' || 
         scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         scale.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scale.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        scale.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (scale.specialty && scale.specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
       
       const matchesCategory = selectedCategory === 'all' || 
         scale.category.toLowerCase() === selectedCategory.toLowerCase();
@@ -197,7 +177,7 @@ export default function SearchScreen() {
       return matchesSearch && matchesCategory;
     }).sort((a, b) => {
       if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
-      if (sortBy === 'popularity') return b.popularity - a.popularity;
+      if (sortBy === 'popularity') return (b.popularity || 0) - (a.popularity || 0);
       // Para 'recent', podríamos usar una fecha de actualización si estuviera disponible
       return 0;
     });
@@ -221,13 +201,18 @@ export default function SearchScreen() {
           <Text style={styles.scaleDescription} numberOfLines={2}>
             {item.description}
           </Text>
-          <View style={styles.tags}>
-            {item.tags.slice(0, 2).map(tag => (
-              <View key={tag} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
+          {item.timeToComplete && (
+            <Text style={styles.timeText}>⏱️ {item.timeToComplete}</Text>
+          )}
+          {item.tags && item.tags.length > 0 && (
+            <View style={styles.tags}>
+              {item.tags.slice(0, 2).map(tag => (
+                <View key={tag} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+          )}
           <View style={styles.cardFooter}>
             <Text style={styles.categoryText}>{item.category}</Text>
             <ChevronRight size={16} color="#64748b" />
@@ -434,6 +419,8 @@ const styles = StyleSheet.create({
     gap: 12,
     borderBottomWidth: 1,
     alignItems: 'center',
+    zIndex: 100,
+    position: 'relative',
   },
   modeToggleContainer: {
     flex: 1,
@@ -462,10 +449,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 48,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -488,6 +485,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
+    zIndex: 50,
+    position: 'relative',
   },
   filterTitle: {
     fontSize: 16,
@@ -574,7 +573,13 @@ const styles = StyleSheet.create({
   scaleDescription: {
     fontSize: 14,
     color: '#64748b',
+    marginBottom: 8,
+  },
+  timeText: {
+    fontSize: 12,
+    color: '#64748b',
     marginBottom: 12,
+    fontStyle: 'italic',
   },
   tags: {
     flexDirection: 'row',

@@ -18,8 +18,8 @@ export const useThemedStyles = () => {
     if (themeMode === 'system') {
       return systemColorScheme === 'dark';
     }
-    return themeMode === 'dark' || darkMode; // fallback to darkMode for compatibility
-  }, [themeMode, darkMode, systemColorScheme]);
+    return themeMode === 'dark';
+  }, [themeMode, systemColorScheme]);
   
   const isHighContrast = contrastLevel === 'high';
   const baseTheme = getThemeColors(effectiveDarkMode, isHighContrast);

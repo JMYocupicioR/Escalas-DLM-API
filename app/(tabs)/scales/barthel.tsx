@@ -9,7 +9,7 @@ import { CircleAlert as AlertCircle, ArrowLeft, ArrowRight, FileText, User } fro
 import { useScalesStore } from '@/store/scales';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { PatientForm } from '@/components/PatientForm';
-import { exportAssessmentPDF, printAssessmentPDF } from '@/api/export/pdf';
+import { exportAssessmentPDF, printAssessmentPDF, generateBarthelReportHtml } from '@/api/export/pdf';
 import { ResultsActions } from '@/components/ResultsActions';
 import { OptionRow } from '@/components/OptionRow';
 
@@ -143,68 +143,6 @@ export default function BarthelScale() {
     resetAssessment
   } = useBarthelAssessment();
 
-  const generatePDFContent = useCallback((total: number, interpretation: ReturnType<typeof getInterpretation>) => {
-    let detailHTML = '';
-    questions.forEach(q => {
-      const answer = answers[q.id];
-      if (answer !== undefined) {
-        const selectedOption = q.options.find(opt => opt.value === answer);
-        if (selectedOption) {
-          detailHTML += `
-            <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-              <h4>${q.question}</h4>
-              <p><strong>${selectedOption.label}</strong> (${selectedOption.value} puntos)</p>
-              <p>${selectedOption.description}</p>
-            </div>
-          `;
-        }
-      }
-    });
-
-    const today = new Date().toLocaleDateString();
-
-    return `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Resultados Escala de Barthel</title>
-          <style>
-            body { font-family: sans-serif; margin: 20px; }
-            .container { max-width: 800px; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .section { margin-bottom: 20px; padding: 15px; border-radius: 8px; background: #f8fafc; }
-            .result { font-size: 24px; color: ${interpretation.color}; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Resultados Escala de Barthel</h1>
-              <p>${today}</p>
-            </div>
-            <div class="section">
-              <h2>Datos del Paciente</h2>
-              <p><strong>Nombre:</strong> ${patientData.name}</p>
-              <p><strong>Edad:</strong> ${patientData.age}</p>
-              <p><strong>Género:</strong> ${patientData.gender}</p>
-              <p><strong>Médico/Evaluador:</strong> ${patientData.doctorName}</p>
-            </div>
-            <div class="section">
-              <h2>Puntuación Total: ${total}/100</h2>
-              <p class="result">${interpretation.result}</p>
-              <p>${interpretation.explanation}</p>
-            </div>
-            <div class="section">
-              <h2>Detalle de Respuestas</h2>
-              ${detailHTML}
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-  }, [answers, patientData]);
-
   const handleExport = useCallback(async () => {
     if (Platform.OS === 'web') {
       Alert.alert('Exportación Web', 'La exportación a PDF no está disponible en la versión web por el momento.');
@@ -214,7 +152,15 @@ export default function BarthelScale() {
     try {
       const total = calculateTotal();
       const interpretation = getInterpretation(total);
-      const htmlContent = generatePDFContent(total, interpretation);
+      const color = colors[interpretation.colorKey] || colors.text;
+      
+      const htmlContent = generateBarthelReportHtml(
+        patientData,
+        answers,
+        total,
+        { ...interpretation, color },
+        questions
+      );
 
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       await shareAsync(uri, {
@@ -229,7 +175,7 @@ export default function BarthelScale() {
         'Ha ocurrido un error al generar el PDF. Por favor intente nuevamente.'
       );
     }
-  }, [calculateTotal, getInterpretation, generatePDFContent]);
+  }, [calculateTotal, getInterpretation, patientData, answers, colors]);
 
   // Crear estilos dinámicos
   const dynamicStyles = useMemo(() => StyleSheet.create({

@@ -258,9 +258,28 @@ export default function SettingsScreen() {
                 icon={Moon}
                 title="Modo oscuro"
                 showToggle
-                isToggled={darkMode}
-                onPress={toggleDarkMode}
+                isToggled={currentTheme === 'dark'}
+                onPress={() => {
+                  if (currentTheme === 'dark') {
+                    setThemeMode('light');
+                  } else {
+                    setThemeMode('dark');
+                  }
+                }}
                 description="Cambiar entre tema claro y oscuro"
+              />
+              <SettingItem
+                icon={Palette}
+                title="Modo de tema"
+                value={getThemeDisplayName(currentTheme)}
+                onPress={() => {
+                  // Ciclar entre light, dark, system
+                  const themeModes = ['light', 'dark', 'system'] as const;
+                  const currentIndex = themeModes.indexOf(currentTheme);
+                  const nextIndex = (currentIndex + 1) % themeModes.length;
+                  setThemeMode(themeModes[nextIndex]);
+                }}
+                description="Configurar el comportamiento del tema"
               />
               <SettingItem
                 icon={Eye}

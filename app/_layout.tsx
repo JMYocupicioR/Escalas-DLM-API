@@ -12,10 +12,17 @@ import { ThemeProvider } from '@react-navigation/native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useSettingsStore } from '@/store/settingsStore';
 import { navigationDarkTheme, navigationLightTheme, paperDarkTheme, paperLightTheme } from '@/app/theme';
+import { setupDevelopmentEnvironment } from '@/config/development';
+import { Appearance } from 'react-native';
 
 export default function RootLayout() {
   useFrameworkReady();
   
+  // Configurar entorno de desarrollo
+  useEffect(() => {
+    setupDevelopmentEnvironment();
+  }, []);
+
   // Podríamos añadir lógica de inicialización aquí si es necesario
   useEffect(() => {
     const initializeApp = async () => {
@@ -35,9 +42,19 @@ export default function RootLayout() {
     initializeApp();
   }, []);
 
-  const darkModeEnabled = useSettingsStore((s) => s.darkMode);
-  const navTheme = darkModeEnabled ? navigationDarkTheme : navigationLightTheme;
-  const paperTheme = darkModeEnabled ? paperDarkTheme : paperLightTheme;
+  const { darkMode, themeMode } = useSettingsStore((s) => ({
+    darkMode: s.darkMode,
+    themeMode: s.themeMode,
+  }));
+  
+  // Determinar el modo efectivo considerando el sistema
+  const systemColorScheme = Appearance.getColorScheme();
+  const effectiveDarkMode = themeMode === 'system' 
+    ? systemColorScheme === 'dark' 
+    : themeMode === 'dark' || darkMode;
+  
+  const navTheme = effectiveDarkMode ? navigationDarkTheme : navigationLightTheme;
+  const paperTheme = effectiveDarkMode ? paperDarkTheme : paperLightTheme;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -50,7 +67,7 @@ export default function RootLayout() {
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
                 </Stack>
-                <StatusBar style={darkModeEnabled ? 'light' : 'dark'} />
+                <StatusBar style={effectiveDarkMode ? 'light' : 'dark'} />
               </BottomSheetModalProvider>
             </ThemeProvider>
           </PaperProvider>

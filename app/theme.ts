@@ -145,4 +145,15 @@ export const getThemeColors = (isDark: boolean, isHighContrast: boolean = false)
   return isDark ? dark : light;
 };
 
+// Exportación por defecto para evitar errores de ruta
+export default {
+  palette,
+  getThemeColors,
+  navigationLightTheme,
+  navigationDarkTheme,
+  paperLightTheme,
+  paperDarkTheme,
+  medicalColors
+};
+
 

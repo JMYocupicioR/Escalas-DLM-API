@@ -251,6 +251,31 @@ export const useScalesStore = create<ScalesState>()(
         currentPatientId: state.currentPatientId,
         lastPatientIdByScale: state.lastPatientIdByScale,
       }),
+      // Función de migración para evitar errores de estado
+      migrate: (persistedState: any, version: number) => {
+        // Si no hay estado persistido, retornar el estado inicial
+        if (!persistedState) {
+          return {
+            favorites: [],
+            recentlyViewed: [],
+            assessments: {},
+            patients: {},
+            currentPatientId: undefined,
+            lastPatientIdByScale: {},
+          };
+        }
+        
+        // Migrar estado existente a nueva estructura
+        return {
+          favorites: persistedState.favorites || [],
+          recentlyViewed: persistedState.recentlyViewed || [],
+          assessments: persistedState.assessments || {},
+          patients: persistedState.patients || {},
+          currentPatientId: persistedState.currentPatientId || undefined,
+          lastPatientIdByScale: persistedState.lastPatientIdByScale || {},
+        };
+      },
+      version: 1, // Versión del esquema de estado
     }
   )
 );

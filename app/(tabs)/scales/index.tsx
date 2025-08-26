@@ -4,14 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMemo } from 'react';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { Activity, Brain, Heart, Stethoscope, Bone, Baby, SortAlphabetical } from 'lucide-react-native';
+import { Activity, Brain, Heart, Stethoscope, Bone, Baby, ListOrdered } from 'lucide-react-native';
 
 const BROWSE_OPTIONS = [
   {
     id: 'alfabetico',
     name: 'Por Abecedario',
     description: 'Todas las escalas ordenadas alfabéticamente',
-    icon: SortAlphabetical,
+    icon: ListOrdered,
     color: '#3b82f6',
   },
   {

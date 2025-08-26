@@ -1,130 +1,18 @@
 import React, { useState, useCallback, memo, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Platform } from 'react-native';
-import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
+import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { SearchWidget } from '@/components/SearchWidget';
 import { ArrowRight, Clock } from 'lucide-react-native';
+import { bodySegmentCategories } from '@/data/body-segment-categories';
+import { scalesById } from '@/data/_scales';
 
-const BODY_SEGMENTS = {
-  cabeza: {
-    name: 'Cabeza y Cuello',
-    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&auto=format&fit=crop&q=60',
-    subsections: {
-      cerebro: {
-        name: 'Cerebro y Sistema Nervioso',
-        scales: [
-          {
-            id: 'glasgow',
-            name: 'Escala de Glasgow',
-            description: 'Evaluación del nivel de consciencia',
-            timeToComplete: '2 min',
-            crossReferences: ['trauma'],
-          },
-          {
-            id: 'mmse',
-            name: 'Mini-Mental State Examination',
-            description: 'Evaluación del estado cognitivo',
-            timeToComplete: '10 min',
-            crossReferences: ['geriatria'],
-          },
-        ],
-      },
-      facial: {
-        name: 'Región Facial',
-        scales: [
-          {
-            id: 'house-brackmann',
-            name: 'House-Brackmann',
-            description: 'Evaluación de parálisis facial',
-            timeToComplete: '5 min',
-            crossReferences: ['neurologia'],
-          },
-        ],
-      },
-    },
-  },
-  tronco: {
-    name: 'Tronco',
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=60',
-    subsections: {
-      columna: {
-        name: 'Columna Vertebral',
-        scales: [
-          {
-            id: 'oswestry',
-            name: 'Índice de Discapacidad de Oswestry',
-            description: 'Evaluación funcional de columna lumbar',
-            timeToComplete: '10 min',
-            crossReferences: ['traumatologia'],
-          },
-        ],
-      },
-      torax: {
-        name: 'Tórax',
-        scales: [
-          {
-            id: 'borg',
-            name: 'Escala de Borg',
-            description: 'Evaluación de disnea',
-            timeToComplete: '2 min',
-            crossReferences: ['neumologia'],
-          },
-        ],
-      },
-    },
-  },
-  extremidades_superiores: {
-    name: 'Extremidades Superiores',
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=60',
-    subsections: {
-      hombro: {
-        name: 'Hombro',
-        scales: [
-          {
-            id: 'constant',
-            name: 'Score de Constant',
-            description: 'Evaluación funcional del hombro',
-            timeToComplete: '10 min',
-            crossReferences: ['traumatologia'],
-          },
-        ],
-      },
-    },
-  },
-  extremidades_inferiores: {
-    name: 'Extremidades Inferiores',
-    image: 'https://images.unsplash.com/photo-1576091160291-258524ab6322?w=800&auto=format&fit=crop&q=60',
-    subsections: {
-      cadera: {
-        name: 'Cadera',
-        scales: [
-          {
-            id: 'harris',
-            name: 'Harris Hip Score',
-            description: 'Evaluación funcional de cadera',
-            timeToComplete: '10 min',
-            crossReferences: ['traumatologia'],
-          },
-        ],
-      },
-      rodilla: {
-        name: 'Rodilla',
-        scales: [
-          {
-            id: 'koos',
-            name: 'KOOS',
-            description: 'Evaluación de resultados en lesiones de rodilla',
-            timeToComplete: '15 min',
-            crossReferences: ['traumatologia'],
-          },
-        ],
-      },
-    },
-  },
-};
-
-const ImageWithFallback = ({ uri, style, ...props }) => {
+const ImageWithFallback: React.FC<{
+  uri: string;
+  style: any;
+  [key: string]: any;
+}> = ({ uri, style, ...props }) => {
   const [hasError, setHasError] = useState(false);
   return (
     <Image
@@ -140,7 +28,7 @@ const ImageWithFallback = ({ uri, style, ...props }) => {
 };
 
 export default function BodySegmentScalesScreen() {
-  const { colors } = useScaleStyles();
+  const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -152,7 +40,7 @@ export default function BodySegmentScalesScreen() {
     router.push(`/scales/${id}`);
   }, []);
 
-  const ScaleCard = memo(({ scale }) => (
+  const ScaleCard = memo<{ scale: any }>(({ scale }) => (
     <TouchableOpacity
       style={styles.scaleCard}
       onPress={() => navigateToScale(scale.id)}
@@ -184,11 +72,18 @@ export default function BodySegmentScalesScreen() {
     </TouchableOpacity>
   ));
 
-  const SubsectionComponent = memo(({ subsection, searchQuery }) => {
-    const filteredScales = subsection.scales.filter(scale =>
-      scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      scale.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const SubsectionComponent = memo<{
+    subsection: any;
+    searchQuery: string;
+  }>(({ subsection, searchQuery }) => {
+    const filteredScales = subsection.scales
+      .map(id => scalesById[id])
+      .filter(
+        scale =>
+          scale &&
+          (scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            scale.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
 
     if (filteredScales.length === 0) return null;
 
@@ -202,7 +97,11 @@ export default function BodySegmentScalesScreen() {
     );
   });
 
-  const SegmentComponent = memo(({ segment, searchKey, searchQuery }) => {
+  const SegmentComponent = memo<{
+    segment: any;
+    searchKey: string;
+    searchQuery: string;
+  }>(({ segment, searchKey, searchQuery }) => {
     return (
       <View key={searchKey} style={styles.segment}>
         <View style={styles.segmentHeader}>
@@ -226,10 +125,12 @@ export default function BodySegmentScalesScreen() {
     );
   });
 
-  const segmentsArray = Object.entries(BODY_SEGMENTS).map(([key, segment]) => ({
-    key,
-    segment
-  }));
+  const segmentsArray = Object.entries(bodySegmentCategories).map(
+    ([key, segment]) => ({
+      key,
+      segment,
+    })
+  );
 
   return (
     <>

@@ -129,7 +129,15 @@ export const useSettingsStore = create<SettingsState>()(
       ...defaultSettings,
       
       // Acciones básicas
-      toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+      toggleDarkMode: () => set((state) => {
+        const newDarkMode = !state.darkMode;
+        // Sincronizar themeMode con darkMode para mantener consistencia
+        const newThemeMode = newDarkMode ? 'dark' : 'light';
+        return { 
+          darkMode: newDarkMode,
+          themeMode: newThemeMode
+        };
+      }),
       setLanguage: (language) => set({ language }),
       setDateFormat: (dateFormat) => set({ dateFormat }),
       setMeasurementSystem: (measurementSystem) => set({ measurementSystem }),

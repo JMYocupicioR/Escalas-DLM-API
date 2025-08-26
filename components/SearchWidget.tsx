@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { 
   View, 
   TextInput, 
@@ -22,6 +22,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { useScalesStore } from '@/store/scales';
+import { useAutoUpdatingScales } from '@/hooks/useAutoUpdatingScales';
+import { DEV_CONFIG } from '@/config/development';
 
 interface SearchSuggestion {
   id: string;
@@ -55,22 +57,30 @@ export function SearchWidget({
   const inputRef = useRef<TextInput>(null);
   const recentlyViewed = useScalesStore((state) => state.recentlyViewed);
   
+  // Use advanced auto-updating scales hook
+  const { 
+    scales: realScales, 
+    lastUpdate, 
+    forceUpdate, 
+    isUpdating, 
+    error,
+    searchScales: hookSearchScales,
+    totalScales 
+  } = useAutoUpdatingScales({
+    updateInterval: DEV_CONFIG.SCALES.AUTO_UPDATE_INTERVAL,
+    enableAutoUpdate: true,
+    enableLogging: DEV_CONFIG.SCALES.ENABLE_LOGGING
+  });
+  
   // Animation values
   const focusScale = useSharedValue(1);
   const borderColor = useSharedValue('#e2e8f0');
 
-  // Mock data - replace with real API calls
-  const mockScales = [
-    { id: 'barthel', name: 'Índice de Barthel', category: 'Funcional' },
-    { id: 'glasgow', name: 'Escala de Glasgow', category: 'Neurológica' },
-    { id: 'mmse', name: 'Mini-Mental', category: 'Cognitiva' },
-    { id: 'vas', name: 'Escala Visual Analógica', category: 'Dolor' },
-    { id: 'tinetti', name: 'Escala de Tinetti', category: 'Movilidad' },
-  ];
 
   const categories = [
     'Funcional', 'Neurológica', 'Cognitiva', 'Dolor', 'Cardiovascular', 
-    'Respiratoria', 'Psiquiátrica', 'Geriátrica'
+    'Respiratoria', 'Psiquiátrica', 'Geriátrica', 'Rehab', 'Rehabilitación',
+    'Medicina Física', 'Traumatología', 'Neurología', 'Geriatría', 'Osteoartritis', 'Rodilla'
   ];
 
   // Animated styles
@@ -94,37 +104,48 @@ export function SearchWidget({
 
   // Handle blur
   const handleBlur = useCallback(() => {
-    setIsFocused(false);
-    focusScale.value = withSpring(1);
-    borderColor.value = '#e2e8f0';
-    onBlur?.();
-    
-    // Hide suggestions after a delay to allow tap
-    setTimeout(() => setSuggestions([]), 200);
+    // Don't immediately hide suggestions to allow tap
+    setTimeout(() => {
+      setIsFocused(false);
+      focusScale.value = withSpring(1);
+      borderColor.value = '#e2e8f0';
+      onBlur?.();
+      setSuggestions([]);
+    }, 150);
   }, [onBlur]);
 
   // Generate recent search suggestions
   const generateRecentSuggestions = useCallback(() => {
+    if (!realScales || realScales.length === 0) {
+      setSuggestions([]);
+      return;
+    }
+
     const recentSuggestions: SearchSuggestion[] = recentlyViewed
       .slice(0, 3)
       .map(id => {
-        const scale = mockScales.find(s => s.id === id);
+        const scale = realScales.find(s => s.id === id);
         return scale ? {
           id: scale.id,
           type: 'recent' as const,
           title: scale.name,
-          subtitle: scale.category,
+          subtitle: scale.description,
         } : null;
       })
       .filter(Boolean) as SearchSuggestion[];
 
     setSuggestions(recentSuggestions);
-  }, [recentlyViewed]);
+  }, [recentlyViewed, realScales]);
 
-  // Generate search suggestions
+  // Generate search suggestions using the advanced hook
   const generateSuggestions = useCallback((searchQuery: string) => {
     if (!searchQuery.trim()) {
       generateRecentSuggestions();
+      return;
+    }
+
+    if (!realScales || realScales.length === 0) {
+      setSuggestions([]);
       return;
     }
 
@@ -132,35 +153,39 @@ export function SearchWidget({
     
     // Simulate API delay
     setTimeout(() => {
-      const scaleSuggestions: SearchSuggestion[] = mockScales
-        .filter(scale => 
-          scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          scale.category.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice(0, 4)
-        .map(scale => ({
-          id: scale.id,
-          type: 'scale' as const,
-          title: scale.name,
-          subtitle: scale.category,
-        }));
+      try {
+        // Use the advanced search function from the hook
+        const scaleSuggestions: SearchSuggestion[] = hookSearchScales(searchQuery)
+          .slice(0, 4)
+          .map(scale => ({
+            id: scale.id,
+            type: 'scale' as const,
+            title: scale.name,
+            subtitle: scale.description,
+          }));
 
-      const categorySuggestions: SearchSuggestion[] = categories
-        .filter(cat => 
-          cat.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice(0, 2)
-        .map(category => ({
-          id: category.toLowerCase(),
-          type: 'category' as const,
-          title: category,
-          subtitle: 'Categoría',
-        }));
+        const categorySuggestions: SearchSuggestion[] = categories
+          .filter(cat => 
+            cat.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .slice(0, 2)
+          .map(category => ({
+            id: category.toLowerCase(),
+            type: 'category' as const,
+            title: category,
+            subtitle: 'Categoría',
+          }));
 
-      setSuggestions([...scaleSuggestions, ...categorySuggestions]);
-      setIsLoading(false);
+        const allSuggestions = [...scaleSuggestions, ...categorySuggestions];
+        setSuggestions(allSuggestions);
+      } catch (error) {
+        console.error('Error generating suggestions:', error);
+        setSuggestions([]);
+      } finally {
+        setIsLoading(false);
+      }
     }, 300);
-  }, [generateRecentSuggestions]);
+  }, [generateRecentSuggestions, realScales, categories, hookSearchScales]);
 
   // Handle text change with debouncing
   const handleTextChange = useCallback((text: string) => {
@@ -187,6 +212,13 @@ export function SearchWidget({
 
   // Handle suggestion tap
   const handleSuggestionTap = useCallback((suggestion: SearchSuggestion) => {
+    // Immediately hide keyboard and suggestions
+    Keyboard.dismiss();
+    setIsFocused(false);
+    setSuggestions([]);
+    inputRef.current?.blur();
+    
+    // Navigate based on suggestion type
     if (suggestion.type === 'scale') {
       router.push(`/scales/${suggestion.id}`);
     } else if (suggestion.type === 'category') {
@@ -197,10 +229,6 @@ export function SearchWidget({
     } else if (suggestion.type === 'recent') {
       router.push(`/scales/${suggestion.id}`);
     }
-    
-    setIsFocused(false);
-    setSuggestions([]);
-    inputRef.current?.blur();
   }, []);
 
   // Clear search
@@ -212,33 +240,47 @@ export function SearchWidget({
   }, [generateRecentSuggestions]);
 
   // Render suggestion item
-  const renderSuggestion = useCallback(({ item }: { item: SearchSuggestion }) => (
-    <TouchableOpacity
-      style={styles.suggestionItem}
-      onPress={() => handleSuggestionTap(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.suggestionIcon}>
-        {item.type === 'recent' ? (
-          <Clock size={16} color="#64748b" />
-        ) : item.type === 'category' ? (
-          <Filter size={16} color="#64748b" />
-        ) : (
-          <Search size={16} color="#64748b" />
-        )}
-      </View>
-      <View style={styles.suggestionContent}>
-        <Text style={styles.suggestionTitle} numberOfLines={1}>
-          {item.title}
-        </Text>
-        {item.subtitle && (
-          <Text style={styles.suggestionSubtitle} numberOfLines={1}>
-            {item.subtitle}
+  const renderSuggestion = useCallback(({ item }: { item: SearchSuggestion }) => {
+    if (!item || !item.id || !item.title) {
+      return null;
+    }
+
+    const getIconColor = () => {
+      switch (item.type) {
+        case 'recent': return '#10b981';
+        case 'category': return '#8b5cf6';
+        default: return '#0891b2';
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        style={styles.suggestionItem}
+        onPress={() => handleSuggestionTap(item)}
+        activeOpacity={0.7}
+      >
+        <View style={[styles.suggestionIcon, { backgroundColor: `${getIconColor()}15` }]}>
+          {item.type === 'recent' ? (
+            <Clock size={16} color={getIconColor()} />
+          ) : item.type === 'category' ? (
+            <Filter size={16} color={getIconColor()} />
+          ) : (
+            <Search size={16} color={getIconColor()} />
+          )}
+        </View>
+        <View style={styles.suggestionContent}>
+          <Text style={styles.suggestionTitle} numberOfLines={1}>
+            {item.title}
           </Text>
-        )}
-      </View>
-    </TouchableOpacity>
-  ), [handleSuggestionTap]);
+          {item.subtitle && (
+            <Text style={styles.suggestionSubtitle} numberOfLines={2}>
+              {item.subtitle}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  }, [handleSuggestionTap]);
 
   return (
     <View style={styles.container}>
@@ -285,7 +327,18 @@ export function SearchWidget({
             <Filter size={18} color="#64748b" />
           </Pressable>
         )}
+
+        {/* Manual refresh button */}
+        <Pressable
+          style={[styles.filterButton, { marginLeft: 8 }]}
+          onPress={forceUpdate}
+          accessibilityLabel="Actualizar escalas"
+          accessibilityRole="button"
+        >
+          <Text style={{ color: '#10b981', fontSize: 12 }}>↻</Text>
+        </Pressable>
       </Animated.View>
+
 
       {/* Suggestions dropdown */}
       {isFocused && suggestions.length > 0 && (
@@ -299,8 +352,10 @@ export function SearchWidget({
             renderItem={renderSuggestion}
             keyExtractor={(item) => `${item.type}-${item.id}`}
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            maxToRenderPerBatch={8}
+            keyboardShouldPersistTaps="always"
+            maxToRenderPerBatch={6}
+            windowSize={10}
+            removeClippedSubviews={Platform.OS === 'android'}
           />
         </Animated.View>
       )}
@@ -322,7 +377,7 @@ export function SearchWidget({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    zIndex: 100,
+    zIndex: 1000,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -333,14 +388,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderWidth: 2,
     borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+    }),
   },
   input: {
     flex: 1,
@@ -373,15 +435,22 @@ const styles = StyleSheet.create({
     maxHeight: 300,
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-    zIndex: 1000,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 8,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 12,
+      },
+    }),
+    zIndex: 10000,
   },
   suggestionItem: {
     flexDirection: 'row',
@@ -392,10 +461,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f1f5f9',
   },
   suggestionIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f8fafc',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -405,13 +473,14 @@ const styles = StyleSheet.create({
   },
   suggestionTitle: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#0f172a',
     marginBottom: 2,
   },
   suggestionSubtitle: {
     fontSize: 13,
     color: '#64748b',
+    lineHeight: 18,
   },
   loadingContainer: {
     position: 'absolute',
@@ -425,14 +494,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 8,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 12,
+      },
+    }),
+    zIndex: 10000,
   },
   loadingText: {
     fontSize: 14,
