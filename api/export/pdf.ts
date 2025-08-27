@@ -4,6 +4,7 @@ import { shareAsync } from 'expo-sharing';
 import { Scale } from '@/types/scale';
 import { palette } from '@/app/theme';
 import { GenericAssessmentForPDF, PdfOptions, PdfTheme } from '@/api/export/types';
+import { puntosMotoresData } from '../../data/botulinum';
 
 /**
  * Genera y comparte un PDF con los resultados de la evaluación
@@ -686,8 +687,7 @@ export const generateLequesneReportHtml = (assessmentData: any) => {
   </div>
 </body>
 </html>`;
-};
-
+  };
 
 // Datos de dosis completos (importados de botulinum.ts)
 const dosisDataComplete = {
@@ -773,16 +773,9 @@ export const generateBotulinumReportHtml = (data: any): string => {
 
   const totalBase = musculos.reduce((total: number, m: any) => total + (m.dosisBase || 0), 0);
 
-  // Función para obtener punto motor
+  // Función para obtener punto motor usando todos los datos disponibles
   const getPuntoMotor = (musculo: string) => {
-    const puntosMotores: Record<string, string> = {
-      "Abductor hallucis": "Se localiza en la región medial plantar del pie, justo distal al tubérculo del calcáneo. Para ubicarlo, palpa con el paciente en decúbito supino o sentado y solicita que realice una ligera flexión plantar y abducción del primer dedo; el punto de mínima resistencia a la estimulación eléctrica se encuentra aproximadamente en el punto medio entre el tubérculo calcáneo medial y la base de la primera falange proximal del hallux.",
-      "Adductor longus": "Se ubica en la cara medial del muslo. Con el paciente en decúbito supino, cadera en ligera abducción y rotación externa, palpa a aproximadamente 3 cm inferior a la sínfisis púbica y 2–3 cm medial a la línea media del muslo. La contracción se confirma solicitando aducción activa del muslo contra resistencia; el punto motor suele hallarse a nivel del tercio proximal del músculo, donde el nervio obturador ingresa al vientre muscular.",
-      "Biceps brachii": "Se localiza en la mitad del brazo, sobre la línea que une el acromion con el pliegue del codo. Con el paciente sentado o en decúbito supino, palpa a aproximadamente 6–8 cm distal al acromion, en la cara anterior del brazo, unos 2–3 cm medial al surco bicipital. La contracción se confirma solicitando flexión de codo con supinación contra resistencia; el punto motor está donde se genere mayor contracción con la menor corriente.",
-      "Gastrocnemio (cabeza lateral)": "Con el paciente en decúbito prono o de pie, palpa la cabeza lateral del gastrocnemio aproximadamente a 1/3 distal de la línea que va desde la cabeza del peroné hasta el tendón de Aquiles. El punto motor se encuentra en la región más prominente del vientre muscular lateral, generalmente unos 8–10 cm distal al pliegue poplíteo. La contracción se confirma solicitando flexión plantar contra resistencia.",
-      "Gastrocnemio (cabeza medial)": "Con el paciente en decúbito prono, localiza el punto motor en la cabeza medial del gastrocnemio, aproximadamente a 1/3 distal de la línea entre el cóndilo medial del fémur y el tendón de Aquiles. Se encuentra en la parte más prominente del vientre muscular medial, generalmente unos 6–8 cm distal al pliegue poplíteo. Confirma la contracción solicitando flexión plantar activa."
-    };
-    return puntosMotores[musculo] || "Referencia anatómica no disponible para este músculo. Consulte literatura especializada.";
+    return puntosMotoresData[musculo as keyof typeof puntosMotoresData] || "Referencia anatómica no disponible para este músculo. Consulte literatura especializada.";
   };
 
   // Obtener datos de dosis para mostrar rangos
