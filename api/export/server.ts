@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { shareAsync } from 'expo-sharing';
 import { Scale } from '@/types/scale';
-import { GenericAssessmentForPDF, PdfOptions } from '@/api/export/pdf';
+import { GenericAssessmentForPDF, PdfOptions } from '@/api/export/types';
 
 type ServerPdfResponse = {
   filename: string;

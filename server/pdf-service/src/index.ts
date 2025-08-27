@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import { z } from 'zod';
 import puppeteer from 'puppeteer';
@@ -33,7 +33,8 @@ const RequestSchema = z.object({
   scale: z.object({ id: z.string(), name: z.string() }),
   options: z.object({
     theme: z.enum(['light', 'dark']).optional(),
-    customTheme: z.record(z.string()).partial().optional(),
+    // Theme overrides as a simple key->string map
+    customTheme: z.record(z.string()).optional(),
     footerNote: z.string().optional(),
     preset: z.enum(['compact', 'medical', 'formal']).optional(),
     headerTitle: z.string().optional(),
@@ -153,7 +154,7 @@ const generateHtml = (payload: z.infer<typeof RequestSchema>): string => {
   </body></html>`;
 };
 
-app.post('/api/pdf/export', async (req, res) => {
+app.post('/api/pdf/export', async (req: Request, res: Response) => {
   try {
     const parsed = RequestSchema.parse(req.body);
     const html = generateHtml(parsed);
