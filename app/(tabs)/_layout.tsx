@@ -51,15 +51,6 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
         }}
       />
-      {__DEV__ && (
-        <Tabs.Screen
-          name="admin"
-          options={{
-            title: 'Admin',
-            tabBarIcon: ({ size, color }) => <Shield size={size} color={color} />,
-          }}
-        />
-      )}
     </Tabs>
   );
 }

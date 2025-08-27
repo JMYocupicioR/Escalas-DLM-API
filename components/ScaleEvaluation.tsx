@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { ArrowLeft, ArrowRight, X } from 'lucide-react-native';
 interface ScaleEvaluationProps {
   scale: ScaleWithDetails;
   onCancel: () => void;
+  onComplete?: (assessment: { scale_id: string; responses: Record<string, number | string> }) => void;
   patientRequired?: boolean;
 }
 
@@ -44,6 +45,7 @@ interface EvaluationState {
 export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   scale,
   onCancel,
+  onComplete,
   patientRequired = false,
 }) => {
   const { colors, fontSizeMultiplier } = useThemedStyles();
@@ -58,6 +60,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   });
 
   const [animatedValue] = useState(new Animated.Value(0));
+  const lastSelectionRef = useRef<{ id: string; value: number | string } | null>(null);
   // const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sortedQuestions = useMemo(() => {
@@ -77,6 +80,9 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   }, [progress]);
 
   const handleAnswerSelect = useCallback((value: number | string) => {
+    if (currentQuestion?.question_id) {
+      lastSelectionRef.current = { id: currentQuestion.question_id, value };
+    }
     setState(prev => ({
       ...prev,
       responses: {
@@ -113,19 +119,25 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       return;
     }
 
+    // Include latest selection if state hasn't flushed yet
+    const workingResponses: Record<string, number | string> = { ...state.responses };
+    if (lastSelectionRef.current && workingResponses[lastSelectionRef.current.id] === undefined) {
+      workingResponses[lastSelectionRef.current.id] = lastSelectionRef.current.value;
+    }
+
     let totalScore = 0;
     const scoring = scale.scoring;
 
     // Calculate based on scoring method
     switch (scoring.scoring_method) {
       case 'sum':
-        totalScore = Object.values(state.responses)
+        totalScore = Object.values(workingResponses)
           .filter((value): value is number => typeof value === 'number')
           .reduce((sum, value) => sum + value, 0);
         break;
         
       case 'average':
-        const numericValues = Object.values(state.responses)
+        const numericValues = Object.values(workingResponses)
           .filter((value): value is number => typeof value === 'number');
         totalScore = numericValues.length > 0 
           ? numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length
@@ -134,13 +146,13 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
         
       case 'weighted':
         // Si no hay pesos definidos en el modelo, utilizar suma como fallback
-        totalScore = Object.values(state.responses)
+        totalScore = Object.values(workingResponses)
           .filter((value): value is number => typeof value === 'number')
           .reduce((sum, value) => sum + value, 0);
         break;
         
       default:
-        totalScore = Object.values(state.responses)
+        totalScore = Object.values(workingResponses)
           .filter((value): value is number => typeof value === 'number')
           .reduce((sum, value) => sum + value, 0);
     }
@@ -156,6 +168,17 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       interpretation,
     }));
   }, [scale.scoring, state.responses]);
+
+  useEffect(() => {
+    if (state.currentStep === 'results') {
+      try {
+        onComplete?.({
+          scale_id: scale.id,
+          responses: state.responses,
+        });
+      } catch {}
+    }
+  }, [state.currentStep]);
 
   const findInterpretation = (score: number, ranges: ScoringRange[]) => {
     const matchingRange = ranges.find(range => 
@@ -441,10 +464,10 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onCancel} style={styles.closeButton}>
+        <TouchableOpacity onPress={onCancel} style={styles.closeButton} testID="closeButton" accessibilityLabel="close">
           <X size={20} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
+        <Text style={styles.headerTitle} numberOfLines={1} testID="headerTitle">
           {state.currentStep === 'patient' ? 'Datos del Paciente' :
            state.currentStep === 'evaluation' ? scale.name :
            'Resultados'}
@@ -779,3 +802,4 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     color: colors.text,
   },
 });
+

@@ -1,9 +1,9 @@
-const { createJestPreset } = require('jest-expo/src/preset/createJestPreset');
 const { defaults } = require('jest-config');
 
 /** @type {import('jest').Config} */
 module.exports = {
-  ...createJestPreset(),
+  // Use Expo's Jest preset for SDK 52
+  preset: 'jest-expo',
   
   // Test file patterns
   testMatch: [

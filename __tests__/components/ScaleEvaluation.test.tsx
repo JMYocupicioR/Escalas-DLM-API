@@ -123,7 +123,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should render the scale name and first question', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -136,7 +136,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should show progress indicator', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -148,7 +148,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should display question options', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -161,7 +161,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should allow selecting an option', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -177,7 +177,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should disable "Anterior" button on first question', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -191,7 +191,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should show "Siguiente" button when option is selected', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -210,7 +210,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should progress to next question when "Siguiente" is pressed', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -236,7 +236,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should show "Finalizar" button on last question', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -260,7 +260,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should calculate score and show results', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -298,7 +298,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should call onComplete with assessment data', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -327,7 +327,7 @@ describe('ScaleEvaluation Component', () => {
 
     // Find and press save button in results
     await waitFor(() => {
-      const saveButtons = getByText('Guardar'); // This would be in ResultsActions component
+      const saveButtons = getByText('Exportar PDF'); // This would be in ResultsActions component
       fireEvent.press(saveButtons);
     });
 
@@ -344,7 +344,7 @@ describe('ScaleEvaluation Component', () => {
   });
 
   it('should call onCancel when close button is pressed', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -352,14 +352,14 @@ describe('ScaleEvaluation Component', () => {
       />
     );
 
-    const closeButton = getByText('×');
+    const closeButton = getByTestId('closeButton');
     fireEvent.press(closeButton);
 
     expect(mockOnCancel).toHaveBeenCalled();
   });
 
   it('should show patient form when patientRequired is true', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={mockScale}
         onComplete={mockOnComplete}
@@ -368,7 +368,7 @@ describe('ScaleEvaluation Component', () => {
       />
     );
 
-    expect(getByText('Datos del Paciente')).toBeTruthy();
+    expect(getAllByText('Datos del Paciente').length).toBeGreaterThan(0);
   });
 
   it('should handle scales without scoring system', () => {
@@ -377,7 +377,7 @@ describe('ScaleEvaluation Component', () => {
       scoring: null,
     };
 
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={scaleWithoutScoring}
         onComplete={mockOnComplete}
@@ -396,7 +396,7 @@ describe('ScaleEvaluation Component', () => {
       questions: [],
     };
 
-    const { getByText } = render(
+    const { getByTestId, getByText, getAllByText } = render(
       <ScaleEvaluation
         scale={scaleWithoutQuestions}
         onComplete={mockOnComplete}
@@ -408,3 +408,4 @@ describe('ScaleEvaluation Component', () => {
     expect(getByText('Cargando pregunta...')).toBeTruthy();
   });
 });
+

@@ -21,7 +21,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.text }]}>Datos del Paciente</Text>
+      <Text style={[styles.title, { color: colors.text }]} testID="patientFormTitle">Datos del Paciente</Text>
 
       <TouchableOpacity onPress={() => setShowPicker(v => !v)} style={[styles.toggle, { backgroundColor: colors.tagBackground }]}> 
         <Text style={[styles.toggleText, { color: colors.text }]}>{showPicker ? 'Ocultar lista de pacientes' : 'Seleccionar paciente existente'}</Text>

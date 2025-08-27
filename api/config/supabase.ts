@@ -382,7 +382,7 @@ export function handleApiError<T = any>(
   shouldThrow = false
 ): { error: true; message: string; code?: string; status?: number; details?: any } {
   // Extract error information
-  const message = error?.message || customMessage;
+  const rawMessage = error?.message || customMessage;
   const code = error?.code || 'general/unknown';
   const status = error?.status || 500;
   const details = error?.details || null;
@@ -396,16 +396,20 @@ export function handleApiError<T = any>(
     code === 'db/row-level-security' ||
     code === 'storage/unauthorized'
   ) {
-    logSecurityEvent('security_error', { 
-      code, 
-      message,
+    logSecurityEvent('security_error', {
+      code,
+      message: resolvedMessage,
       user: supabase.auth.getUser() || 'unauthenticated',
     });
   }
   
+  const resolvedMessage = error?.code && ERROR_CODES[error.code]
+    ? ERROR_CODES[error.code]
+    : rawMessage;
+
   const processedError = {
     error: true,
-    message: ERROR_CODES[code] || message,
+    message: resolvedMessage,
     code,
     status,
     details,
@@ -603,7 +607,7 @@ function isCriticalSecurityEvent(eventType: string): boolean {
  * @param data The data to sanitize
  * @returns Sanitized data safe for logging
  */
-function sanitizeLogData(data: Record<string, any>): Record<string, any> {
+export function sanitizeLogData(data: Record<string, any>): Record<string, any> {
   const sensitiveKeys = [
     'password',
     'token',
@@ -870,3 +874,4 @@ export async function checkKeyRotationNeeded(): Promise<boolean> {
 
 // Export additional utility functions and error handlers
 export { handleApiError as handleError };
+
