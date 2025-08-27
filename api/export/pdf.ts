@@ -6,6 +6,7 @@ import { Scale } from '@/types/scale';
 import { palette } from '@/app/theme';
 import { GenericAssessmentForPDF, PdfOptions, PdfTheme } from '@/api/export/types';
 import { puntosMotoresData } from '../../data/botulinum';
+import jsPDF from 'jspdf';
 
 /**
  * Genera y comparte un PDF con los resultados de la evaluación
@@ -35,6 +36,22 @@ export const exportAssessmentPDF = async (
     return true;
   } catch (error) {
     console.error('Error al exportar PDF:', error);
+    
+    // Fallback para web usando jsPDF
+    if (Platform.OS === 'web') {
+      try {
+        const doc = new jsPDF();
+        // Generar contenido simple con jsPDF (adaptar según necesidades)
+        doc.text(`Resultados de ${scale.name}`, 10, 10);
+        doc.text(`Puntuación: ${assessment.score}`, 10, 20);
+        // Agregar más contenido...
+        doc.save(`${scale.name}-resultados.pdf`);
+        return true;
+      } catch (jsError) {
+        console.error('Error en fallback jsPDF:', jsError);
+      }
+    }
+    
     return false;
   }
 };
@@ -101,7 +118,7 @@ const appIconSvg = `<svg width="32" height="32" viewBox="0 0 100 100" xmlns="htt
   <path d="M32 50 L45 63 L68 40" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-const generatePDFContent = (
+export const generatePDFContent = (
   assessment: GenericAssessmentForPDF,
   scale: Scale,
   options?: PdfOptions

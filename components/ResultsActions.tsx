@@ -31,8 +31,8 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
             showPatientSummary: true,
           });
           if (!ok) {
-            // Fallback local con expo-print
-            await exportAssessmentPDF(assessment, scale as Scale, {
+            // Fallback local con expo-print o jsPDF
+            const success = await exportAssessmentPDF(assessment, scale as Scale, {
               theme: isDark ? 'dark' : 'light',
               preset: 'compact',
               scale: 0.85,
@@ -40,6 +40,22 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
               headerSubtitle: scale.name,
               showPatientSummary: true,
             });
+            if (success && Platform.OS === 'web') {
+              // Abrir preview en nueva pestaña para web
+              const htmlContent = generatePDFContent(assessment, scale as Scale, {
+                theme: isDark ? 'dark' : 'light',
+                preset: 'compact',
+                scale: 0.85,
+                headerTitle: 'Informe de Resultados',
+                headerSubtitle: scale.name,
+                showPatientSummary: true,
+              });
+              const previewWindow = window.open('', '_blank');
+              if (previewWindow) {
+                previewWindow.document.write(htmlContent);
+                previewWindow.document.close();
+              }
+            }
           }
         }}
         accessibilityLabel="Exportar resultados como PDF"
