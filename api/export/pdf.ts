@@ -1,6 +1,7 @@
 // api/export/pdf.ts
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
+import { Platform } from 'react-native';
 import { Scale } from '@/types/scale';
 import { palette } from '@/app/theme';
 import { GenericAssessmentForPDF, PdfOptions, PdfTheme } from '@/api/export/types';
@@ -45,8 +46,39 @@ export const printAssessmentPDF = async (
 ): Promise<boolean> => {
   try {
     const htmlContent = generatePDFContent(assessment, scale, options);
-    await Print.printAsync({ html: htmlContent });
-    return true;
+    
+    if (Platform.OS === 'web') {
+      // Para web: usar la función de impresión del navegador
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        printWindow.onload = () => {
+          printWindow.print();
+          printWindow.close();
+        };
+      }
+      return true;
+    } else {
+      // Para móvil: intentar imprimir directamente
+      try {
+        await Print.printAsync({ html: htmlContent });
+        return true;
+      } catch (printError) {
+        console.log('Impresión directa falló, intentando fallback...');
+        
+        // Fallback: generar archivo y compartir
+        const { uri } = await Print.printToFileAsync({ html: htmlContent });
+        
+        // Compartir el archivo generado como alternativa
+        await shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: `Imprimir ${scale.name}`,
+          UTI: 'com.adobe.pdf',
+        });
+        return true;
+      }
+    }
   } catch (error) {
     console.error('Error al imprimir PDF:', error);
     return false;
@@ -75,7 +107,7 @@ const generatePDFContent = (
   options?: PdfOptions
 ): string => {
   const today = new Date().toLocaleDateString();
-  const { patientData, score, interpretation, answers } = assessment;
+  const { patientData, score, interpretation } = assessment;
   const theme = getPdfTheme(options?.theme ?? 'light', options?.customTheme);
   const preset = options?.preset ?? 'medical';
   const s = Math.max(0.7, Math.min(1.1, options?.scale ?? (preset === 'compact' ? 0.85 : preset === 'medical' ? 0.9 : 1)));
@@ -232,7 +264,7 @@ export const generateBarthelReportHtml = (
   questions.forEach(q => {
     const answer = answers[q.id];
     if (answer !== undefined) {
-      const selectedOption = q.options.find(opt => opt.value === answer);
+      const selectedOption = q.options.find((opt: any) => opt.value === answer);
       if (selectedOption) {
         detailHTML += `
           <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
@@ -290,7 +322,7 @@ export const generateBarthelReportHtml = (
 };
 
 export const generateFimReportHtml = (assessmentData: any) => {
-  const { patientData, totalScore, motorScore, cognitiveScore, answers, questions, fimCategories } = assessmentData;
+  const { patientData, totalScore, motorScore, cognitiveScore, answers, questions } = assessmentData;
   
   // Get interpretation and recommendation text
   let interpretation = '';
@@ -409,9 +441,9 @@ export const generateLequesneReportHtml = (assessmentData: any) => {
   
   // Build detailed results table
   let detailHTML = '';
-  questions.forEach(q => {
+  questions.forEach((q: any) => {
     const answer = answers[q.id];
-    const option = q.options.find(opt => opt.value === answer);
+    const option = q.options.find((opt: any) => opt.value === answer);
     detailHTML += `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
