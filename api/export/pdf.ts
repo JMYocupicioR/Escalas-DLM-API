@@ -40,12 +40,62 @@ export const exportAssessmentPDF = async (
     // Fallback para web usando jsPDF
     if (Platform.OS === 'web') {
       try {
-        const doc = new jsPDF();
-        // Generar contenido simple con jsPDF (adaptar según necesidades)
-        doc.text(`Resultados de ${scale.name}`, 10, 10);
-        doc.text(`Puntuación: ${assessment.score}`, 10, 20);
-        // Agregar más contenido...
-        doc.save(`${scale.name}-resultados.pdf`);
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm', 
+          format: 'a4'
+        });
+        
+        // Header
+        doc.setFontSize(16);
+        doc.text(`Resultados de ${scale.name}`, 20, 20);
+        
+        // Fecha
+        doc.setFontSize(10);
+        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 30);
+        
+        let yPos = 45;
+        
+        // Datos del paciente
+        if (assessment.patientData) {
+          doc.setFontSize(12);
+          doc.text('Datos del Paciente:', 20, yPos);
+          yPos += 10;
+          
+          doc.setFontSize(10);
+          if (assessment.patientData.name) {
+            doc.text(`Nombre: ${assessment.patientData.name}`, 25, yPos);
+            yPos += 6;
+          }
+          if (assessment.patientData.age) {
+            doc.text(`Edad: ${assessment.patientData.age}`, 25, yPos);
+            yPos += 6;
+          }
+          if (assessment.patientData.gender) {
+            doc.text(`Género: ${assessment.patientData.gender}`, 25, yPos);
+            yPos += 6;
+          }
+          yPos += 5;
+        }
+        
+        // Resultados
+        doc.setFontSize(12);
+        doc.text('Resultados:', 20, yPos);
+        yPos += 10;
+        
+        doc.setFontSize(10);
+        if (assessment.score !== undefined) {
+          doc.text(`Puntuación: ${assessment.score}`, 25, yPos);
+          yPos += 6;
+        }
+        if (assessment.interpretation) {
+          // Dividir texto largo en líneas
+          const lines = doc.splitTextToSize(`Interpretación: ${assessment.interpretation}`, 160);
+          doc.text(lines, 25, yPos);
+          yPos += lines.length * 6;
+        }
+        
+        doc.save(`${scale.name.replace(/\s+/g, '_')}-resultados.pdf`);
         return true;
       } catch (jsError) {
         console.error('Error en fallback jsPDF:', jsError);
@@ -54,6 +104,16 @@ export const exportAssessmentPDF = async (
     
     return false;
   }
+};
+
+/**
+ * Detecta si el dispositivo es un navegador móvil
+ */
+const isMobileBrowser = (): boolean => {
+  if (Platform.OS !== 'web') return false;
+  if (typeof navigator === 'undefined') return false;
+  
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
 };
 
 export const printAssessmentPDF = async (
@@ -65,29 +125,89 @@ export const printAssessmentPDF = async (
     const htmlContent = generatePDFContent(assessment, scale, options);
     
     if (Platform.OS === 'web') {
-      // Para web: usar la función de impresión del navegador
+      // Verificar si es navegador móvil web
+      const isMobile = isMobileBrowser();
+      
+      if (isMobile) {
+        // Navegadores móviles: crear PDF con jsPDF y abrir para imprimir
+        try {
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
+          
+          // Contenido simplificado para jsPDF
+          const lines = [
+            `Resultados de ${scale.name}`,
+            `Fecha: ${new Date().toLocaleDateString()}`,
+            '',
+            'Datos del Paciente:',
+            `Nombre: ${assessment.patientData?.name || 'No especificado'}`,
+            `Edad: ${assessment.patientData?.age || 'No especificada'}`,
+            `Género: ${assessment.patientData?.gender || 'No especificado'}`,
+            '',
+            'Resultados:',
+            `Puntuación: ${assessment.score || 'N/A'}`,
+            `Interpretación: ${assessment.interpretation || 'N/A'}`,
+          ];
+          
+          let yPos = 20;
+          lines.forEach(line => {
+            doc.text(line, 20, yPos);
+            yPos += 7;
+          });
+          
+          // Abrir PDF en nueva ventana para imprimir
+          const pdfBlob = doc.output('blob');
+          const url = URL.createObjectURL(pdfBlob);
+          const printWindow = window.open(url, '_blank');
+          
+          if (printWindow) {
+            // Limpiar URL después de abrir
+            setTimeout(() => URL.revokeObjectURL(url), 30000);
+            return true;
+          }
+          return false;
+        } catch (pdfError) {
+          console.log('jsPDF falló, usando HTML directo...');
+          // Fallback a HTML directo
+        }
+      }
+      
+      // Navegador desktop o fallback: usar HTML directo
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         printWindow.document.write(htmlContent);
         printWindow.document.close();
         printWindow.onload = () => {
           printWindow.print();
-          printWindow.close();
+          // No cerrar automáticamente en móviles
+          if (!isMobile) {
+            printWindow.close();
+          }
         };
+        return true;
       }
-      return true;
+      return false;
     } else {
-      // Para móvil: intentar imprimir directamente
+      // Aplicaciones nativas (iOS/Android)
       try {
-        await Print.printAsync({ html: htmlContent });
+        // Intentar impresión directa primero
+        await Print.printAsync({ 
+          html: htmlContent,
+          printerUrl: undefined // Permitir selección de impresora
+        });
         return true;
       } catch (printError) {
-        console.log('Impresión directa falló, intentando fallback...');
+        console.log('Impresión directa falló, usando compartir como alternativa...');
         
-        // Fallback: generar archivo y compartir
-        const { uri } = await Print.printToFileAsync({ html: htmlContent });
+        // Fallback: generar PDF y compartir
+        const { uri } = await Print.printToFileAsync({ 
+          html: htmlContent,
+          base64: false
+        });
         
-        // Compartir el archivo generado como alternativa
         await shareAsync(uri, {
           mimeType: 'application/pdf',
           dialogTitle: `Imprimir ${scale.name}`,

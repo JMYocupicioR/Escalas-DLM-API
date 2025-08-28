@@ -303,7 +303,7 @@ export function SearchWidget({
           selectTextOnFocus
           clearButtonMode={Platform.OS === 'ios' ? 'while-editing' : 'never'}
           accessibilityLabel="Campo de búsqueda de escalas médicas"
-          accessibilityRole="searchbox"
+          accessibilityRole="search"
         />
 
         {query.length > 0 && Platform.OS === 'android' && (

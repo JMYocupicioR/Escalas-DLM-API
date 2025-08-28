@@ -179,7 +179,8 @@ app.post('/api/pdf/export', async (req: Request, res: Response) => {
     if (req.query.binary) {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      return res.send(pdfBuffer);
+      res.setHeader('Content-Length', pdfBuffer.length.toString());
+      return res.end(pdfBuffer, 'binary');
     }
     // Por defecto: JSON base64 para apps nativas
     return res.json({ filename, base64: pdfBuffer.toString('base64') });

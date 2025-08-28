@@ -4,8 +4,7 @@ import { palette, getThemeColors, medicalColors } from '@/app/theme';
 import { Appearance } from 'react-native';
 
 export const useThemedStyles = () => {
-  const { darkMode, themeMode, contrastLevel, fontSize } = useSettingsStore((s) => ({
-    darkMode: s.darkMode,
+  const { themeMode, contrastLevel, fontSize } = useSettingsStore((s) => ({
     themeMode: s.themeMode,
     contrastLevel: s.contrastLevel,
     fontSize: s.fontSize,

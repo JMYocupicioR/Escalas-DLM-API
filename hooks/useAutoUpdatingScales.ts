@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { DEV_CONFIG } from '@/config/development';
+import { scalesById } from '@/data/_scales';
 
 interface Scale {
   id: string;
@@ -35,17 +36,15 @@ export function useAutoUpdatingScales(options: UseAutoUpdatingScalesOptions = {}
     }
   }, [enableLogging]);
 
-  // Import scales dynamically to get latest data
+  // Update scales from local data (static import for compatibility)
   const updateScales = useCallback(async (force = false) => {
     try {
       setIsUpdating(true);
       setError(null);
       
       log('Starting scales update...');
-      
-      // Import scales data
-      const { scalesById } = await import('@/data/_scales');
-      log(`Imported scalesById with ${Object.keys(scalesById).length} keys`);
+      // Use statically imported data
+      log(`Using scalesById with ${Object.keys(scalesById).length} keys`);
       
       const currentScales = Object.values(scalesById) as Scale[];
       log(`Converted to array with ${currentScales.length} scales`);
@@ -165,6 +164,8 @@ export function useAutoUpdatingScales(options: UseAutoUpdatingScalesOptions = {}
         clearInterval(interval);
       };
     }
+    // Ensure consistent return type for effect
+    return undefined;
   }, [updateScales, enableAutoUpdate, updateInterval, log]);
 
   // Listen for file changes in development (optional)

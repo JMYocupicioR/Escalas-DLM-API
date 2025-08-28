@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Scale } from '@/types/scale';
 
 // Interfaces para el almacenamiento
 export interface Patient {
@@ -252,7 +251,7 @@ export const useScalesStore = create<ScalesState>()(
         lastPatientIdByScale: state.lastPatientIdByScale,
       }),
       // Función de migración para evitar errores de estado
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: any, _version: number) => {
         // Si no hay estado persistido, retornar el estado inicial
         if (!persistedState) {
           return {

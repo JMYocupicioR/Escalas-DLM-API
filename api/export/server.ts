@@ -20,6 +20,78 @@ const getPdfServiceUrl = (): string | null => {
  * - Nativo: guarda en cache y abre diálogo de compartir
  * Devuelve true si tuvo éxito; false si falla (para permitir fallback local)
  */
+/**
+ * Intenta imprimir el PDF a través del servicio backend (Puppeteer).
+ * - Web: abre PDF en nueva pestaña para imprimir
+ * - Nativo: usa diálogo nativo de impresión
+ * Devuelve true si tuvo éxito; false si falla (para permitir fallback local)
+ */
+export const printAssessmentServerPDF = async (
+  assessment: GenericAssessmentForPDF,
+  scale: Scale,
+  options?: PdfOptions
+): Promise<boolean> => {
+  try {
+    const serviceBase = getPdfServiceUrl();
+    if (!serviceBase) return false;
+
+    const endpoint = `${serviceBase}/api/pdf/export?binary=1`;
+    const payload = {
+      assessment,
+      scale: { id: scale.id, name: scale.name },
+      options,
+    };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    if (Platform.OS === 'web') {
+      // Web: crear blob y abrir en nueva pestaña para imprimir
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const printWindow = window.open(url, '_blank');
+      
+      if (printWindow) {
+        // Esperar a que cargue y ejecutar print automáticamente
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+        // Limpiar URL después de un tiempo
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+        return true;
+      }
+      return false;
+    } else {
+      // Nativo: convertir blob a base64 y usar expo-print
+      const arrayBuffer = await res.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      
+      const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
+      const targetPath = `${FileSystem.cacheDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(targetPath, base64, { 
+        encoding: FileSystem.EncodingType.Base64 
+      });
+      
+      // En móviles, compartir es la mejor opción disponible
+      await shareAsync(targetPath, {
+        mimeType: 'application/pdf',
+        dialogTitle: `Imprimir ${scale.name}`,
+        UTI: 'com.adobe.pdf',
+      });
+      return true;
+    }
+  } catch (error) {
+    console.error('Error en impresión PDF vía servidor:', error);
+    return false;
+  }
+};
+
 export const exportAssessmentServerPDF = async (
   assessment: GenericAssessmentForPDF,
   scale: Scale,
