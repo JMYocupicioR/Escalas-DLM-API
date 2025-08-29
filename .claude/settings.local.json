@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
-      "Bash(netlify:*)"
+      "Bash(netlify:*)",
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

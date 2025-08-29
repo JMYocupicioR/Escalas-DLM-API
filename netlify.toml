@@ -1,13 +1,23 @@
 [build]
-  command = "npm run build:web"
+  command = "npm run build:web && npm run build:functions"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20.18.0"
   NPM_VERSION = "10.8.0"
   SECRETS_SCAN_ENABLED = "false"
 
+# API redirects (before catch-all)
+[[redirects]]
+  from = "/api/pdf/export"
+  to = "/.netlify/functions/pdf-export"
+  status = 200
+
+# Catch-all for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  conditions = {Role = ["visitor"]}
+  force = false

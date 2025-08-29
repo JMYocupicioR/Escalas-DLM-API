@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start",
     "build:web": "expo export --platform web",
+    "build:functions": "tsc --project netlify/functions/tsconfig.json",
     "lint": "expo lint",
     "lint:app": "eslint app/(tabs)/index.tsx components/SearchWidget.tsx hooks/useAutoUpdatingScales.ts hooks/useThemedStyles.ts hooks/useResponsiveLayout.ts store/scales.ts data/_scales.ts app/theme.ts",
     "import:scales": "tsx scripts/massScaleImporter.ts",
@@ -26,6 +27,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@gorhom/bottom-sheet": "^5.0.0-alpha.12",
     "@lucide/lab": "^0.1.2",
+    "@netlify/functions": "^2.4.1",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
@@ -65,6 +67,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.19.13",
     "react-native-webview": "13.12.5",
+    "zod": "^3.23.8",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
