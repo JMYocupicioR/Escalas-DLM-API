@@ -1,6 +1,9 @@
-import { Handler } from '@netlify/functions';
+import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import { z } from 'zod';
 import puppeteer from 'puppeteer';
+
+// Define proper headers type
+type Headers = Record<string, string>;
 
 const AssessmentSchema = z.object({
   patientData: z.object({
@@ -147,30 +150,31 @@ const generateHtml = (payload: z.infer<typeof RequestSchema>): string => {
   </body></html>`;
 };
 
-export const handler: Handler = async (event, context) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
-  }
+export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+  const corsHeaders: Headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
 
   // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
+      headers: corsHeaders,
       body: '',
+    };
+  }
+
+  // Only allow POST requests
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ error: 'Method not allowed' }),
     };
   }
 
@@ -218,13 +222,11 @@ export const handler: Handler = async (event, context) => {
       return {
         statusCode: 200,
         headers: {
+          ...corsHeaders,
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="${filename}"`,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
         },
-        body: pdfBuffer.toString('base64'),
+        body: Buffer.from(pdfBuffer).toString('base64'),
         isBase64Encoded: true,
       };
     }
@@ -233,14 +235,12 @@ export const handler: Handler = async (event, context) => {
     return {
       statusCode: 200,
       headers: {
+        ...corsHeaders,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
       body: JSON.stringify({
         filename,
-        base64: pdfBuffer.toString('base64'),
+        base64: Buffer.from(pdfBuffer).toString('base64'),
       }),
     };
   } catch (error: any) {
@@ -248,10 +248,8 @@ export const handler: Handler = async (event, context) => {
     return {
       statusCode: 400,
       headers: {
+        ...corsHeaders,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
       body: JSON.stringify({
         error: error?.message || 'Bad Request',
