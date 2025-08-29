@@ -10,7 +10,6 @@ import { useScalesStore } from '@/store/scales';
 import { ResultsActions } from '@/components/ResultsActions';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-import { generateLequesneReportHtml } from '@/api/export/pdf';
 
 function useLequesneAssessment() {
   const [currentStep, setCurrentStep] = useState<'form' | 'questions' | 'results'>('form');
@@ -115,21 +114,10 @@ export default function LequesneScaleScreen() {
   } = useLequesneAssessment();
 
   const handleExport = async () => {
-    try {
-      const interpretation = getInterpretation();
-      const htmlContent = generateLequesneReportHtml({
-        patientData,
-        totalScore,
-        answers,
-        questions: lequesneQuestions,
-        interpretation
-      });
-      
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      await shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Compartir Reporte Lequesne' });
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo generar el reporte PDF');
-    }
+    Alert.alert(
+      'Función en desarrollo', 
+      'La exportación PDF para esta escala está siendo actualizada. Estará disponible pronto.'
+    );
   };
 
   const renderForm = () => (

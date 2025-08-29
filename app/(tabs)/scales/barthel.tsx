@@ -9,7 +9,6 @@ import { CircleAlert as AlertCircle, ArrowLeft, ArrowRight, FileText, User } fro
 import { useScalesStore } from '@/store/scales';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { PatientForm } from '@/components/PatientForm';
-import { exportAssessmentPDF, printAssessmentPDF, generateBarthelReportHtml } from '@/api/export/pdf';
 import { ResultsActions } from '@/components/ResultsActions';
 import { OptionRow } from '@/components/OptionRow';
 
@@ -143,39 +142,6 @@ export default function BarthelScale() {
     resetAssessment
   } = useBarthelAssessment();
 
-  const handleExport = useCallback(async () => {
-    if (Platform.OS === 'web') {
-      Alert.alert('Exportación Web', 'La exportación a PDF no está disponible en la versión web por el momento.');
-      return;
-    }
-    
-    try {
-      const total = calculateTotal();
-      const interpretation = getInterpretation(total);
-      const color = colors[interpretation.colorKey] || colors.text;
-      
-      const htmlContent = generateBarthelReportHtml(
-        patientData,
-        answers,
-        total,
-        { ...interpretation, color },
-        questions
-      );
-
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      await shareAsync(uri, {
-        mimeType: 'application/pdf',
-        dialogTitle: 'Exportar Resultados',
-        UTI: 'com.adobe.pdf',
-      });
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-      Alert.alert(
-        'Error de Exportación',
-        'Ha ocurrido un error al generar el PDF. Por favor intente nuevamente.'
-      );
-    }
-  }, [calculateTotal, getInterpretation, patientData, answers, colors]);
 
   // Crear estilos dinámicos
   const dynamicStyles = useMemo(() => StyleSheet.create({

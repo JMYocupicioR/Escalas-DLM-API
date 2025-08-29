@@ -9,7 +9,6 @@ import { questions, options, fimCategories } from '@/data/fim';
 import { useScalesStore } from '@/store/scales';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-import { generateFimReportHtml } from '@/api/export/pdf';
 
 function useFimAssessment() {
   const [currentStep, setCurrentStep] = useState<'form' | 'questions' | 'results'>('form');
@@ -130,22 +129,10 @@ export default function FimScaleScreen() {
   } = useFimAssessment();
 
   const handleExport = async () => {
-    const assessmentData = {
-      patientData,
-      totalScore,
-      motorScore,
-      cognitiveScore,
-      answers,
-      questions,
-      fimCategories,
-    };
-    const html = generateFimReportHtml(assessmentData);
-    try {
-      const { uri } = await Print.printToFileAsync({ html });
-      await shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Reporte FIM' });
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo generar el reporte PDF.');
-    }
+    Alert.alert(
+      'Función en desarrollo', 
+      'La exportación PDF para esta escala está siendo actualizada. Estará disponible pronto.'
+    );
   };
   
   const goToHome = useCallback(() => {

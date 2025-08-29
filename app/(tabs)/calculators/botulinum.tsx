@@ -15,7 +15,9 @@ import { Picker } from '@react-native-picker/picker';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { dosisData, puntosMotoresData } from '@/data/botulinum';
 import * as Print from 'expo-print';
-import { generateBotulinumReportHtml } from '@/api/export/pdf';
+import { generatePdfFromService } from '@/api/export/pdf';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { PlusCircle, Printer, RotateCcw, Trash2, TrendingUp } from 'lucide-react-native';
 
 // Define types for state management
@@ -181,10 +183,12 @@ export default function BotulinumCalculator() {
     }
 
     const reportData = {
-      medico,
-      pacienteNombre,
-      pacienteEdad,
-      pacientePeso,
+      patientData: {
+        name: pacienteNombre,
+        age: pacienteEdad,
+        weight: pacientePeso,
+        doctorName: medico,
+      },
       marca,
       musculos,
       totalDosisAjustada,
@@ -192,29 +196,64 @@ export default function BotulinumCalculator() {
       dilucion,
     };
 
-    const html = generateBotulinumReportHtml(reportData);
+    const scale = {
+      id: 'botulinum',
+      name: 'Calculadora de Toxina Botulínica'
+    };
 
     try {
+      const base64Pdf = await generatePdfFromService(reportData, scale, {
+        headerTitle: 'Reporte de Toxina Botulínica',
+        footerNote: 'Creado con DeepLuxMed - Escalas Médicas'
+      });
+
       if (Platform.OS === 'web') {
-        // Para web: abrir nueva ventana con el reporte para imprimir
-        const printWindow = window.open('', '_blank');
+        // Para web: crear blob y abrir en nueva pestaña
+        const base64toBlob = (data: string) => {
+          const bytes = atob(data);
+          const byteArray = new Uint8Array(bytes.length);
+          for (let i = 0; i < bytes.length; i++) {
+            byteArray[i] = bytes.charCodeAt(i);
+          }
+          return new Blob([byteArray], { type: 'application/pdf' });
+        };
+        
+        const blob = base64toBlob(base64Pdf);
+        const url = URL.createObjectURL(blob);
+        const printWindow = window.open(url, '_blank');
         if (printWindow) {
-          printWindow.document.write(html);
-          printWindow.document.close();
           printWindow.onload = () => {
             printWindow.print();
-            printWindow.close();
           };
+        } else {
+          // Fallback: descargar el archivo
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `reporte_botulinum_${Date.now()}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
         }
       } else {
-        // Para nativo: usar expo-print
-        await Print.printAsync({
-          html,
+        // Para nativo: usar expo-file-system y sharing
+        const filename = `reporte_botulinum_${Date.now()}.pdf`;
+        const uri = `${FileSystem.documentDirectory}${filename}`;
+        
+        await FileSystem.writeAsStringAsync(uri, base64Pdf, {
+          encoding: FileSystem.EncodingType.Base64,
         });
+        
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Compartir Reporte PDF'
+          });
+        } else {
+          Alert.alert('Éxito', `PDF guardado en: ${uri}`);
+        }
       }
     } catch (error) {
-      console.error('Error al imprimir:', error);
-      Alert.alert('Error', 'No se pudo imprimir el reporte. Intente nuevamente.');
+      console.error('Error al generar PDF:', error);
+      Alert.alert('Error', 'No se pudo generar el reporte PDF. Intente nuevamente.');
     }
   };
 
