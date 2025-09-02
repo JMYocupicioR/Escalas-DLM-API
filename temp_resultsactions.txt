@@ -118,15 +118,9 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
       showPatientSummary: true,
     };
     try {
+      const base64Pdf = await generatePdfFromService(assessment, scale as Scale, options);
       if (Platform.OS === 'web') {
-        // Prefer binary response on web to avoid JSON base64 overhead
-        const res = await fetch('/api/pdf/export?binary=1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options }),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const blob = await res.blob();
+        const blob = base64ToBlob(base64Pdf);
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -136,8 +130,6 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } else {
-        // Native: fetch JSON base64 then save/share
-        const base64Pdf = await generatePdfFromService(assessment, scale as Scale, options);
         const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
         const filePath = `${FileSystem.cacheDirectory}${fileName}`;
         await FileSystem.writeAsStringAsync(filePath, base64Pdf, { encoding: FileSystem.EncodingType.Base64 });
@@ -237,5 +229,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
 
 

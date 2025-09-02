@@ -84,7 +84,13 @@ export const handler: Handler = async (event: HandlerEvent) => {
     if (isBinary) {
       return {
         statusCode: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${filename}"` },
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Content-Length': String(pdfBuffer.length),
+          'Cache-Control': 'no-store',
+        },
         body: Buffer.from(pdfBuffer).toString('base64'),
         isBase64Encoded: true,
       };
@@ -92,7 +98,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
     return {
       statusCode: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ filename, base64: Buffer.from(pdfBuffer).toString('base64') }),
     };
   } catch (error: any) {
