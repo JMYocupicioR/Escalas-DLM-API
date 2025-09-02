@@ -6,14 +6,14 @@ This guide helps contributors navigate, develop, test, and submit changes effici
 - `app/`: Expo Router screens/layouts (e.g., `app/(tabs)`, `_layout.tsx`).
 - `components/`, `hooks/`, `store/`: UI components, reusable hooks, Zustand state.
 - `api/`: Client APIs and config (Supabase in `api/config/supabase.ts`).
+- `api/export/templates/`: Shared PDF templates and dispatcher.
 - `data/`, `types/`, `config/`: Domain data, shared TS types, app config.
-- `server/pdf-service/`: PDF microservice (Express + Puppeteer).
 - `scripts/`, `__tests__/`, `assets/`, `supabase/migrations/`.
 
 ## Build, Test, and Development Commands
 - `npm run dev`: Start the Expo dev server (web/native).
 - `npm run build:web`: Export a static web build to `dist/`.
-- `npm run pdf:dev` / `npm run pdf:build`: Develop/build the PDF microservice.
+- `npm run build:functions`: Build Netlify Functions (including `pdf-export`).
 - `npm test` | `npm run test:watch` | `npm run test:coverage`: Run Jest via `jest-expo` (coverage report).
 - `npm run lint`: Lint with Expo’s ESLint config.
 - `npm run typecheck`: TypeScript compile checks (no emit).
@@ -40,5 +40,4 @@ This guide helps contributors navigate, develop, test, and submit changes effici
 ## Security & Configuration Tips
 - Node: Use Node 20.x (see `engines`).
 - Secrets: Do not commit keys. Provide Supabase via `SUPABASE_URL`/`SUPABASE_ANON_KEY` or `EXPO_PUBLIC_*` env vars.
-- PDF Service: Run separately when generating PDFs (`npm run pdf:dev`); Puppeteer may require OS deps in CI.
-
+- PDF Generation: Handled by Netlify Function `pdf-export` (Puppeteer). For local dev, run `netlify dev` to proxy `/api/pdf/export`.

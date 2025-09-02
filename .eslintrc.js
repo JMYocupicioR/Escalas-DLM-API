@@ -3,7 +3,6 @@ module.exports = {
   extends: 'expo',
   ignorePatterns: [
     '/dist/*',
-    'server/pdf-service/**',
     'scripts/**',
   ],
   rules: {

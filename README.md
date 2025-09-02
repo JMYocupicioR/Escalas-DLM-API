@@ -695,7 +695,7 @@ describe('Nueva Escala', () => {
 - [ ] **API GraphQL** para queries más eficientes
 - [ ] **Dashboard web** para administradores
 - [ ] **Exportación PDF** mejorada con plantillas personalizables
-  - Servicio backend opcional con Puppeteer en `server/pdf-service`
+  - Servicio backend opcional con Puppeteer en `api/export/templates`
   - Variable `EXPO_PUBLIC_PDF_SERVICE_URL` para apuntar al servicio
   - Fallback local con `expo-print` si el backend no está disponible
 
@@ -704,7 +704,7 @@ describe('Nueva Escala', () => {
 1) Instalar dependencias y correr localmente:
 
 ```bash
-cd server/pdf-service && npm install && npm run dev
+cd api/export/templates && npm install && npm run dev
 ```
 
 2) Configurar URL pública/accesible desde la app:
@@ -804,3 +804,4 @@ Para licencias comerciales, contactar: [licencias@deepluxmed.com](mailto:licenci
 [![Built with React Native](https://img.shields.io/badge/Built%20with-React%20Native-blue.svg)](https://reactnative.dev/)
 [![Powered by Supabase](https://img.shields.io/badge/Powered%20by-Supabase-green.svg)](https://supabase.com/)
 [![Medical Grade](https://img.shields.io/badge/Medical%20Grade-HIPAA%20Compliant-red.svg)](#)
+
