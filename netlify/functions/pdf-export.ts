@@ -17,7 +17,9 @@ try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   puppeteer = require('puppeteer');
 }
-import { getTemplateFunction } from '../../api/export/templates';
+// Import templates via built JS to avoid TS compiling files outside rootDir
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const templates: any = require('../../api/export/templates/index.js');
 
 type Headers = Record<string, string>;
 
@@ -76,7 +78,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     // 1) Pick template by scale id and render HTML
     let html: string;
     try {
-      const templateFn = getTemplateFunction(parsed.scale.id);
+      const templateFn = templates.getTemplateFunction(parsed.scale.id);
       html = templateFn(parsed as any);
     } catch (e: any) {
       console.error('[pdf-export] template render error', { requestId, message: e?.message });

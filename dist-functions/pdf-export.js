@@ -20,7 +20,9 @@ catch {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     puppeteer = require('puppeteer');
 }
-const templates_1 = require("../../api/export/templates");
+// Import templates via built JS to avoid TS compiling files outside rootDir
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const templates = require('../../api/export/templates/index.js');
 // Flexible schema to accept different payloads per template
 const RequestSchema = zod_1.z.object({
     assessment: zod_1.z.any(),
@@ -72,7 +74,7 @@ const handler = async (event) => {
         // 1) Pick template by scale id and render HTML
         let html;
         try {
-            const templateFn = (0, templates_1.getTemplateFunction)(parsed.scale.id);
+            const templateFn = templates.getTemplateFunction(parsed.scale.id);
             html = templateFn(parsed);
         }
         catch (e) {
