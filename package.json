@@ -9,6 +9,9 @@
   },
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start",
+    "dev:pdf": "cross-env EXPO_PUBLIC_PDF_SERVICE_URL=http://localhost:8787 EXPO_NO_TELEMETRY=1 expo start",
+    "dev:web:pdf": "cross-env EXPO_PUBLIC_PDF_SERVICE_URL=http://localhost:8787 EXPO_NO_TELEMETRY=1 expo start --web",
+    "dev:pdf-service": "tsx server/pdf-service/src/index.ts",
     "build:web": "expo export --platform web",
     "build:functions": "tsc --project netlify/functions/tsconfig.json",
     "lint": "expo lint",

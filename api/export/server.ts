@@ -48,7 +48,20 @@ export const printAssessmentServerPDF = async (
       body: JSON.stringify(payload),
     });
     
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      let serverMsg = `HTTP ${res.status}`;
+      try {
+        const ct = res.headers.get('content-type') || '';
+        if (ct.includes('application/json')) {
+          const j = await res.json();
+          if (j?.error) serverMsg = j.error;
+        } else {
+          const t = await res.text();
+          if (t) serverMsg = t.slice(0, 500);
+        }
+      } catch {}
+      throw new Error(serverMsg);
+    }
 
     if (Platform.OS === 'web') {
       // Web: crear blob y abrir en nueva pestaña para imprimir
@@ -135,7 +148,20 @@ export const exportAssessmentServerPDF = async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      let serverMsg = `HTTP ${res.status}`;
+      try {
+        const ct = res.headers.get('content-type') || '';
+        if (ct.includes('application/json')) {
+          const j = await res.json();
+          if (j?.error) serverMsg = j.error;
+        } else {
+          const t = await res.text();
+          if (t) serverMsg = t.slice(0, 500);
+        }
+      } catch {}
+      throw new Error(serverMsg);
+    }
 
     const data = (await res.json()) as ServerPdfResponse;
     if (!data?.base64) throw new Error('Respuesta inválida del servicio PDF');

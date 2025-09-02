@@ -118,7 +118,21 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options }),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          // Try to extract server error message for better diagnostics
+          let serverMsg = `HTTP ${res.status}`;
+          try {
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              const j = await res.json();
+              if (j?.error) serverMsg = j.error;
+            } else {
+              const t = await res.text();
+              if (t) serverMsg = t.slice(0, 500);
+            }
+          } catch {}
+          throw new Error(serverMsg);
+        }
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
