@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet, ViewStyle, Platform, Alert, A
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { generatePdfFromService } from '@/api/export/pdf';
 import { exportAssessmentServerPDF } from '@/api/export/server';
-import { GenericAssessmentForPDF } from '@/api/export/types';
+import { GenericAssessmentForPDF, PdfOptions } from '@/api/export/types';
 import { Scale } from '@/types/scale';
 import * as FileSystem from 'expo-file-system';
 import { shareAsync } from 'expo-sharing';
@@ -18,15 +18,7 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
   const { colors, isDark } = useThemedStyles();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const base64ToBlob = (base64: string, type: string = 'application/pdf'): Blob => {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type });
-  };
+  
 
   const escapeCsv = (value: unknown): string => {
     const str = value === null || value === undefined ? '' : String(value);
@@ -109,9 +101,10 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
   const handlePdfGeneration = async () => {
     if (isGeneratingPdf) return;
     setIsGeneratingPdf(true);
-    const options = {
-      theme: isDark ? 'dark' : 'light' as const,
-      preset: 'compact' as const,
+    const theme: 'light' | 'dark' = isDark ? 'dark' : 'light';
+    const options: PdfOptions = {
+      theme,
+      preset: 'compact',
       scale: 0.85,
       headerTitle: 'Informe de Resultados',
       headerSubtitle: scale.name,
