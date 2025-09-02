@@ -22,7 +22,7 @@ catch {
 }
 // Import templates via built JS to avoid TS compiling files outside rootDir
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const templates = require('../../api/export/templates/index.js');
+const templates = require('../../api/export/templates-dist/index.js');
 // Flexible schema to accept different payloads per template
 const RequestSchema = zod_1.z.object({
     assessment: zod_1.z.any(),

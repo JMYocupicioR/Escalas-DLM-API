@@ -19,7 +19,7 @@ try {
 }
 // Import templates via built JS to avoid TS compiling files outside rootDir
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const templates: any = require('../../api/export/templates/index.js');
+const templates: any = require('../../api/export/templates-dist/index.js');
 
 type Headers = Record<string, string>;
 
