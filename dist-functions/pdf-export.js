@@ -1,33 +1,29 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 const zod_1 = require("zod");
-const puppeteer_1 = __importDefault(require("puppeteer"));
-const AssessmentSchema = zod_1.z.object({
-    patientData: zod_1.z.object({
-        name: zod_1.z.string().optional(),
-        age: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-        gender: zod_1.z.string().optional(),
-        doctorName: zod_1.z.string().optional(),
-    }),
-    score: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-    interpretation: zod_1.z.string().optional(),
-    answers: zod_1.z.union([
-        zod_1.z.array(zod_1.z.object({
-            id: zod_1.z.string(),
-            question: zod_1.z.string().optional(),
-            label: zod_1.z.string().optional(),
-            value: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-            points: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
-        })),
-        zod_1.z.record(zod_1.z.unknown()),
-    ]).optional(),
-});
+// Use puppeteer-core + @sparticuz/chromium in serverless; fall back to puppeteer locally
+// We keep requires dynamic to avoid bundling unused binaries.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const isServerless = !!(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY);
+let puppeteer;
+let chromium;
+try {
+    // Prefer serverless combo if available
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    chromium = require('@sparticuz/chromium');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    puppeteer = require('puppeteer-core');
+}
+catch {
+    // Fallback to full puppeteer when running locally or when core/chromium are missing
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    puppeteer = require('puppeteer');
+}
+const templates_1 = require("../../api/export/templates");
+// Flexible schema to accept different payloads per template
 const RequestSchema = zod_1.z.object({
-    assessment: AssessmentSchema,
+    assessment: zod_1.z.any(),
     scale: zod_1.z.object({ id: zod_1.z.string(), name: zod_1.z.string() }),
     options: zod_1.z.object({
         theme: zod_1.z.enum(['light', 'dark']).optional(),
@@ -41,169 +37,103 @@ const RequestSchema = zod_1.z.object({
         showPatientSummary: zod_1.z.boolean().optional(),
     }).optional(),
 });
-const generateHtml = (payload) => {
-    const { assessment, scale, options } = payload;
-    const theme = options?.theme === 'dark'
-        ? { bg: '#0f172a', card: '#111827', text: '#f8fafc', muted: '#94a3b8', border: '#334155', primary: '#0891b2' }
-        : { bg: '#f8fafc', card: '#ffffff', text: '#0f172a', muted: '#64748b', border: '#e5e7eb', primary: '#0891b2' };
-    const s = Math.max(0.7, Math.min(1.1, options?.scale ?? 0.9));
-    const px = (n) => `${(n * s).toFixed(2)}px`;
-    let detailsHTML = '';
-    if (Array.isArray(assessment.answers)) {
-        const rows = assessment.answers.map(a => `
-      <tr>
-        <td>${a.question ?? a.id}</td>
-        <td>${a.label ?? ''}</td>
-        <td>${a.value ?? ''}</td>
-        <td>${a.points ?? ''}</td>
-      </tr>
-    `).join('');
-        detailsHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Pregunta</th><th>Respuesta</th><th>Valor</th><th>Puntos</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-    }
-    else if (assessment.answers && typeof assessment.answers === 'object') {
-        const rows = Object.entries(assessment.answers).map(([k, v]) => `
-      <tr><td>${k}</td><td colspan="3">${String(v)}</td></tr>
-    `).join('');
-        detailsHTML = `
-      <table>
-        <thead><tr><th>Campo</th><th colspan="3">Valor</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-    }
-    const today = new Date().toLocaleDateString();
-    const css = `
-    @page { size: A4; margin: 18mm; }
-    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: ${theme.text}; background: ${theme.bg}; font-size: ${px(12)}; }
-    .container { max-width: 820px; margin: 0 auto; padding: ${px(16)}; }
-    .header { display: flex; align-items: center; gap: ${px(10)}; margin-bottom: ${px(18)}; }
-    .logo { height: ${px(28)}; width: auto; }
-    .headerText h1 { font-size: ${px(18)}; font-weight: 700; margin: 0 0 ${px(2)} 0; }
-    .headerText p { font-size: ${px(11)}; color: ${theme.muted}; margin: 0; }
-    .section { margin-bottom: ${px(14)}; padding: ${px(12)}; border-radius: ${px(8)}; background: ${theme.card}; border: 1px solid ${theme.border}; }
-    .section h2 { font-size: ${px(14)}; font-weight: 700; margin: 0 0 ${px(6)} 0; letter-spacing: 0.3px; text-transform: uppercase; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: ${px(6)} ${px(12)}; }
-    .label { font-weight: 600; }
-    .value { color: ${theme.text}; }
-    .muted { color: ${theme.muted}; }
-    .score { display: flex; align-items: baseline; gap: ${px(6)}; }
-    .scoreValue { font-size: ${px(18)}; font-weight: 800; }
-    .result { font-size: ${px(12)}; font-weight: 700; color: ${theme.primary}; }
-    .footer { font-size: ${px(9)}; text-align: center; margin-top: ${px(28)}; color: ${theme.muted}; }
-    table { width: 100%; border-collapse: collapse; font-size: ${px(11)}; }
-    th, td { padding: ${px(6)}; border-bottom: 1px solid ${theme.border}; text-align: left; }
-  `;
-    return `<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Resultados ${scale.name}</title><style>${css}</style></head><body>
-    <div class="container">
-      <div class="header">
-        ${options?.logoUrl ? `<img class="logo" src="${options.logoUrl}" />` : ''}
-        <div class="headerText">
-          <h1>${options?.headerTitle ?? 'Informe de Resultados'}</h1>
-          <p>${options?.headerSubtitle ?? `Fecha: ${today}`}</p>
-          ${options?.showPatientSummary !== false ? `
-            <p class="muted">
-              ${[
-        assessment.patientData.name ? `Paciente: <span class='value'>${assessment.patientData.name}</span>` : '',
-        assessment.patientData.age ? `Edad: <span class='value'>${assessment.patientData.age}</span>` : '',
-        assessment.patientData.gender ? `Género: <span class='value'>${assessment.patientData.gender}</span>` : '',
-        assessment.patientData.doctorName ? `Evaluador: <span class='value'>${assessment.patientData.doctorName}</span>` : ''
-    ].filter(Boolean).join(' · ')}
-            </p>` : ''}
-        </div>
-      </div>
-      <div class="section">
-        <h2>Datos del Paciente</h2>
-        <div class="grid">
-          <div><span class="label">Nombre:</span> <span class="value">${assessment.patientData.name ?? ''}</span></div>
-          <div><span class="label">Edad:</span> <span class="value">${assessment.patientData.age ?? ''}</span></div>
-          <div><span class="label">Género:</span> <span class="value">${assessment.patientData.gender ?? ''}</span></div>
-          <div><span class="label">Médico/Evaluador:</span> <span class="value">${assessment.patientData.doctorName ?? ''}</span></div>
-        </div>
-      </div>
-      <div class="section">
-        <h2>Resultados</h2>
-        <div class="score">
-          ${assessment.score !== undefined ? `<span class="scoreValue">Puntuación: ${assessment.score}</span>` : ''}
-          ${assessment.interpretation ? `<span class="result">${assessment.interpretation}</span>` : ''}
-        </div>
-      </div>
-      <div class="section">
-        <h2>Detalle de Respuestas</h2>
-        ${detailsHTML || '<p class="muted">Sin detalle disponible.</p>'}
-      </div>
-      <div class="footer">
-        <p>Documento generado por DeepLuxMed.mx</p>
-        <p>${options?.footerNote ?? 'Privacidad médico-paciente aplicada.'}</p>
-      </div>
-    </div>
-  </body></html>`;
-};
-const handler = async (event, context) => {
+const handler = async (event) => {
+    const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const debug = event.queryStringParameters?.debug === '1';
+    const flavor = chromium ? 'core+chromium' : 'bundled';
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
     };
-    // Handle preflight requests
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers: corsHeaders,
-            body: '',
-        };
+        return { statusCode: 200, headers: corsHeaders, body: '' };
     }
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-            },
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }
     try {
-        if (!event.body) {
+        console.log('[pdf-export] start', { requestId, isServerless, flavor });
+        if (!event.body)
             throw new Error('Request body is required');
+        let parsed;
+        try {
+            const body = JSON.parse(event.body);
+            parsed = RequestSchema.parse(body);
         }
-        const body = JSON.parse(event.body);
-        const parsed = RequestSchema.parse(body);
-        const html = generateHtml(parsed);
-        // Launch puppeteer with Netlify-compatible options
-        const browser = await puppeteer_1.default.launch({
-            headless: 'shell',
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--no-first-run',
-                '--no-zygote',
-                '--single-process',
-                '--disable-gpu'
-            ],
-        });
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: { top: '18mm', right: '18mm', bottom: '18mm', left: '18mm' },
-            preferCSSPageSize: true,
-        });
-        await page.close();
-        await browser.close();
+        catch (e) {
+            console.error('[pdf-export] parse/validate error', { requestId, message: e?.message });
+            throw new Error(`PARSE_ERROR: ${e?.message || 'Invalid request body'}`);
+        }
+        // 1) Pick template by scale id and render HTML
+        let html;
+        try {
+            const templateFn = (0, templates_1.getTemplateFunction)(parsed.scale.id);
+            html = templateFn(parsed);
+        }
+        catch (e) {
+            console.error('[pdf-export] template render error', { requestId, message: e?.message });
+            throw new Error(`TEMPLATE_ERROR: ${e?.message || 'Failed to render template'}`);
+        }
+        // 3) Render with Puppeteer / Puppeteer-Core
+        let executablePath;
+        let browser;
+        try {
+            const launchOptions = isServerless && chromium ? {
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: (executablePath = await chromium.executablePath()),
+                headless: chromium.headless,
+                ignoreHTTPSErrors: true,
+            } : {
+                headless: 'shell',
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-accelerated-2d-canvas',
+                    '--no-first-run',
+                    '--no-zygote',
+                    '--single-process',
+                    '--disable-gpu',
+                ],
+            };
+            console.log('[pdf-export] launching browser', { requestId, flavor, isServerless, executablePath: executablePath || null });
+            browser = await puppeteer.launch(launchOptions);
+        }
+        catch (e) {
+            console.error('[pdf-export] launch error', { requestId, flavor, message: e?.message });
+            throw new Error(`LAUNCH_ERROR: ${e?.message || 'Failed to launch browser'}`);
+        }
+        let pdfBuffer;
+        try {
+            const page = await browser.newPage();
+            await page.setContent(html, { waitUntil: 'networkidle0' });
+            pdfBuffer = await page.pdf({
+                format: 'A4',
+                printBackground: true,
+                margin: { top: '18mm', right: '18mm', bottom: '18mm', left: '18mm' },
+                preferCSSPageSize: true,
+            });
+            await page.close();
+        }
+        catch (e) {
+            console.error('[pdf-export] render/pdf error', { requestId, message: e?.message });
+            try {
+                await browser?.close();
+            }
+            catch { }
+            throw new Error(`RENDER_ERROR: ${e?.message || 'Failed to render PDF'}`);
+        }
+        try {
+            await browser?.close();
+        }
+        catch { }
         const filename = `${parsed.scale.name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}.pdf`;
-        // Check if binary response is requested
         const isBinary = event.queryStringParameters?.binary === '1';
         if (isBinary) {
             return {
@@ -212,35 +142,27 @@ const handler = async (event, context) => {
                     ...corsHeaders,
                     'Content-Type': 'application/pdf',
                     'Content-Disposition': `attachment; filename="${filename}"`,
+                    'Content-Length': String(pdfBuffer.length),
+                    'Cache-Control': 'no-store',
                 },
                 body: Buffer.from(pdfBuffer).toString('base64'),
                 isBase64Encoded: true,
             };
         }
-        // Default: JSON response with base64
         return {
             statusCode: 200,
-            headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                filename,
-                base64: Buffer.from(pdfBuffer).toString('base64'),
-            }),
+            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+            body: JSON.stringify({ filename, base64: Buffer.from(pdfBuffer).toString('base64') }),
         };
     }
     catch (error) {
-        console.error('PDF export error:', error);
+        const msg = error?.message || 'Bad Request';
+        const stage = (msg.split(':', 1)[0] || '').replace(/[^A-Z_]/g, '') || 'UNKNOWN';
+        console.error('[pdf-export] error', { requestId, stage, flavor, message: msg });
         return {
             statusCode: 400,
-            headers: {
-                ...corsHeaders,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                error: error?.message || 'Bad Request',
-            }),
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: msg, requestId, ...(debug ? { stage, flavor } : {}) }),
         };
     }
 };

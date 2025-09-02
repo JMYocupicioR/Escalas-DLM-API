@@ -34,8 +34,7 @@ export const printAssessmentServerPDF = async (
   try {
     const serviceBase = getPdfServiceUrl();
     if (!serviceBase) return false;
-
-    const endpoint = `${serviceBase}/api/pdf/export?binary=1`;
+    const endpoint = `${serviceBase}/api/pdf/export?binary=1${__DEV__ ? '&debug=1' : ''}`;
     const payload = {
       assessment,
       scale: { id: scale.id, name: scale.name },
@@ -113,8 +112,11 @@ export const exportAssessmentServerPDF = async (
   try {
     const serviceBase = getPdfServiceUrl();
     if (!serviceBase) return false;
-
-    const endpoint = `${serviceBase}/api/pdf/export${Platform.OS === 'web' ? '?binary=1' : ''}`;
+    const q: string[] = [];
+    if (Platform.OS === 'web') q.push('binary=1');
+    if (__DEV__) q.push('debug=1');
+    const qs = q.length ? `?${q.join('&')}` : '';
+    const endpoint = `${serviceBase}/api/pdf/export${qs}`;
 
     const payload = {
       assessment,
@@ -143,7 +145,8 @@ export const exportAssessmentServerPDF = async (
     }
 
     // Nativo: esperamos JSON con base64 para evitar problemas de fetch binario
-    const res = await fetch(endpoint.replace('?binary=1', ''), {
+    const nativeEndpoint = `${serviceBase}/api/pdf/export${__DEV__ ? '?debug=1' : ''}`;
+    const res = await fetch(nativeEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

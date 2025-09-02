@@ -112,8 +112,9 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
     };
     try {
       if (Platform.OS === 'web') {
+        const dbg = __DEV__ ? '&debug=1' : '';
         // Prefer binary response on web to avoid JSON base64 overhead
-        const res = await fetch('/api/pdf/export?binary=1', {
+        const res = await fetch(`/api/pdf/export?binary=1${dbg}` as any, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options }),

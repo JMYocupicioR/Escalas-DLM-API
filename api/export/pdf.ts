@@ -11,6 +11,7 @@ export const generatePdfFromService = async (
   options?: PdfOptions
 ): Promise<string> => {
   try {
+    const dbg = __DEV__ ? '?debug=1' : '';
     // Prepare the request payload
     const payload = {
       assessment,
@@ -19,7 +20,7 @@ export const generatePdfFromService = async (
     };
 
     // Make the API call to our Netlify Function first
-    const response = await fetch('/api/pdf/export', {
+    const response = await fetch(`/api/pdf/export${dbg}` as any, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +47,7 @@ export const generatePdfFromService = async (
       const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
       if (!base) throw new Error('Direct PDF service URL not configured');
 
-      const res = await fetch(`${base}/api/pdf/export`, {
+      const res = await fetch(`${base}/api/pdf/export${dbg}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
