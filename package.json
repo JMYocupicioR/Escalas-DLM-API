@@ -15,8 +15,6 @@
     "lint:app": "eslint app/(tabs)/index.tsx components/SearchWidget.tsx hooks/useAutoUpdatingScales.ts hooks/useThemedStyles.ts hooks/useResponsiveLayout.ts store/scales.ts data/_scales.ts app/theme.ts",
     "import:scales": "tsx scripts/massScaleImporter.ts",
     "import:template": "tsx scripts/massScaleImporter.ts template",
-    "pdf:dev": "npm --prefix server/pdf-service run dev",
-    "pdf:build": "npm --prefix server/pdf-service run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
