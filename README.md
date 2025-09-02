@@ -805,3 +805,21 @@ Para licencias comerciales, contactar: [licencias@deepluxmed.com](mailto:licenci
 [![Powered by Supabase](https://img.shields.io/badge/Powered%20by-Supabase-green.svg)](https://supabase.com/)
 [![Medical Grade](https://img.shields.io/badge/Medical%20Grade-HIPAA%20Compliant-red.svg)](#)
 
+---
+
+## 🧾 PDF Service (Serverless/Netlify)
+
+Para ejecutar exportación PDF en Netlify Functions, este repo usa `puppeteer-core` + `@sparticuz/chromium` en entornos serverless y recurre a `puppeteer` completo en local.
+
+- Dependencias necesarias (producción/serverless): `puppeteer-core`, `@sparticuz/chromium`.
+- Desarrollo local: puedes usar la Function vía `netlify dev` o el microservicio Express.
+
+Comandos útiles:
+- `npm run dev:pdf-service` — inicia el servicio Express en `http://localhost:8787`.
+- `npm run dev:web:pdf` — inicia Expo Web con `EXPO_PUBLIC_PDF_SERVICE_URL=http://localhost:8787`.
+- `npm run dev:pdf` — inicia Expo (web/nativo) con la misma variable.
+
+Notas Netlify:
+- La Function detecta entorno serverless y usa `@sparticuz/chromium` automáticamente.
+- Asegúrate de instalar las dependencias antes del deploy (`npm install`).
+

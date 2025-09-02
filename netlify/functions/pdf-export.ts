@@ -1,6 +1,22 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import { z } from 'zod';
-import puppeteer from 'puppeteer';
+// Use puppeteer-core + @sparticuz/chromium in serverless; fall back to puppeteer locally
+// We keep requires dynamic to avoid bundling unused binaries.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const isServerless = !!(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY);
+let puppeteer: any;
+let chromium: any;
+try {
+  // Prefer serverless combo if available
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  chromium = require('@sparticuz/chromium');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  puppeteer = require('puppeteer-core');
+} catch {
+  // Fallback to full puppeteer when running locally or when core/chromium are missing
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  puppeteer = require('puppeteer');
+}
 import { getTemplateFunction } from '../../api/export/templates';
 
 type Headers = Record<string, string>;
@@ -53,8 +69,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
     // 2) Generate HTML from the selected template
     const html = templateFn(parsed as any);
 
-    // 3) Render with Puppeteer
-    const browser = await puppeteer.launch({
+    // 3) Render with Puppeteer / Puppeteer-Core
+    const launchOptions: Record<string, any> = isServerless && chromium ? {
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+    } : {
       headless: 'shell',
       args: [
         '--no-sandbox',
@@ -66,7 +88,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
         '--single-process',
         '--disable-gpu',
       ],
-    });
+    };
+    const browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     const pdfBuffer = await page.pdf({
