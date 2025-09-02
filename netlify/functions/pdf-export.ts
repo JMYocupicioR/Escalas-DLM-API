@@ -39,6 +39,9 @@ const RequestSchema = z.object({
 });
 
 export const handler: Handler = async (event: HandlerEvent) => {
+  const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const debug = event.queryStringParameters?.debug === '1';
+  const flavor = chromium ? 'core+chromium' : 'bundled';
   const corsHeaders: Headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -58,48 +61,74 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
+    console.log('[pdf-export] start', { requestId, isServerless, flavor });
     if (!event.body) throw new Error('Request body is required');
 
-    const body = JSON.parse(event.body);
-    const parsed = RequestSchema.parse(body);
+    let parsed: z.infer<typeof RequestSchema>;
+    try {
+      const body = JSON.parse(event.body);
+      parsed = RequestSchema.parse(body);
+    } catch (e: any) {
+      console.error('[pdf-export] parse/validate error', { requestId, message: e?.message });
+      throw new Error(`PARSE_ERROR: ${e?.message || 'Invalid request body'}`);
+    }
 
-    // 1) Pick template by scale id
-    const templateFn = getTemplateFunction(parsed.scale.id);
-
-    // 2) Generate HTML from the selected template
-    const html = templateFn(parsed as any);
+    // 1) Pick template by scale id and render HTML
+    let html: string;
+    try {
+      const templateFn = getTemplateFunction(parsed.scale.id);
+      html = templateFn(parsed as any);
+    } catch (e: any) {
+      console.error('[pdf-export] template render error', { requestId, message: e?.message });
+      throw new Error(`TEMPLATE_ERROR: ${e?.message || 'Failed to render template'}`);
+    }
 
     // 3) Render with Puppeteer / Puppeteer-Core
-    const launchOptions: Record<string, any> = isServerless && chromium ? {
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
-    } : {
-      headless: 'shell',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu',
-      ],
-    };
-    const browser = await puppeteer.launch(launchOptions);
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '18mm', right: '18mm', bottom: '18mm', left: '18mm' },
-      preferCSSPageSize: true,
-    });
-    await page.close();
-    await browser.close();
+    let executablePath: string | undefined;
+    let browser: any;
+    try {
+      const launchOptions: Record<string, any> = isServerless && chromium ? {
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: (executablePath = await chromium.executablePath()),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      } : {
+        headless: 'shell',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+        ],
+      };
+      console.log('[pdf-export] launching browser', { requestId, flavor, isServerless, executablePath: executablePath || null });
+      browser = await puppeteer.launch(launchOptions);
+    } catch (e: any) {
+      console.error('[pdf-export] launch error', { requestId, flavor, message: e?.message });
+      throw new Error(`LAUNCH_ERROR: ${e?.message || 'Failed to launch browser'}`);
+    }
+    let pdfBuffer: Buffer;
+    try {
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: 'networkidle0' });
+      pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '18mm', right: '18mm', bottom: '18mm', left: '18mm' },
+        preferCSSPageSize: true,
+      });
+      await page.close();
+    } catch (e: any) {
+      console.error('[pdf-export] render/pdf error', { requestId, message: e?.message });
+      try { await browser?.close(); } catch {}
+      throw new Error(`RENDER_ERROR: ${e?.message || 'Failed to render PDF'}`);
+    }
+    try { await browser?.close(); } catch {}
 
     const filename = `${parsed.scale.name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}.pdf`;
     const isBinary = event.queryStringParameters?.binary === '1';
@@ -125,11 +154,13 @@ export const handler: Handler = async (event: HandlerEvent) => {
       body: JSON.stringify({ filename, base64: Buffer.from(pdfBuffer).toString('base64') }),
     };
   } catch (error: any) {
-    console.error('PDF export error:', error);
+    const msg: string = error?.message || 'Bad Request';
+    const stage = (msg.split(':', 1)[0] || '').replace(/[^A-Z_]/g, '') || 'UNKNOWN';
+    console.error('[pdf-export] error', { requestId, stage, flavor, message: msg });
     return {
       statusCode: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: error?.message || 'Bad Request' }),
+      body: JSON.stringify({ error: msg, requestId, ...(debug ? { stage, flavor } : {}) }),
     };
   }
 };
