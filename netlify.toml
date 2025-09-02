@@ -21,3 +21,13 @@
   status = 200
   conditions = {Role = ["visitor"]}
   force = false
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = [
+    "api/export/templates/**"
+  ]
+
+[functions."pdf-export"]
+  timeout = 26
+  memory = 1024

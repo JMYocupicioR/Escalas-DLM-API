@@ -8,14 +8,15 @@ import { ArrowRight, Clock } from 'lucide-react-native';
 import { bodySegmentCategories } from '@/data/body-segment-categories';
 import { scalesById } from '@/data/_scales';
 
-const ImageWithFallback: React.FC<{
+const ImageWithFallback = React.forwardRef<Image, {
   uri: string;
   style: any;
   [key: string]: any;
-}> = ({ uri, style, ...props }) => {
+}>(({ uri, style, ...props }, ref) => {
   const [hasError, setHasError] = useState(false);
   return (
     <Image
+      ref={ref}
       source={hasError ? { uri: 'https://images.unsplash.com/photo-1584516150909-c43483ee7932?w=800&auto=format&fit=crop&q=60' } : { uri }}
       style={style}
       onError={() => {
@@ -25,7 +26,9 @@ const ImageWithFallback: React.FC<{
       {...props}
     />
   );
-};
+});
+
+ImageWithFallback.displayName = 'ImageWithFallback';
 
 export default function BodySegmentScalesScreen() {
   const { colors } = useThemedStyles();
@@ -59,7 +62,7 @@ export default function BodySegmentScalesScreen() {
           </View>
           {scale.crossReferences?.length > 0 && (
             <View style={styles.crossReferences}>
-              {scale.crossReferences.map(ref => (
+              {scale.crossReferences.map((ref: string) => (
                 <View key={ref} style={styles.crossRefTag}>
                   <Text style={styles.crossRefText}>{ref}</Text>
                 </View>
@@ -72,14 +75,16 @@ export default function BodySegmentScalesScreen() {
     </TouchableOpacity>
   ));
 
+  ScaleCard.displayName = 'ScaleCard';
+
   const SubsectionComponent = memo<{
     subsection: any;
     searchQuery: string;
   }>(({ subsection, searchQuery }) => {
     const filteredScales = subsection.scales
-      .map(id => scalesById[id])
+      .map((id: string) => scalesById[id])
       .filter(
-        scale =>
+        (scale: any) =>
           scale &&
           (scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             scale.description.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -90,12 +95,14 @@ export default function BodySegmentScalesScreen() {
     return (
       <View style={styles.subsection}>
         <Text style={styles.subsectionTitle}>{subsection.name}</Text>
-        {filteredScales.map(scale => (
+        {filteredScales.map((scale: any) => (
           <ScaleCard key={scale.id} scale={scale} />
         ))}
       </View>
     );
   });
+
+  SubsectionComponent.displayName = 'SubsectionComponent';
 
   const SegmentComponent = memo<{
     segment: any;
@@ -124,6 +131,8 @@ export default function BodySegmentScalesScreen() {
       </View>
     );
   });
+
+  SegmentComponent.displayName = 'SegmentComponent';
 
   const segmentsArray = Object.entries(bodySegmentCategories).map(
     ([key, segment]) => ({

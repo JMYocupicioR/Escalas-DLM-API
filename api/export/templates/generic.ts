@@ -1,10 +1,4 @@
-import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import { z } from 'zod';
-import puppeteer from 'puppeteer';
-import { renderHtmlForScale } from '../../api/export/templates';
-
-// Define proper headers type
-type Headers = Record<string, string>;
 
 const AssessmentSchema = z.object({
   patientData: z.object({
@@ -43,7 +37,9 @@ const RequestSchema = z.object({
   }).optional(),
 });
 
-const generateHtml = (payload: z.infer<typeof RequestSchema>): string => {
+export type GenericPayload = z.infer<typeof RequestSchema>;
+
+export const generateHtml = (payload: GenericPayload): string => {
   const { assessment, scale, options } = payload;
   const theme = options?.theme === 'dark'
     ? { bg: '#0f172a', card: '#111827', text: '#f8fafc', muted: '#94a3b8', border: '#334155', primary: '#0891b2' }
@@ -151,110 +147,3 @@ const generateHtml = (payload: z.infer<typeof RequestSchema>): string => {
   </body></html>`;
 };
 
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  const corsHeaders: Headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: '',
-    };
-  }
-
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
-  }
-
-  try {
-    if (!event.body) {
-      throw new Error('Request body is required');
-    }
-
-    const body = JSON.parse(event.body);
-    const parsed = RequestSchema.parse(body);
-    const html = renderHtmlForScale(parsed as any);
-    
-    // Launch puppeteer with Netlify-compatible options
-    const browser = await puppeteer.launch({
-      headless: 'shell',
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
-      ],
-    });
-    
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '18mm', right: '18mm', bottom: '18mm', left: '18mm' },
-      preferCSSPageSize: true,
-    });
-    await page.close();
-    await browser.close();
-
-    const filename = `${parsed.scale.name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}.pdf`;
-
-    // Check if binary response is requested
-    const isBinary = event.queryStringParameters?.binary === '1';
-
-    if (isBinary) {
-      return {
-        statusCode: 200,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="${filename}"`,
-        },
-        body: Buffer.from(pdfBuffer).toString('base64'),
-        isBase64Encoded: true,
-      };
-    }
-
-    // Default: JSON response with base64
-    return {
-      statusCode: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        filename,
-        base64: Buffer.from(pdfBuffer).toString('base64'),
-      }),
-    };
-  } catch (error: any) {
-    console.error('PDF export error:', error);
-    return {
-      statusCode: 400,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        error: error?.message || 'Bad Request',
-      }),
-    };
-  }
-};

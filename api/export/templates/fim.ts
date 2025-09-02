@@ -40,7 +40,6 @@ export const generateHtml = (payload: FimPayload): string => {
   const { assessment, scale, questions = [], options } = payload;
   const { patientData, totalScore, motorScore, cognitiveScore, answers } = assessment;
   
-  // Get interpretation and recommendation text
   let interpretation = '';
   let recommendation = '';
   if (totalScore >= 108) {
@@ -64,7 +63,7 @@ export const generateHtml = (payload: FimPayload): string => {
     locomocion: 'LOCOMOCIÓN',
     comunicacion: 'COMUNICACIÓN',
     cognicion: 'COGNICIÓN SOCIAL',
-  };
+  } as const;
 
   let tableRows = '';
   Object.entries(categories).forEach(([categoryKey, categoryName]) => {
@@ -153,3 +152,4 @@ export const generateHtml = (payload: FimPayload): string => {
   </html>
   `;
 };
+

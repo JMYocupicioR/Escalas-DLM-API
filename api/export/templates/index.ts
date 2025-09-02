@@ -1,45 +1,21 @@
-import { z } from 'zod';
+export type PdfTemplatePayload = {
+  assessment: any;
+  scale: { id: string; name: string };
+  options?: {
+    theme?: 'light' | 'dark';
+    customTheme?: Record<string, string>;
+    footerNote?: string;
+    preset?: 'compact' | 'medical' | 'formal';
+    headerTitle?: string;
+    headerSubtitle?: string;
+    logoUrl?: string;
+    scale?: number;
+    showPatientSummary?: boolean;
+  };
+};
 
-const AssessmentSchema = z.object({
-  patientData: z.object({
-    name: z.string().optional(),
-    age: z.union([z.number(), z.string()]).optional(),
-    gender: z.string().optional(),
-    doctorName: z.string().optional(),
-  }),
-  score: z.union([z.number(), z.string()]).optional(),
-  interpretation: z.string().optional(),
-  answers: z.union([
-    z.array(z.object({
-      id: z.string(),
-      question: z.string().optional(),
-      label: z.string().optional(),
-      value: z.union([z.number(), z.string()]).optional(),
-      points: z.union([z.number(), z.string()]).optional(),
-    })),
-    z.record(z.unknown()),
-  ]).optional(),
-});
-
-const RequestSchema = z.object({
-  assessment: AssessmentSchema,
-  scale: z.object({ id: z.string(), name: z.string() }),
-  options: z.object({
-    theme: z.enum(['light', 'dark']).optional(),
-    customTheme: z.record(z.string()).optional(),
-    footerNote: z.string().optional(),
-    preset: z.enum(['compact', 'medical', 'formal']).optional(),
-    headerTitle: z.string().optional(),
-    headerSubtitle: z.string().optional(),
-    logoUrl: z.string().optional(),
-    scale: z.number().optional(),
-    showPatientSummary: z.boolean().optional(),
-  }).optional(),
-});
-
-export type GenericPayload = z.infer<typeof RequestSchema>;
-
-export const generateHtml = (payload: GenericPayload): string => {
+/* moved to ./generic */
+export const renderGenericHtml = (payload: PdfTemplatePayload): string => {
   const { assessment, scale, options } = payload;
   const theme = options?.theme === 'dark'
     ? { bg: '#0f172a', card: '#111827', text: '#f8fafc', muted: '#94a3b8', border: '#334155', primary: '#0891b2' }
@@ -48,8 +24,8 @@ export const generateHtml = (payload: GenericPayload): string => {
   const px = (n: number) => `${(n * s).toFixed(2)}px`;
 
   let detailsHTML = '';
-  if (Array.isArray(assessment.answers)) {
-    const rows = assessment.answers.map(a => `
+  if (Array.isArray(assessment?.answers)) {
+    const rows = assessment.answers.map((a: any) => `
       <tr>
         <td>${a.question ?? a.id}</td>
         <td>${a.label ?? ''}</td>
@@ -66,7 +42,7 @@ export const generateHtml = (payload: GenericPayload): string => {
         </thead>
         <tbody>${rows}</tbody>
       </table>`;
-  } else if (assessment.answers && typeof assessment.answers === 'object') {
+  } else if (assessment?.answers && typeof assessment.answers === 'object') {
     const rows = Object.entries(assessment.answers).map(([k, v]) => `
       <tr><td>${k}</td><td colspan="3">${String(v)}</td></tr>
     `).join('');
@@ -111,28 +87,19 @@ export const generateHtml = (payload: GenericPayload): string => {
           ${options?.showPatientSummary !== false ? `
             <p class="muted">
               ${[
-                assessment.patientData.name ? `Paciente: <span class='value'>${assessment.patientData.name}</span>` : '',
-                assessment.patientData.age ? `Edad: <span class='value'>${assessment.patientData.age}</span>` : '',
-                assessment.patientData.gender ? `Género: <span class='value'>${assessment.patientData.gender}</span>` : '',
-                assessment.patientData.doctorName ? `Evaluador: <span class='value'>${assessment.patientData.doctorName}</span>` : ''
+                assessment?.patientData?.name ? `Paciente: ${assessment.patientData.name}` : '',
+                assessment?.patientData?.age ? `Edad: ${assessment.patientData.age}` : '',
+                assessment?.patientData?.gender ? `Género: ${assessment.patientData.gender}` : '',
+                assessment?.patientData?.doctorName ? `Médico: ${assessment.patientData.doctorName}` : ''
               ].filter(Boolean).join(' · ')}
             </p>` : ''}
         </div>
       </div>
       <div class="section">
-        <h2>Datos del Paciente</h2>
-        <div class="grid">
-          <div><span class="label">Nombre:</span> <span class="value">${assessment.patientData.name ?? ''}</span></div>
-          <div><span class="label">Edad:</span> <span class="value">${assessment.patientData.age ?? ''}</span></div>
-          <div><span class="label">Género:</span> <span class="value">${assessment.patientData.gender ?? ''}</span></div>
-          <div><span class="label">Médico/Evaluador:</span> <span class="value">${assessment.patientData.doctorName ?? ''}</span></div>
-        </div>
-      </div>
-      <div class="section">
         <h2>Resultados</h2>
         <div class="score">
-          ${assessment.score !== undefined ? `<span class="scoreValue">Puntuación: ${assessment.score}</span>` : ''}
-          ${assessment.interpretation ? `<span class="result">${assessment.interpretation}</span>` : ''}
+          ${assessment?.score !== undefined ? `<span class="scoreValue">Puntuación: ${assessment.score}</span>` : ''}
+          ${assessment?.interpretation ? `<span class="result">${assessment.interpretation}</span>` : ''}
         </div>
       </div>
       <div class="section">
@@ -145,4 +112,42 @@ export const generateHtml = (payload: GenericPayload): string => {
       </div>
     </div>
   </body></html>`;
+};
+
+export { generateHtml as renderGenericHtml } from './generic';
+// Simple dispatcher for now; extend with per-scale templates over time
+export { generateHtml as renderBotulinumHtml } from './botulinum';
+export { generateHtml as renderFimHtml } from './fim';
+export { generateHtml as renderBarthelHtml } from './barthel';
+export { generateHtml as renderLequesneHtml } from './lequesne';
+
+export const renderHtmlForScale = (payload: PdfTemplatePayload): string => {
+  const id = payload?.scale?.id || '';
+  if (id === 'botulinum') {
+    // Dynamic import via direct file to keep tree-shaking predictable
+    return (require('./botulinum') as typeof import('./botulinum')).generateHtml(payload as any);
+  }
+  if (id === 'fim') {
+    return (require('./fim') as typeof import('./fim')).generateHtml(payload as any);
+  }
+  if (id === 'barthel') {
+    return (require('./barthel') as typeof import('./barthel')).generateHtml(payload as any);
+  }
+  if (id === 'lequesne') {
+    return (require('./lequesne') as typeof import('./lequesne')).generateHtml(payload as any);
+  }
+  return (require('./generic') as typeof import('./generic')).generateHtml(payload as any);
+};
+
+// Provide a map + selector for compatibility with existing server code
+export const TEMPLATE_MAP = {
+  botulinum: (payload: PdfTemplatePayload) => (require('./botulinum') as typeof import('./botulinum')).generateHtml(payload as any),
+  fim: (payload: PdfTemplatePayload) => (require('./fim') as typeof import('./fim')).generateHtml(payload as any),
+  barthel: (payload: PdfTemplatePayload) => (require('./barthel') as typeof import('./barthel')).generateHtml(payload as any),
+  lequesne: (payload: PdfTemplatePayload) => (require('./lequesne') as typeof import('./lequesne')).generateHtml(payload as any),
+  generic: (payload: PdfTemplatePayload) => (require('./generic') as typeof import('./generic')).generateHtml(payload as any),
+} as const;
+
+export const getTemplateFunction = (scaleId: string) => {
+  return (TEMPLATE_MAP as Record<string, (p: PdfTemplatePayload) => string>)[scaleId] || TEMPLATE_MAP.generic;
 };

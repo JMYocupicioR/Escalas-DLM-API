@@ -295,7 +295,7 @@ export default function BarthelScale() {
         </View>
       </View>
     );
-  }, [answers, calculateTotal, getInterpretation, handleExport, patientData, resetAssessment]);
+  }, [answers, calculateTotal, getInterpretation, patientData, colors, dynamicStyles, styles, questions]);
 
   return (
     <>

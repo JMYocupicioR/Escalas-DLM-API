@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ViewStyle, Platform, Alert, ActivityIndicator } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { generatePdfFromService } from '@/api/export/pdf';
-import { exportAssessmentServerPDF } from '@/api/export/server';
 import { GenericAssessmentForPDF } from '@/api/export/types';
 import { Scale } from '@/types/scale';
 import * as FileSystem from 'expo-file-system';
@@ -39,19 +38,23 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
   const handleExcelExport = async () => {
     try {
       const lines: string[] = [];
+      // Patient Data
       if (assessment.patientData) {
         const pd = assessment.patientData as Record<string, unknown>;
         for (const key of Object.keys(pd)) {
           lines.push([escapeCsv('Paciente'), escapeCsv(key), escapeCsv(pd[key])].join(','));
         }
       }
+      // Score & interpretation
       if (assessment.score !== undefined) {
-        lines.push([escapeCsv('Resultado'), escapeCsv('Puntuacion'), escapeCsv(assessment.score)].join(','));
+        lines.push([escapeCsv('Resultado'), escapeCsv('Puntuación'), escapeCsv(assessment.score)].join(','));
       }
       if (assessment.interpretation) {
-        lines.push([escapeCsv('Resultado'), escapeCsv('Interpretacion'), escapeCsv(assessment.interpretation)].join(','));
+        lines.push([escapeCsv('Resultado'), escapeCsv('Interpretación'), escapeCsv(assessment.interpretation)].join(','));
       }
+      // Separator
       if (lines.length > 0) lines.push('');
+      // Answers table header
       lines.push(['Tipo', 'ID', 'Pregunta', 'Etiqueta', 'Valor', 'Puntos'].map(escapeCsv).join(','));
       const answers = assessment.answers as any;
       if (Array.isArray(answers)) {
@@ -106,58 +109,78 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
     }
   };
 
-  const handlePdfGeneration = async () => {
+  const handlePdfGeneration = async (action: 'export') => {
     if (isGeneratingPdf) return;
+    
     setIsGeneratingPdf(true);
-    const options = {
-      theme: isDark ? 'dark' : 'light' as const,
-      preset: 'compact' as const,
-      scale: 0.85,
-      headerTitle: 'Informe de Resultados',
-      headerSubtitle: scale.name,
-      showPatientSummary: true,
-    };
     try {
-      const base64Pdf = await generatePdfFromService(assessment, scale as Scale, options);
+      const base64Pdf = await generatePdfFromService(assessment, scale as Scale, {
+        theme: isDark ? 'dark' : 'light',
+        preset: 'compact',
+        scale: 0.85,
+        headerTitle: 'Informe de Resultados',
+        headerSubtitle: scale.name,
+        showPatientSummary: true,
+      });
+
       if (Platform.OS === 'web') {
+        // Web: Convert base64 to Blob and create URL
         const blob = base64ToBlob(base64Pdf);
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+
+        if (action === 'export') {
+          // Download the PDF
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } else {
+          // Open in new tab for printing
+          const printWindow = window.open(url, '_blank');
+          if (printWindow) {
+            printWindow.onload = () => {
+              printWindow.print();
+            };
+            // Clean up URL after 30 seconds
+            setTimeout(() => URL.revokeObjectURL(url), 30000);
+          } else {
+            Alert.alert('Error', 'No se pudo abrir ventana de impresión. Verifique que no esté bloqueada.');
+          }
+        }
       } else {
+        // iOS/Android: Save to temporary file and share
         const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
         const filePath = `${FileSystem.cacheDirectory}${fileName}`;
-        await FileSystem.writeAsStringAsync(filePath, base64Pdf, { encoding: FileSystem.EncodingType.Base64 });
+        
+        await FileSystem.writeAsStringAsync(filePath, base64Pdf, {
+          encoding: FileSystem.EncodingType.Base64
+        });
+
         await shareAsync(filePath, {
           mimeType: 'application/pdf',
-          dialogTitle: `Resultados de ${scale.name}`,
+          dialogTitle: action === 'export' ? `Resultados de ${scale.name}` : `Imprimir ${scale.name}`,
           UTI: 'com.adobe.pdf',
         });
       }
     } catch (error) {
-      console.error('Error al exportar PDF (Netlify):', error);
-      try {
-        const ok = await exportAssessmentServerPDF(assessment, scale as Scale, options);
-        if (ok) return;
-      } catch (fallbackErr) {
-        console.error('Fallback PDF service failed:', fallbackErr);
-      }
-      Alert.alert('Error', `No se pudo exportar el PDF. ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      console.error(`Error al ${action === 'export' ? 'exportar' : 'imprimir'} PDF:`, error);
+      Alert.alert(
+        'Error',
+        `No se pudo ${action === 'export' ? 'exportar' : 'imprimir'} el PDF. ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
     } finally {
       setIsGeneratingPdf(false);
     }
   };
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[styles.container, containerStyle]}> 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors.buttonSecondary }]}
-        onPress={handlePdfGeneration}
+        onPress={() => handlePdfGeneration('export')}
         disabled={isGeneratingPdf}
         accessibilityLabel="Exportar resultados como PDF"
         accessibilityRole="button"
@@ -188,16 +211,21 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
             anchor.download = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.json`;
             anchor.click();
           } else {
+            // For mobile platforms, save JSON to temporary file and share
             try {
               const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.json`;
               const filePath = `${FileSystem.cacheDirectory}${fileName}`;
+              
               await FileSystem.writeAsStringAsync(filePath, JSON.stringify(assessment, null, 2));
               await shareAsync(filePath, {
                 mimeType: 'application/json',
                 dialogTitle: `Datos de ${scale.name}`,
               });
             } catch (error) {
-              Alert.alert('Error', `No se pudo exportar el archivo JSON. ${error instanceof Error ? error.message : 'Error desconocido'}`);
+              Alert.alert(
+                'Error',
+                `No se pudo exportar el archivo JSON. ${error instanceof Error ? error.message : 'Error desconocido'}`
+              );
             }
           }
         }}
@@ -222,12 +250,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 44,
+    minHeight: 44, // Ensure consistent height for loading indicator
   },
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
   },
 });
-
 

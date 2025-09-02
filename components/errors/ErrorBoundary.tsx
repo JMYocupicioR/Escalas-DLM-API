@@ -41,7 +41,17 @@ class ErrorBoundary extends Component<Props, State> {
 
   navigateHome = (): void => {
     this.resetError();
-    router.replace('/');
+    // Use setTimeout to ensure navigation happens after the component has re-rendered
+    setTimeout(() => {
+      try {
+        router.replace('/');
+      } catch (error) {
+        // If navigation fails, reload the page as fallback
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+      }
+    }, 100);
   }
 
   render(): ReactNode {

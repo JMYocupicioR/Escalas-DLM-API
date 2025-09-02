@@ -18,7 +18,7 @@ export const generatePdfFromService = async (
       options: options || {}
     };
 
-    // Make the API call to our PDF service
+    // Make the API call to our Netlify Function first
     const response = await fetch('/api/pdf/export', {
       method: 'POST',
       headers: {
@@ -35,19 +35,33 @@ export const generatePdfFromService = async (
     }
 
     const result = await response.json();
-    
     if (!result.base64) {
       throw new Error('No PDF data received from service');
     }
-
-    // Return the base64 string
     return result.base64;
   } catch (error) {
-    console.error('Error calling PDF service:', error);
-    throw new Error(
-      error instanceof Error 
-        ? `PDF generation failed: ${error.message}`
-        : 'PDF generation failed: Unknown error'
-    );
+    console.error('Error calling Netlify PDF function:', error);
+    // Fallback: try direct PDF service if available via EXPO_PUBLIC_PDF_SERVICE_URL
+    try {
+      const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
+      if (!base) throw new Error('Direct PDF service URL not configured');
+
+      const res = await fetch(`${base}/api/pdf/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data?.base64) throw new Error('No PDF data in fallback response');
+      return data.base64 as string;
+    } catch (fallbackError) {
+      console.error('Direct PDF service fallback failed:', fallbackError);
+      throw new Error(
+        fallbackError instanceof Error
+          ? `PDF generation failed: ${fallbackError.message}`
+          : 'PDF generation failed: Unknown error'
+      );
+    }
   }
 };

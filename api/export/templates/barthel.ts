@@ -111,3 +111,4 @@ export const generateHtml = (payload: BarthelPayload): string => {
     </html>
   `;
 };
+

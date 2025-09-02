@@ -14,11 +14,8 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { dosisData, puntosMotoresData } from '@/data/botulinum';
-import * as Print from 'expo-print';
-import { generatePdfFromService } from '@/api/export/pdf';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import { PlusCircle, Printer, RotateCcw, Trash2, TrendingUp } from 'lucide-react-native';
+import { PlusCircle, RotateCcw, Trash2, TrendingUp } from 'lucide-react-native';
+import { ResultsActions } from '@/components/ResultsActions';
 
 // Define types for state management
 type Marca = 'Dysport' | 'Botox' | 'Xeomin' | '';
@@ -176,7 +173,7 @@ export default function BotulinumCalculator() {
     setCalculoRealizado(true);
   };
 
-  const handleImprimir = async () => {
+  onst handleImprimir = async () => {
     if (!calculoRealizado) {
       setError('Debe calcular las dosis antes de imprimir.');
       return;
@@ -465,10 +462,27 @@ export default function BotulinumCalculator() {
                 <Text style={styles.resultLabel}>Dosis Total Recomendada:</Text>
                 <Text style={styles.resultValue}>{totalDosisAjustada} U</Text>
               </View>
-              <TouchableOpacity style={[styles.button, styles.imprimirButton]} onPress={handleImprimir}>
-                <Printer size={18} color={colors.buttonPrimaryText} />
-                <Text style={styles.buttonText}>Imprimir Reporte</Text>
-              </TouchableOpacity>
+              <ResultsActions
+                assessment={{
+                  patientData: {
+                    name: pacienteNombre,
+                    age: pacienteEdad,
+                    gender: '',
+                    doctorName: medico,
+                  },
+                  score: totalDosisAjustada,
+                  interpretation: advertencia ? `Advertencia: ${advertencia}` : '',
+                  answers: musculos.map((m) => ({
+                    id: m.id,
+                    question: `${m.nombre} (${m.lado})`,
+                    label: m.opcionDosis === 'min' ? 'Mínima' : m.opcionDosis === 'max' ? 'Máxima' : '',
+                    value: m.dosisAjustada ?? m.dosisBase ?? '',
+                    points: m.dosisAjustada ?? '',
+                  })),
+                }}
+                scale={{ id: 'botulinum', name: 'Calculadora de Toxina Botulínica' } as any}
+                containerStyle={{ marginTop: 12 }}
+              />
             </>
           )}
           
@@ -695,5 +709,6 @@ const createStyles = (colors: any) =>
       marginBottom: 8,
     },
   });
+
 
 
