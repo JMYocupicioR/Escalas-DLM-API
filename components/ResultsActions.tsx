@@ -113,36 +113,53 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
     try {
       if (Platform.OS === 'web') {
         const dbg = __DEV__ ? '&debug=1' : '';
-        // Prefer binary response on web to avoid JSON base64 overhead
-        const res = await fetch(`/api/pdf/export?binary=1${dbg}` as any, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options }),
-        });
-        if (!res.ok) {
-          // Try to extract server error message for better diagnostics
-          let serverMsg = `HTTP ${res.status}`;
+        const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
+        const payload = { assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options };
+
+        const tryDownload = async (endpoint: string) => {
+          const res = await fetch(endpoint as any, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) {
+            let serverMsg = `HTTP ${res.status}`;
+            try {
+              const ct = res.headers.get('content-type') || '';
+              if (ct.includes('application/json')) {
+                const j = await res.json();
+                if (j?.error) serverMsg = j.error;
+              } else {
+                const t = await res.text();
+                if (t) serverMsg = t.slice(0, 500);
+              }
+            } catch {}
+            throw new Error(serverMsg);
+          }
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        };
+
+        // Prefer direct service if configured, then fall back to Netlify route
+        let lastError: unknown = null;
+        if (base) {
           try {
-            const ct = res.headers.get('content-type') || '';
-            if (ct.includes('application/json')) {
-              const j = await res.json();
-              if (j?.error) serverMsg = j.error;
-            } else {
-              const t = await res.text();
-              if (t) serverMsg = t.slice(0, 500);
-            }
-          } catch {}
-          throw new Error(serverMsg);
+            await tryDownload(`${base}/api/pdf/export?binary=1${dbg}`);
+            return;
+          } catch (e) { lastError = e; }
         }
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        try {
+          await tryDownload(`/api/pdf/export?binary=1${dbg}`);
+          return;
+        } catch (e) { lastError = e; }
+        throw lastError instanceof Error ? lastError : new Error('PDF export failed');
       } else {
         // Native: fetch JSON base64 then save/share
         const base64Pdf = await generatePdfFromService(assessment, scale as Scale, options);
