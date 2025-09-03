@@ -5,23 +5,53 @@ exports.handler = void 0;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 const zod_1 = require("zod");
-// Use puppeteer-core + @sparticuz/chromium in serverless; fall back to puppeteer locally
-// We keep requires dynamic to avoid bundling unused binaries.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// Dynamic imports for serverless vs local environment
 const isServerless = !!(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY);
-let puppeteer;
-let chromium;
-try {
-    // Prefer serverless combo if available
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    chromium = require('@sparticuz/chromium');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    puppeteer = require('puppeteer-core');
-}
-catch {
-    // Fallback to full puppeteer when running locally or when core/chromium are missing
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    puppeteer = require('puppeteer');
+async function getBrowserConfig() {
+    if (isServerless) {
+        try {
+            // Serverless configuration with @sparticuz/chromium
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const chromium = require('@sparticuz/chromium');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires  
+            const puppeteer = require('puppeteer-core');
+            return {
+                puppeteer,
+                launchOptions: {
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: await chromium.executablePath(),
+                    headless: chromium.headless,
+                    ignoreHTTPSErrors: true,
+                }
+            };
+        }
+        catch (error) {
+            console.error('[pdf-export] Failed to load serverless dependencies:', error);
+            throw new Error('DEPENDENCY_ERROR: Could not load @sparticuz/chromium or puppeteer-core');
+        }
+    }
+    else {
+        // Local development configuration
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const puppeteer = require('puppeteer');
+        return {
+            puppeteer,
+            launchOptions: {
+                headless: 'shell',
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-accelerated-2d-canvas',
+                    '--no-first-run',
+                    '--no-zygote',
+                    '--single-process',
+                    '--disable-gpu',
+                ],
+            }
+        };
+    }
 }
 // Import templates via built JS to avoid TS compiling files outside rootDir
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,7 +75,7 @@ const RequestSchema = zod_1.z.object({
 const handler = async (event) => {
     const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     const debug = event.queryStringParameters?.debug === '1';
-    const flavor = chromium ? 'core+chromium' : 'bundled';
+    const flavor = isServerless ? 'serverless' : 'local';
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -84,50 +114,17 @@ const handler = async (event) => {
             console.error('[pdf-export] template render error', { requestId, message: e?.message });
             throw new Error(`TEMPLATE_ERROR: ${e?.message || 'Failed to render template'}`);
         }
-        // 3) Render with Puppeteer / Puppeteer-Core
-        let executablePath;
+        // 3) Get browser configuration and launch
         let browser;
         try {
-            if (isServerless && chromium) {
-                // Serverless configuration for @sparticuz/chromium
-                const launchOptions = {
-                    args: chromium.args,
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: await chromium.executablePath(),
-                    headless: chromium.headless,
-                    ignoreHTTPSErrors: true,
-                    ignoreDefaultArgs: ['--disable-extensions'],
-                };
-                console.log('[pdf-export] launching serverless browser', {
-                    requestId,
-                    flavor: 'chromium+puppeteer-core',
-                    executablePath: launchOptions.executablePath,
-                    args: launchOptions.args?.slice(0, 3) // Log first few args only
-                });
-                browser = await puppeteer.launch(launchOptions);
-            }
-            else {
-                // Local development configuration
-                const launchOptions = {
-                    headless: 'shell',
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--disable-accelerated-2d-canvas',
-                        '--no-first-run',
-                        '--no-zygote',
-                        '--single-process',
-                        '--disable-gpu',
-                    ],
-                };
-                console.log('[pdf-export] launching local browser', {
-                    requestId,
-                    flavor: 'puppeteer-bundled',
-                    args: launchOptions.args?.slice(0, 3)
-                });
-                browser = await puppeteer.launch(launchOptions);
-            }
+            const { puppeteer, launchOptions } = await getBrowserConfig();
+            console.log('[pdf-export] launching browser', {
+                requestId,
+                isServerless,
+                executablePath: launchOptions.executablePath || 'system-default',
+                argsCount: launchOptions.args?.length || 0
+            });
+            browser = await puppeteer.launch(launchOptions);
         }
         catch (e) {
             console.error('[pdf-export] launch error', { requestId, flavor, message: e?.message });
