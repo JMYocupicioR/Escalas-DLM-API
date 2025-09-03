@@ -47,7 +47,13 @@ export type BotulinumPayload = {
 
 export const generateHtml = (payload: BotulinumPayload): string => {
   // Corregir warning: remover variable 'scale' no usada
-  const { assessment, puntosMotoresData = {}, dosisDataComplete } = payload;
+  const { assessment } = payload;
+  // Aceptar datos auxiliares tanto en la raíz del payload como embebidos en assessment
+  // Esto alinea el template con el componente BotulinumCalculator, que los envía dentro de assessment
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const puntosMotoresData: Record<string, string> = (payload as any).puntosMotoresData || (assessment as any)?.puntosMotoresData || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dosisDataComplete: BotulinumPayload['dosisDataComplete'] = (payload as any).dosisDataComplete || (assessment as any)?.dosisDataComplete;
   const {
     medico,
     pacienteNombre,
@@ -80,7 +86,10 @@ export const generateHtml = (payload: BotulinumPayload): string => {
   };
 
   const getDosisRange = (musculo: string, marcaSel: string) => {
-    return dosisDataComplete?.[marcaSel as keyof typeof dosisDataComplete]?.[musculo] || { min: 0, max: 0 };
+    // Soporta estructuras completas de dosis por marca como las de data/botulinum.ts
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const byBrand = (dosisDataComplete as any)?.[marcaSel];
+    return byBrand?.[musculo] || { min: 0, max: 0 };
   };
 
   const musculosRows = (musculos || [])
@@ -394,7 +403,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
         <div class="reporte-impresion">
           <header class="reporte-header">
             <div class="header-content">
-              <div class="clinica-logo">DeepLuxMed</div>
+              <div class="clinica-logo">Escalas DLM</div>
             </div>
             <div class="reporte-titulo">Reporte de Dosis de Toxina Botulínica</div>
             <div class="fecha-reporte">${fecha}</div>
@@ -429,7 +438,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
               <thead>
                 <tr>
                   <th>Lado</th>
-                  <th>Músculo y Punto Motor</th>
+                  <th>Músculo</th>
                   <th>Rango y Selección</th>
                   <th>Dosis Final</th>
                   <th>Vol. a aplicar</th>
