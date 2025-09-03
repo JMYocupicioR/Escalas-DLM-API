@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Search, Chrome as Home, BookMarked as BookMedical, Settings, Shield, Grid3X3 } from 'lucide-react-native';
+import { Search, Chrome as Home, BookMarked as BookMedical, Settings, Shield } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
 import { Calculator } from 'lucide-react-native';
 
@@ -21,13 +21,6 @@ export default function TabLayout() {
         options={{
           title: 'Inicio',
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="categories"
-        options={{
-          title: 'Categorías',
-          tabBarIcon: ({ size, color }) => <Grid3X3 size={size} color={color} />,
         }}
       />
       <Tabs.Screen

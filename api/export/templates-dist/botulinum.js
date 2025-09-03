@@ -40,17 +40,29 @@ const BotulinumRequestSchema = zod_1.z.object({
         showPatientSummary: zod_1.z.boolean().optional(),
     }).optional(),
 });
-// SVG icon
-const appIconSvg = `<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+// SVG icons
+const appIconSvg = `<svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0891b2;" />
-      <stop offset="100%" style="stop-color:#06b6d4;" />
+      <stop offset="0%" style="stop-color:#0f766e;" />
+      <stop offset="100%" style="stop-color:#14b8a6;" />
     </linearGradient>
   </defs>
-  <circle cx="50" cy="50" r="40" fill="url(#iconGradient)"/>
-  <circle cx="50" cy="50" r="35" fill="none" stroke="white" stroke-opacity="0.2" stroke-width="1.5"/>
-  <path d="M32 50 L45 63 L68 40" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="50" r="45" fill="url(#iconGradient)"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="white" stroke-opacity="0.3" stroke-width="2"/>
+  <path d="M30 50 L42 62 L70 34" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+const patientIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e">
+  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+</svg>`;
+const summaryIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e">
+  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+</svg>`;
+const injectionIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e">
+  <path d="M9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9A3,3 0 0,0 9,12M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+</svg>`;
+const notesIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e">
+  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
 </svg>`;
 const generateHtml = (payload) => {
     const { assessment, scale, puntosMotoresData = {}, dosisDataComplete } = payload;
@@ -66,14 +78,14 @@ const generateHtml = (payload) => {
         'Xeomin': 'Xeomin (Incobotulinumtoxina A)'
     };
     const uiFrasco = marca === 'Dysport' ? 500 : 100;
-    const totalBase = musculos.reduce((total, m) => total + (m.dosisBase || 0), 0);
+    const totalBase = (musculos || []).reduce((total, m) => total + (m.dosisBase || 0), 0);
     const getPuntoMotor = (musculo) => {
         return puntosMotoresData[musculo] || 'Referencia anatómica no disponible para este músculo. Consulte literatura especializada.';
     };
     const getDosisRange = (musculo, marcaSel) => {
         return dosisDataComplete?.[marcaSel]?.[musculo] || { min: 0, max: 0 };
     };
-    const musculosRows = musculos
+    const musculosRows = (musculos || [])
         .map((m) => {
         const range = getDosisRange(m.nombre, marca);
         const seleccion = m.opcionDosis === 'min' ? 'Mínima' : 'Máxima';
@@ -98,38 +110,254 @@ const generateHtml = (payload) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reporte de Dosis de Toxina Botulínica</title>
         <style>
-          @page { size: A4; margin: 18mm; }
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; color: #111827; }
-          .reporte-impresion { max-width: 820px; margin: 0 auto; padding: 16px; }
-          .reporte-header { text-align: center; margin-bottom: 10px; }
-          .clinica-logo { font-size: 18pt; font-weight: 800; color: #0e7490; letter-spacing: 0.5px; }
-          .reporte-titulo { font-size: 16pt; font-weight: 700; margin-top: 6px; }
-          .fecha-reporte { font-size: 10pt; color: #64748b; }
-          .seccion-paciente, .seccion-resumen, .seccion-tabla, .seccion-notas { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
-          .seccion-titulo { font-size: 12pt; font-weight: 700; color: #0e7490; margin: 0 0 10px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
-          .info-campo { display: flex; gap: 6px; }
-          .etiqueta { font-weight: 600; color: #334155; }
-          .valor { color: #111827; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border-bottom: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 10pt; }
-          th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
-          .resumen-card { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-          .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; }
-          .card .label { font-size: 9pt; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-          .card .value { font-size: 14pt; font-weight: 700; color: #0e7490; }
-          .advertencia-limites { background-color: #fff7ed; border-left: 4px solid #f59e0b; padding: 10px; margin-top: 10px; font-size: 10pt; color: #b45309; font-weight: 600; }
-          .firma-area { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 22px 0; }
-          .firma-box .firma-linea { border-bottom: 1px solid #333; height: 50px; margin-bottom: 5px; }
-          .firma-label { font-size: 9pt; color: #666; text-align: center; }
-          .disclaimer { font-size: 8pt; color: #666; text-align: justify; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 12px; }
+          @page { size: A4; margin: 15mm; }
+          body { 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
+            margin: 0; 
+            color: #1f2937; 
+            line-height: 1.5;
+            background: #fafafa;
+          }
+          .reporte-impresion { 
+            max-width: 850px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+          }
+          
+          /* Header mejorado */
+          .reporte-header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 25px -8px rgba(15, 118, 110, 0.3);
+          }
+          .header-content {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-bottom: 15px;
+          }
+          .clinica-logo { 
+            font-size: 22pt; 
+            font-weight: 800; 
+            letter-spacing: 0.8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .reporte-titulo { 
+            font-size: 18pt; 
+            font-weight: 600; 
+            margin: 8px 0 4px 0;
+            opacity: 0.95;
+          }
+          .fecha-reporte { 
+            font-size: 11pt; 
+            opacity: 0.8;
+            font-weight: 400;
+          }
+          
+          /* Secciones mejoradas */
+          .seccion-paciente, .seccion-resumen, .seccion-tabla, .seccion-notas { 
+            background: #ffffff; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+          }
+          .seccion-paciente:hover, .seccion-resumen:hover, .seccion-tabla:hover, .seccion-notas:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          }
+          
+          .seccion-titulo { 
+            font-size: 14pt; 
+            font-weight: 700; 
+            color: #0f766e; 
+            margin: 0 0 16px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0fdfa;
+          }
+          
+          /* Grid y campos mejorados */
+          .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px 20px; 
+          }
+          .info-campo { 
+            display: flex; 
+            flex-direction: column;
+            gap: 4px; 
+            padding: 8px 0;
+          }
+          .etiqueta { 
+            font-weight: 600; 
+            color: #6b7280; 
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .valor { 
+            color: #1f2937; 
+            font-weight: 500;
+            font-size: 11pt;
+          }
+          
+          /* Tabla mejorada */
+          table { 
+            width: 100%; 
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          th, td { 
+            padding: 12px; 
+            text-align: left; 
+            font-size: 10pt;
+            border-bottom: 1px solid #f3f4f6;
+          }
+          th { 
+            background: linear-gradient(135deg, #0f766e, #14b8a6); 
+            font-weight: 600; 
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 9pt;
+          }
+          tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+          }
+          tbody tr:hover {
+            background-color: #f0fdfa;
+          }
+          .musculo-nombre {
+            font-weight: 600;
+            color: #1f2937;
+          }
+          .dosis-ajustada {
+            font-weight: 700;
+            color: #0f766e;
+          }
+          .ml-aplicar {
+            font-weight: 600;
+            color: #059669;
+            background: #ecfdf5;
+            border-radius: 4px;
+          }
+          
+          /* Cards de resumen mejoradas */
+          .resumen-card { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 16px; 
+          }
+          .card { 
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); 
+            border: 1px solid #a7f3d0; 
+            padding: 16px; 
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+          }
+          .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          .card .label { 
+            font-size: 9pt; 
+            color: #065f46; 
+            text-transform: uppercase; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px; 
+          }
+          .card .value { 
+            font-size: 16pt; 
+            font-weight: 700; 
+            color: #0f766e;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+          }
+          
+          /* Advertencia mejorada */
+          .advertencia-limites { 
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%); 
+            border-left: 4px solid #f59e0b; 
+            padding: 16px; 
+            margin-top: 16px; 
+            font-size: 10pt; 
+            color: #92400e; 
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
+          }
+          
+          /* Firma área mejorada */
+          .firma-area { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 50px; 
+            margin: 30px 0; 
+            padding: 20px 0;
+          }
+          .firma-box {
+            text-align: center;
+          }
+          .firma-box .firma-linea { 
+            border-bottom: 2px solid #0f766e; 
+            height: 60px; 
+            margin-bottom: 8px;
+            position: relative;
+          }
+          .firma-box .firma-linea::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: #14b8a6;
+          }
+          .firma-label { 
+            font-size: 10pt; 
+            color: #6b7280; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          /* Disclaimer mejorado */
+          .disclaimer { 
+            font-size: 8pt; 
+            color: #9ca3af; 
+            text-align: justify; 
+            border-top: 2px solid #f3f4f6; 
+            padding-top: 16px; 
+            margin-top: 20px;
+            line-height: 1.4;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+          }
         </style>
       </head>
       <body>
         <div class="reporte-impresion">
           <header class="reporte-header">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-              <div style="width: 40px; height: 40px;">${appIconSvg}</div>
+            <div class="header-content">
+              <div style="width: 50px; height: 50px;">${appIconSvg}</div>
               <div class="clinica-logo">DeepLuxMed</div>
             </div>
             <div class="reporte-titulo">Reporte de Dosis de Toxina Botulínica</div>
@@ -137,7 +365,10 @@ const generateHtml = (payload) => {
           </header>
 
           <section class="seccion-paciente">
-            <h2 class="seccion-titulo">Información del Paciente</h2>
+            <h2 class="seccion-titulo">
+              ${patientIcon}
+              Información del Paciente
+            </h2>
             <div class="grid">
               <div class="info-campo"><span class="etiqueta">Nombre:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
               <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad || 'No especificada'}</span></div>
@@ -147,7 +378,10 @@ const generateHtml = (payload) => {
           </section>
 
           <section class="seccion-resumen">
-            <h2 class="seccion-titulo">Resumen</h2>
+            <h2 class="seccion-titulo">
+              ${summaryIcon}
+              Resumen
+            </h2>
             <div class="resumen-card">
               <div class="card"><div class="label">Marca</div><div class="value">${toxinaInfo[marca] || marca}</div></div>
               <div class="card"><div class="label">Dilución</div><div class="value">${dilucion} ml</div></div>
@@ -158,7 +392,10 @@ const generateHtml = (payload) => {
           </section>
 
           <section class="seccion-tabla">
-            <h2 class="seccion-titulo">Plan de Inyección</h2>
+            <h2 class="seccion-titulo">
+              ${injectionIcon}
+              Plan de Inyección
+            </h2>
             <table>
               <thead>
                 <tr>
@@ -174,7 +411,10 @@ const generateHtml = (payload) => {
           </section>
 
           <section class="seccion-notas">
-            <h2 class="seccion-titulo">Notas</h2>
+            <h2 class="seccion-titulo">
+              ${notesIcon}
+              Notas
+            </h2>
             <p style="margin: 0; line-height: 1.5;">Las dosis fueron ajustadas en función de la edad y el peso cuando corresponde. Verifique la técnica, puntos motores y contraindicaciones antes de la aplicación.</p>
           </section>
 
