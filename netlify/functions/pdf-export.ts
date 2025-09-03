@@ -92,32 +92,48 @@ export const handler: Handler = async (event: HandlerEvent) => {
     let executablePath: string | undefined;
     let browser: any;
     try {
-      const launchOptions: Record<string, any> = isServerless && chromium ? {
-        args: [
-          ...chromium.args,
-          '--hide-scrollbars',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor',
-        ],
-        defaultViewport: chromium.defaultViewport,
-        executablePath: (executablePath = await chromium.executablePath()),
-        headless: chromium.headless,
-        ignoreHTTPSErrors: true,
-      } : {
-        headless: 'shell',
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--single-process',
-          '--disable-gpu',
-        ],
-      };
-      console.log('[pdf-export] launching browser', { requestId, flavor, isServerless, executablePath: executablePath || null });
-      browser = await puppeteer.launch(launchOptions);
+      if (isServerless && chromium) {
+        // Serverless configuration for @sparticuz/chromium
+        const launchOptions = {
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath({
+            // Force download if not found, critical for Netlify
+            ensureExists: true
+          }),
+          headless: chromium.headless,
+          ignoreHTTPSErrors: true,
+          ignoreDefaultArgs: ['--disable-extensions'],
+        };
+        console.log('[pdf-export] launching serverless browser', { 
+          requestId, 
+          flavor: 'chromium+puppeteer-core',
+          executablePath: launchOptions.executablePath,
+          args: launchOptions.args?.slice(0, 3) // Log first few args only
+        });
+        browser = await puppeteer.launch(launchOptions);
+      } else {
+        // Local development configuration
+        const launchOptions = {
+          headless: 'shell',
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu',
+          ],
+        };
+        console.log('[pdf-export] launching local browser', { 
+          requestId, 
+          flavor: 'puppeteer-bundled',
+          args: launchOptions.args?.slice(0, 3)
+        });
+        browser = await puppeteer.launch(launchOptions);
+      }
     } catch (e: any) {
       console.error('[pdf-export] launch error', { requestId, flavor, message: e?.message });
       throw new Error(`LAUNCH_ERROR: ${e?.message || 'Failed to launch browser'}`);
