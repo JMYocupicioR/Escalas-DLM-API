@@ -1,4 +1,7 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
+// Resolve paths safely when the function is bundled by Netlify esbuild
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');
 import { z } from 'zod';
 // Use puppeteer-core + @sparticuz/chromium in serverless; fall back to puppeteer locally
 // We keep requires dynamic to avoid bundling unused binaries.
@@ -90,7 +93,12 @@ export const handler: Handler = async (event: HandlerEvent) => {
     let browser: any;
     try {
       const launchOptions: Record<string, any> = isServerless && chromium ? {
-        args: chromium.args,
+        args: [
+          ...chromium.args,
+          '--hide-scrollbars',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor',
+        ],
         defaultViewport: chromium.defaultViewport,
         executablePath: (executablePath = await chromium.executablePath()),
         headless: chromium.headless,

@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
+// Resolve paths safely when the function is bundled by Netlify esbuild
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');
 const zod_1 = require("zod");
 // Use puppeteer-core + @sparticuz/chromium in serverless; fall back to puppeteer locally
 // We keep requires dynamic to avoid bundling unused binaries.
@@ -86,7 +89,12 @@ const handler = async (event) => {
         let browser;
         try {
             const launchOptions = isServerless && chromium ? {
-                args: chromium.args,
+                args: [
+                    ...chromium.args,
+                    '--hide-scrollbars',
+                    '--disable-web-security',
+                    '--disable-features=VizDisplayCompositor',
+                ],
                 defaultViewport: chromium.defaultViewport,
                 executablePath: (executablePath = await chromium.executablePath()),
                 headless: chromium.headless,
