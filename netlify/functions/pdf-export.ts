@@ -97,10 +97,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
         const launchOptions = {
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath({
-            // Force download if not found, critical for Netlify
-            ensureExists: true
-          }),
+          executablePath: await chromium.executablePath(),
           headless: chromium.headless,
           ignoreHTTPSErrors: true,
           ignoreDefaultArgs: ['--disable-extensions'],
