@@ -1,7 +1,7 @@
-// Import all template functions
-export { TEMPLATE_MAP, getTemplateFunction } from '../../../../api/export/templates';
-export { generateHtml as generateGenericTemplate } from '../../../../api/export/templates/generic';
-export { generateHtml as generateBarthelTemplate } from '../../../../api/export/templates/barthel';
-export { generateHtml as generateFimTemplate } from '../../../../api/export/templates/fim';
-export { generateHtml as generateLequesneTemplate } from '../../../../api/export/templates/lequesne';
-export { generateHtml as generateBotulinumTemplate } from '../../../../api/export/templates/botulinum';
+// Use the prebuilt JS templates to avoid TS/ESM export issues across package boundaries
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - CJS module default interop
+import templates from '../../../../api/export/templates-dist/index.js';
+
+export const TEMPLATE_MAP = templates.TEMPLATE_MAP as Record<string, (payload: any) => string>;
+export const getTemplateFunction = templates.getTemplateFunction as (id: string) => (payload: any) => string;

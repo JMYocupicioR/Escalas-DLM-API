@@ -114,7 +114,18 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
       if (Platform.OS === 'web') {
         const dbg = __DEV__ ? '&debug=1' : '';
         const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
-        const payload = { assessment, scale: { id: (scale as Scale).id, name: (scale as Scale).name }, options };
+        // Include additional data for botulinum scale
+        const additionalData = scale.id === 'botulinum' ? {
+          puntosMotoresData: (assessment as any).puntosMotoresData,
+          dosisDataComplete: (assessment as any).dosisDataComplete,
+        } : {};
+        
+        const payload = { 
+          assessment, 
+          scale: { id: (scale as Scale).id, name: (scale as Scale).name }, 
+          options,
+          ...additionalData
+        };
 
         const tryDownload = async (endpoint: string) => {
           const res = await fetch(endpoint as any, {
@@ -162,7 +173,14 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
         throw lastError instanceof Error ? lastError : new Error('PDF export failed');
       } else {
         // Native: fetch JSON base64 then save/share
-        const base64Pdf = await generatePdfFromService(assessment, scale as Scale, options);
+        // For botulinum scale, enhance assessment with additional data
+        const enhancedAssessment = scale.id === 'botulinum' ? {
+          ...assessment,
+          puntosMotoresData: (assessment as any).puntosMotoresData,
+          dosisDataComplete: (assessment as any).dosisDataComplete,
+        } : assessment;
+        
+        const base64Pdf = await generatePdfFromService(enhancedAssessment, scale as Scale, options);
         const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
         const filePath = `${FileSystem.cacheDirectory}${fileName}`;
         await FileSystem.writeAsStringAsync(filePath, base64Pdf, { encoding: FileSystem.EncodingType.Base64 });

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+// Schema para validación de datos de entrada
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BotulinumAssessmentSchema = z.object({
   medico: z.string().optional(),
   pacienteNombre: z.string().optional(),
@@ -18,29 +20,28 @@ const BotulinumAssessmentSchema = z.object({
   dilucion: z.string(),
 });
 
-const BotulinumRequestSchema = z.object({
-  assessment: BotulinumAssessmentSchema,
-  scale: z.object({ id: z.string(), name: z.string() }),
-  puntosMotoresData: z.record(z.string()).optional(),
-  dosisDataComplete: z.object({
-    Dysport: z.record(z.object({ min: z.number(), max: z.number() })),
-    Botox: z.record(z.object({ min: z.number(), max: z.number() })),
-    Xeomin: z.record(z.object({ min: z.number(), max: z.number() })),
-  }).optional(),
-  options: z.object({
-    theme: z.enum(['light', 'dark']).optional(),
-    customTheme: z.record(z.string()).optional(),
-    footerNote: z.string().optional(),
-    preset: z.enum(['compact', 'medical', 'formal']).optional(),
-    headerTitle: z.string().optional(),
-    headerSubtitle: z.string().optional(),
-    logoUrl: z.string().optional(),
-    scale: z.number().optional(),
-    showPatientSummary: z.boolean().optional(),
-  }).optional(),
-});
-
-export type BotulinumPayload = z.infer<typeof BotulinumRequestSchema>;
+// Definir el tipo directamente para evitar warnings
+export type BotulinumPayload = {
+  assessment: z.infer<typeof BotulinumAssessmentSchema>;
+  scale: { id: string; name: string };
+  puntosMotoresData?: Record<string, string>;
+  dosisDataComplete?: {
+    Dysport: Record<string, { min: number; max: number }>;
+    Botox: Record<string, { min: number; max: number }>;
+    Xeomin: Record<string, { min: number; max: number }>;
+  };
+  options?: {
+    theme?: 'light' | 'dark';
+    customTheme?: Record<string, string>;
+    footerNote?: string;
+    preset?: 'compact' | 'medical' | 'formal';
+    headerTitle?: string;
+    headerSubtitle?: string;
+    logoUrl?: string;
+    scale?: number;
+    showPatientSummary?: boolean;
+  };
+};
 
 // SVG icons
 const appIconSvg = `<svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -71,8 +72,13 @@ const notesIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e
   <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
 </svg>`;
 
+const anatomyIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f766e">
+  <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+</svg>`;
+
 export const generateHtml = (payload: BotulinumPayload): string => {
-  const { assessment, scale, puntosMotoresData = {}, dosisDataComplete } = payload;
+  // Corregir warning: remover variable 'scale' no usada
+  const { assessment, puntosMotoresData = {}, dosisDataComplete } = payload;
   const {
     medico,
     pacienteNombre,
@@ -112,18 +118,41 @@ export const generateHtml = (payload: BotulinumPayload): string => {
     .map((m) => {
       const range = getDosisRange(m.nombre, marca);
       const seleccion = m.opcionDosis === 'min' ? 'Mínima' : 'Máxima';
+      const puntoMotor = getPuntoMotor(m.nombre);
+      const mlAplicar = ((m.dosisAjustada / uiFrasco) * parseFloat(dilucion)).toFixed(2);
+      
       return `
     <tr>
       <td>${m.lado}</td>
-      <td class="musculo-nombre">${m.nombre}</td>
+      <td class="musculo-nombre">
+        <div class="musculo-title">${m.nombre}</div>
+        <div class="punto-motor">Punto motor: ${puntoMotor}</div>
+      </td>
       <td class="referencias">
-        <div class="rango-info">${range.min}-${range.max} U</div>
-        <div class="seleccion-info">${seleccion} (${m.dosisBase} U)</div>
+        <div class="rango-info">Rango: ${range.min}-${range.max} U</div>
+        <div class="seleccion-info">${seleccion}: ${m.dosisBase} U</div>
       </td>
       <td class="dosis-ajustada">${m.dosisAjustada} U</td>
-      <td class="ml-aplicar">${((m.dosisAjustada / uiFrasco) * parseFloat(dilucion)).toFixed(2)} ml</td>
+      <td class="ml-aplicar">${mlAplicar} ml</td>
     </tr>`;
     })
+    .join('');
+
+  // Generar lista de puntos motores únicos
+  const puntosMotoresUnicos = Array.from(new Set((musculos || []).map(m => m.nombre)))
+    .map(nombreMusculo => ({
+      nombre: nombreMusculo,
+      puntoMotor: getPuntoMotor(nombreMusculo)
+    }))
+    .filter(pm => pm.puntoMotor && !pm.puntoMotor.includes('no disponible'));
+
+  const puntosMotoresList = puntosMotoresUnicos
+    .map(pm => `
+      <div class="punto-motor-item">
+        <div class="punto-motor-nombre">${pm.nombre}</div>
+        <div class="punto-motor-descripcion">${pm.puntoMotor}</div>
+      </div>
+    `)
     .join('');
 
   return `
@@ -187,7 +216,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
           }
           
           /* Secciones mejoradas */
-          .seccion-paciente, .seccion-resumen, .seccion-tabla, .seccion-notas { 
+          .seccion-paciente, .seccion-resumen, .seccion-tabla, .seccion-notas, .seccion-puntos-motores { 
             background: #ffffff; 
             border: 1px solid #e5e7eb; 
             border-radius: 12px; 
@@ -196,7 +225,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease;
           }
-          .seccion-paciente:hover, .seccion-resumen:hover, .seccion-tabla:hover, .seccion-notas:hover {
+          .seccion-paciente:hover, .seccion-resumen:hover, .seccion-tabla:hover, .seccion-notas:hover, .seccion-puntos-motores:hover {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           }
           
@@ -269,6 +298,19 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             font-weight: 600;
             color: #1f2937;
           }
+          .musculo-title {
+            font-weight: 700;
+            font-size: 10.5pt;
+            color: #1f2937;
+            margin-bottom: 4px;
+          }
+          .punto-motor {
+            font-size: 8pt;
+            color: #6b7280;
+            font-style: italic;
+            line-height: 1.2;
+            max-width: 200px;
+          }
           .dosis-ajustada {
             font-weight: 700;
             color: #0f766e;
@@ -278,6 +320,48 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             color: #059669;
             background: #ecfdf5;
             border-radius: 4px;
+          }
+          .referencias {
+            font-size: 9pt;
+          }
+          .rango-info {
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+          .seleccion-info {
+            color: #059669;
+            font-weight: 600;
+          }
+          
+          /* Puntos motores específicos */
+          .punto-motor-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+          }
+          .punto-motor-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+          }
+          .punto-motor-nombre {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 10pt;
+            margin-bottom: 4px;
+          }
+          .punto-motor-descripcion {
+            font-size: 9pt;
+            color: #475569;
+            line-height: 1.4;
+          }
+          .puntos-motores-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
           }
           
           /* Cards de resumen mejoradas */
@@ -394,10 +478,10 @@ export const generateHtml = (payload: BotulinumPayload): string => {
               Información del Paciente
             </h2>
             <div class="grid">
-              <div class="info-campo"><span class="etiqueta">Nombre:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad || 'No especificada'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso || 'No especificado'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Médico:</span><span class="valor">${medico || 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Nombre del Paciente:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad ? `${pacienteEdad} años` : 'No especificada'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso ? `${pacientePeso} kg` : 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Médico Tratante:</span><span class="valor">${medico || 'No especificado'}</span></div>
             </div>
           </section>
 
@@ -409,8 +493,10 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             <div class="resumen-card">
               <div class="card"><div class="label">Marca</div><div class="value">${toxinaInfo[marca as keyof typeof toxinaInfo] || marca}</div></div>
               <div class="card"><div class="label">Dilución</div><div class="value">${dilucion} ml</div></div>
+              <div class="card"><div class="label">Músculos Tratados</div><div class="value">${(musculos || []).length}</div></div>
               <div class="card"><div class="label">Dosis Base Total</div><div class="value">${totalBase} U</div></div>
               <div class="card"><div class="label">Dosis Total Ajustada</div><div class="value">${totalDosisAjustada} U</div></div>
+              <div class="card"><div class="label">Factor de Ajuste</div><div class="value">${pacienteEdad && pacientePeso && parseFloat(pacienteEdad) < 18 ? `${(parseFloat(pacientePeso) / 40).toFixed(2)}x` : '1.0x'}</div></div>
             </div>
             ${advertencia ? `<div class="advertencia-limites">${advertencia}</div>` : ''}
           </section>
@@ -424,15 +510,27 @@ export const generateHtml = (payload: BotulinumPayload): string => {
               <thead>
                 <tr>
                   <th>Lado</th>
-                  <th>Músculo</th>
-                  <th>Rango / Selección</th>
-                  <th>Dosis Ajustada</th>
-                  <th>ml a aplicar</th>
+                  <th>Músculo y Punto Motor</th>
+                  <th>Rango y Selección</th>
+                  <th>Dosis Final</th>
+                  <th>Vol. a aplicar</th>
                 </tr>
               </thead>
               <tbody>${musculosRows}</tbody>
             </table>
           </section>
+
+          ${puntosMotoresUnicos.length > 0 ? `
+          <section class="seccion-puntos-motores">
+            <h2 class="seccion-titulo">
+              ${anatomyIcon}
+              Puntos Motores de Referencia
+            </h2>
+            <div class="puntos-motores-container">
+              ${puntosMotoresList}
+            </div>
+          </section>
+          ` : ''}
 
           <section class="seccion-notas">
             <h2 class="seccion-titulo">
@@ -454,7 +552,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
           </div>
 
           <div class="disclaimer">
-            Documento generado automáticamente en ${fecha}. Información con fines clínicos; confirmar siempre con guías actualizadas y ficha técnica del producto.
+            Documento generado automáticamente en ${fecha}. Información con fines clínicos; Se sugiere confirmar siempre con guías actualizadas y ficha técnica del producto.
           </div>
         </div>
       </body>

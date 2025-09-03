@@ -384,6 +384,17 @@ export default function BotulinumCalculator() {
               </View>
               <ResultsActions
                 assessment={{
+                  medico,
+                  pacienteNombre,
+                  pacienteEdad,
+                  pacientePeso,
+                  marca,
+                  musculos,
+                  totalDosisAjustada,
+                  advertencia,
+                  dilucion,
+                  puntosMotoresData,
+                  dosisDataComplete: dosisData,
                   patientData: {
                     name: pacienteNombre,
                     age: pacienteEdad,

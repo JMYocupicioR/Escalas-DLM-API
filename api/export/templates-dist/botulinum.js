@@ -89,16 +89,21 @@ const generateHtml = (payload) => {
         .map((m) => {
         const range = getDosisRange(m.nombre, marca);
         const seleccion = m.opcionDosis === 'min' ? 'Mínima' : 'Máxima';
+        const puntoMotor = getPuntoMotor(m.nombre);
+        const mlAplicar = ((m.dosisAjustada / uiFrasco) * parseFloat(dilucion)).toFixed(2);
         return `
     <tr>
       <td>${m.lado}</td>
-      <td class="musculo-nombre">${m.nombre}</td>
+      <td class="musculo-nombre">
+        <div class="musculo-title">${m.nombre}</div>
+        <div class="punto-motor">${puntoMotor}</div>
+      </td>
       <td class="referencias">
-        <div class="rango-info">${range.min}-${range.max} U</div>
-        <div class="seleccion-info">${seleccion} (${m.dosisBase} U)</div>
+        <div class="rango-info">Rango: ${range.min}-${range.max} U</div>
+        <div class="seleccion-info">${seleccion}: ${m.dosisBase} U</div>
       </td>
       <td class="dosis-ajustada">${m.dosisAjustada} U</td>
-      <td class="ml-aplicar">${((m.dosisAjustada / uiFrasco) * parseFloat(dilucion)).toFixed(2)} ml</td>
+      <td class="ml-aplicar">${mlAplicar} ml</td>
     </tr>`;
     })
         .join('');
@@ -245,6 +250,19 @@ const generateHtml = (payload) => {
             font-weight: 600;
             color: #1f2937;
           }
+          .musculo-title {
+            font-weight: 700;
+            font-size: 10.5pt;
+            color: #1f2937;
+            margin-bottom: 4px;
+          }
+          .punto-motor {
+            font-size: 8pt;
+            color: #6b7280;
+            font-style: italic;
+            line-height: 1.2;
+            max-width: 200px;
+          }
           .dosis-ajustada {
             font-weight: 700;
             color: #0f766e;
@@ -254,6 +272,18 @@ const generateHtml = (payload) => {
             color: #059669;
             background: #ecfdf5;
             border-radius: 4px;
+          }
+          .referencias {
+            font-size: 9pt;
+          }
+          .rango-info {
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+          .seleccion-info {
+            color: #059669;
+            font-weight: 600;
           }
           
           /* Cards de resumen mejoradas */
@@ -370,10 +400,10 @@ const generateHtml = (payload) => {
               Información del Paciente
             </h2>
             <div class="grid">
-              <div class="info-campo"><span class="etiqueta">Nombre:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad || 'No especificada'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso || 'No especificado'}</span></div>
-              <div class="info-campo"><span class="etiqueta">Médico:</span><span class="valor">${medico || 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Nombre del Paciente:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad ? `${pacienteEdad} años` : 'No especificada'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso ? `${pacientePeso} kg` : 'No especificado'}</span></div>
+              <div class="info-campo"><span class="etiqueta">Médico Tratante:</span><span class="valor">${medico || 'No especificado'}</span></div>
             </div>
           </section>
 
@@ -385,8 +415,10 @@ const generateHtml = (payload) => {
             <div class="resumen-card">
               <div class="card"><div class="label">Marca</div><div class="value">${toxinaInfo[marca] || marca}</div></div>
               <div class="card"><div class="label">Dilución</div><div class="value">${dilucion} ml</div></div>
+              <div class="card"><div class="label">Músculos Tratados</div><div class="value">${(musculos || []).length}</div></div>
               <div class="card"><div class="label">Dosis Base Total</div><div class="value">${totalBase} U</div></div>
               <div class="card"><div class="label">Dosis Total Ajustada</div><div class="value">${totalDosisAjustada} U</div></div>
+              <div class="card"><div class="label">Factor de Ajuste</div><div class="value">${pacienteEdad && pacientePeso && parseFloat(pacienteEdad) < 18 ? `${(parseFloat(pacientePeso) / 40).toFixed(2)}x` : '1.0x'}</div></div>
             </div>
             ${advertencia ? `<div class="advertencia-limites">${advertencia}</div>` : ''}
           </section>
@@ -400,10 +432,10 @@ const generateHtml = (payload) => {
               <thead>
                 <tr>
                   <th>Lado</th>
-                  <th>Músculo</th>
-                  <th>Rango / Selección</th>
-                  <th>Dosis Ajustada</th>
-                  <th>ml a aplicar</th>
+                  <th>Músculo y Punto Motor</th>
+                  <th>Rango y Selección</th>
+                  <th>Dosis Final</th>
+                  <th>Vol. a aplicar</th>
                 </tr>
               </thead>
               <tbody>${musculosRows}</tbody>

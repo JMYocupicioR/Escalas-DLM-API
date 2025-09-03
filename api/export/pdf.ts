@@ -12,11 +12,17 @@ export const generatePdfFromService = async (
 ): Promise<string> => {
   try {
     const dbg = __DEV__ ? '?debug=1' : '';
-    // Prepare the request payload
+    // Prepare the request payload with additional data for botulinum scale
+    const additionalData = scale.id === 'botulinum' ? {
+      puntosMotoresData: (assessment as any).puntosMotoresData,
+      dosisDataComplete: (assessment as any).dosisDataComplete,
+    } : {};
+    
     const payload = {
       assessment,
       scale,
-      options: options || {}
+      options: options || {},
+      ...additionalData
     };
 
     // Make the API call to our Netlify Function first
