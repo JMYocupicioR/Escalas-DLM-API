@@ -255,22 +255,8 @@ export default function SettingsScreen() {
             <Text style={themedStyles.sectionTitle}>Apariencia</Text>
             <View style={themedStyles.sectionContent}>
               <SettingItem
-                icon={Moon}
-                title="Modo oscuro"
-                showToggle
-                isToggled={currentTheme === 'dark'}
-                onPress={() => {
-                  if (currentTheme === 'dark') {
-                    setThemeMode('light');
-                  } else {
-                    setThemeMode('dark');
-                  }
-                }}
-                description="Cambiar entre tema claro y oscuro"
-              />
-              <SettingItem
                 icon={Palette}
-                title="Modo de tema"
+                title="Tema de la aplicación"
                 value={getThemeDisplayName(currentTheme)}
                 onPress={() => {
                   // Ciclar entre light, dark, system
