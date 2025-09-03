@@ -16,7 +16,7 @@ async function getBrowserConfig() {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         chromium = require('@sparticuz/chromium');
         console.log('[pdf-export] @sparticuz/chromium loaded successfully');
-      } catch (e) {
+      } catch (e: any) {
         console.error('[pdf-export] Failed to load @sparticuz/chromium:', e?.message);
         throw new Error('@sparticuz/chromium not available');
       }
@@ -25,7 +25,7 @@ async function getBrowserConfig() {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         puppeteer = require('puppeteer-core');
         console.log('[pdf-export] puppeteer-core loaded successfully');
-      } catch (e) {
+      } catch (e: any) {
         console.error('[pdf-export] Failed to load puppeteer-core:', e?.message);
         throw new Error('puppeteer-core not available');
       }
@@ -43,7 +43,7 @@ async function getBrowserConfig() {
           ignoreHTTPSErrors: true,
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('[pdf-export] Serverless setup failed:', error);
       throw new Error(`DEPENDENCY_ERROR: ${error?.message || 'Could not load serverless dependencies'}`);
     }
