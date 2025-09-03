@@ -24,10 +24,14 @@
 
 [functions]
   node_bundler = "esbuild"
+  # Force external modules to prevent bundling issues
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core", "puppeteer"]
   included_files = [
-    "api/export/templates/**"
+    "api/export/templates-dist/**/*",
+    "node_modules/@sparticuz/chromium/**/*",
+    "dist-functions/**"
   ]
 
 [functions."pdf-export"]
-  timeout = 26
-  memory = 1024
+  timeout = 30
+  memory = 1536

@@ -9,25 +9,43 @@ const isServerless = !!(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETL
 async function getBrowserConfig() {
   if (isServerless) {
     try {
-      // Serverless configuration with @sparticuz/chromium
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const chromium = require('@sparticuz/chromium');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires  
-      const puppeteer = require('puppeteer-core');
+      // Check if modules are available before requiring
+      let chromium, puppeteer;
+      
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        chromium = require('@sparticuz/chromium');
+        console.log('[pdf-export] @sparticuz/chromium loaded successfully');
+      } catch (e) {
+        console.error('[pdf-export] Failed to load @sparticuz/chromium:', e?.message);
+        throw new Error('@sparticuz/chromium not available');
+      }
+      
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        puppeteer = require('puppeteer-core');
+        console.log('[pdf-export] puppeteer-core loaded successfully');
+      } catch (e) {
+        console.error('[pdf-export] Failed to load puppeteer-core:', e?.message);
+        throw new Error('puppeteer-core not available');
+      }
+      
+      const executablePath = await chromium.executablePath();
+      console.log('[pdf-export] Chromium executable path:', executablePath);
       
       return {
         puppeteer,
         launchOptions: {
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath(),
+          executablePath,
           headless: chromium.headless,
           ignoreHTTPSErrors: true,
         }
       };
     } catch (error) {
-      console.error('[pdf-export] Failed to load serverless dependencies:', error);
-      throw new Error('DEPENDENCY_ERROR: Could not load @sparticuz/chromium or puppeteer-core');
+      console.error('[pdf-export] Serverless setup failed:', error);
+      throw new Error(`DEPENDENCY_ERROR: ${error?.message || 'Could not load serverless dependencies'}`);
     }
   } else {
     // Local development configuration
