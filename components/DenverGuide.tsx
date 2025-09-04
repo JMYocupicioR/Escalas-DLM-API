@@ -262,9 +262,30 @@ interface DenverInfoButtonProps {
 export function DenverInfoButton({ onPress }: DenverInfoButtonProps) {
   const { colors } = useThemedStyles();
   
+  const infoButtonStyle = {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    backgroundColor: colors.primary,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 4,
+      },
+    }),
+  };
+  
   return (
     <TouchableOpacity
-      style={[styles.infoButton, { backgroundColor: colors.primary }]}
+      style={infoButtonStyle}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -468,25 +489,6 @@ const createStyles = (colors: any) => StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  infoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Platform.select({
-      web: {
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 4,
-      },
-    }),
   },
 });
 
