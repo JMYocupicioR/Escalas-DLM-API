@@ -1,21 +1,33 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { AppIcon } from '@/components/AppIcon';
 import { SearchWidget } from '@/components/SearchWidget';
+import { QuickActions } from '@/components/QuickActions';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useScalesStore } from '@/store/scales';
 import { scalesById, scales as allScales } from '@/data/_scales';
-import { Activity, Brain, Star, Calculator, Compass } from 'lucide-react-native';
+import { Activity, Brain, Star, Calculator, Compass, Heart, TrendingUp, Users, Clock, Zap } from 'lucide-react-native';
 
 const calculators = [
   { id: 'botulinum', title: 'Toxina Botulínica', description: 'Unidades, volumen y dilución' },
 ];
 
 const POPULAR_IDS = ['barthel', 'glasgow', 'mmse', 'fim', 'lequesne-rodilla-es-v1', 'vas'];
+
+// Simulated usage stats for popular scales
+const SCALE_STATS = {
+  'barthel': { uses: 1247, rating: 4.8, category: 'Funcional', icon: Activity, color: '#10b981' },
+  'glasgow': { uses: 982, rating: 4.9, category: 'Neurológica', icon: Brain, color: '#8b5cf6' },
+  'mmse': { uses: 756, rating: 4.7, category: 'Cognitiva', icon: Zap, color: '#f59e0b' },
+  'fim': { uses: 654, rating: 4.6, category: 'Funcional', icon: TrendingUp, color: '#0891b2' },
+  'lequesne-rodilla-es-v1': { uses: 432, rating: 4.5, category: 'Dolor', icon: Heart, color: '#ef4444' },
+  'vas': { uses: 1156, rating: 4.8, category: 'Dolor', icon: Activity, color: '#f97316' },
+};
 
 export default function HomeScreen() {
   const { colors } = useThemedStyles();
@@ -34,6 +46,10 @@ export default function HomeScreen() {
   }, []);
 
   const columns = isDesktop ? 3 : isTablet ? 2 : 1;
+  
+  // Responsive breakpoints for better mobile web experience
+  const isCompact = !isTablet && !isDesktop;
+  const shouldShowQuickActions = !isCompact || recentlyViewed.length === 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -61,8 +77,16 @@ export default function HomeScreen() {
 
         {/* Search */}
         <View style={styles.searchSection}>
-          <SearchWidget placeholder="Buscar escalas médicas..." showFilters={true} />
+          <SearchWidget 
+            placeholder="Buscar escalas médicas..." 
+            showFilters={true}
+            showVoiceSearch={true}
+            showQuickFilters={true}
+          />
         </View>
+
+        {/* Quick Actions */}
+        {shouldShowQuickActions && <QuickActions />}
 
         {/* Recientes */}
         <View style={styles.section}>
@@ -99,15 +123,55 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.grid(columns)}>
-            {popularScales.map((s) => (
-              <TouchableOpacity key={s.id} style={[styles.card, styles.col(columns)]} onPress={() => router.push(`/scales/${s.id}`)}>
-                <View style={[styles.iconBadge, { backgroundColor: `${colors.primary}15` }]}>
-                  <Activity size={18} color={colors.primary} />
-                </View>
-                <Text style={styles.cardTitle}>{s.name}</Text>
-                <Text style={styles.cardDesc} numberOfLines={2}>{s.description}</Text>
-              </TouchableOpacity>
-            ))}
+            {popularScales.map((s) => {
+              const stats = SCALE_STATS[s.id as keyof typeof SCALE_STATS];
+              const IconComponent = stats?.icon || Activity;
+              const iconColor = stats?.color || colors.primary;
+              
+              return (
+                <TouchableOpacity 
+                  key={s.id} 
+                  style={[styles.card, styles.col(columns)]} 
+                  onPress={() => router.push(`/scales/${s.id}`)}
+                  activeOpacity={0.7}
+                >
+                  {/* Header with icon, stats and favorite */}
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardHeaderLeft}>
+                      <View style={[styles.iconBadge, { backgroundColor: `${iconColor}15` }]}>
+                        <IconComponent size={18} color={iconColor} />
+                      </View>
+                      {stats && (
+                        <View style={styles.statsContainer}>
+                          <View style={styles.statItem}>
+                            <Users size={12} color={colors.mutedText} />
+                            <Text style={styles.statText}>{stats.uses.toLocaleString()}</Text>
+                          </View>
+                          <View style={styles.statItem}>
+                            <Star size={12} color="#f59e0b" />
+                            <Text style={styles.statText}>{stats.rating}</Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+                    <FavoriteButton scaleId={s.id} size={16} />
+                  </View>
+                  
+                  {/* Content */}
+                  <Text style={styles.cardTitle}>{s.name}</Text>
+                  <Text style={styles.cardDesc} numberOfLines={2}>{s.description}</Text>
+                  
+                  {/* Category badge */}
+                  {stats && (
+                    <View style={[styles.categoryBadge, { backgroundColor: `${iconColor}10` }]}>
+                      <Text style={[styles.categoryText, { color: iconColor }]}>
+                        {stats.category}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -154,8 +218,25 @@ export default function HomeScreen() {
 }
 
 const createStyles = (colors: any) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { paddingBottom: 32 },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.background,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+    }),
+  },
+  content: { 
+    paddingBottom: 32,
+    ...Platform.select({
+      web: {
+        paddingHorizontal: 16,
+      },
+    }),
+  },
 
   hero: {
     margin: 16,
@@ -217,6 +298,57 @@ const createStyles = (colors: any) => StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     margin: 6,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+    }),
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  cardHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 8,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  statText: {
+    fontSize: 11,
+    color: colors.mutedText,
+    fontWeight: '500',
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  categoryText: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   cardWide: {
     backgroundColor: colors.card,

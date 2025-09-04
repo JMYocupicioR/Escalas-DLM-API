@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { ErrorBoundary } from '@/components/errors';
+import { ToastContainer } from '@/components/Toast';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/api/config/reactQuery';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -68,6 +69,7 @@ export default function RootLayout() {
                   <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
                 </Stack>
                 <StatusBar style={effectiveDarkMode ? 'light' : 'dark'} />
+                <ToastContainer />
               </BottomSheetModalProvider>
             </ThemeProvider>
           </PaperProvider>

@@ -8,9 +8,10 @@ import {
   FlatList, 
   TouchableOpacity,
   Platform,
-  Keyboard
+  Keyboard,
+  Vibration
 } from 'react-native';
-import { Search, X, Clock, Filter } from 'lucide-react-native';
+import { Search, X, Clock, Filter, Mic, Star, TrendingUp, Zap } from 'lucide-react-native';
 import Animated, { 
   FadeIn, 
   FadeOut, 
@@ -39,6 +40,8 @@ interface SearchWidgetProps {
   onFocus?: () => void;
   onBlur?: () => void;
   showFilters?: boolean;
+  showVoiceSearch?: boolean;
+  showQuickFilters?: boolean;
   initialValue?: string;
 }
 
@@ -48,12 +51,16 @@ export function SearchWidget({
   onFocus,
   onBlur,
   showFilters = false,
+  showVoiceSearch = false,
+  showQuickFilters = true,
   initialValue = ""
 }: SearchWidgetProps) {
   const [query, setQuery] = useState(initialValue);
   const [isFocused, setIsFocused] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string | null>(null);
+  const [isVoiceSearching, setIsVoiceSearching] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const recentlyViewed = useScalesStore((state) => state.recentlyViewed);
   
@@ -81,6 +88,14 @@ export function SearchWidget({
     'Funcional', 'Neurológica', 'Cognitiva', 'Dolor', 'Cardiovascular', 
     'Respiratoria', 'Psiquiátrica', 'Geriátrica', 'Rehab', 'Rehabilitación',
     'Medicina Física', 'Traumatología', 'Neurología', 'Geriatría', 'Osteoartritis', 'Rodilla'
+  ];
+
+  const quickFilters = [
+    { id: 'popular', label: 'Populares', icon: TrendingUp, color: '#f59e0b' },
+    { id: 'recent', label: 'Recientes', icon: Clock, color: '#10b981' },
+    { id: 'favorites', label: 'Favoritos', icon: Star, color: '#ef4444' },
+    { id: 'neurological', label: 'Neurológica', icon: Zap, color: '#8b5cf6' },
+    { id: 'functional', label: 'Funcional', icon: TrendingUp, color: '#0891b2' },
   ];
 
   // Animated styles
@@ -235,9 +250,41 @@ export function SearchWidget({
   const clearSearch = useCallback(() => {
     setQuery('');
     setSuggestions([]);
+    setSelectedQuickFilter(null);
     inputRef.current?.focus();
     generateRecentSuggestions();
   }, [generateRecentSuggestions]);
+
+  // Handle quick filter selection
+  const handleQuickFilter = useCallback((filterId: string) => {
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate(50);
+    }
+    
+    setSelectedQuickFilter(filterId);
+    const filter = quickFilters.find(f => f.id === filterId);
+    
+    if (filter) {
+      router.push({
+        pathname: '/search',
+        params: { filter: filterId, category: filter.label.toLowerCase() }
+      });
+    }
+  }, [quickFilters]);
+
+  // Handle voice search (placeholder - would need speech recognition library)
+  const handleVoiceSearch = useCallback(() => {
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate(100);
+    }
+    
+    setIsVoiceSearching(true);
+    // Placeholder for voice search implementation
+    setTimeout(() => {
+      setIsVoiceSearching(false);
+      // Would implement actual voice recognition here
+    }, 2000);
+  }, []);
 
   // Render suggestion item
   const renderSuggestion = useCallback(({ item }: { item: SearchSuggestion }) => {
@@ -317,6 +364,17 @@ export function SearchWidget({
           </Pressable>
         )}
 
+        {showVoiceSearch && (
+          <Pressable
+            style={[styles.filterButton, isVoiceSearching && styles.voiceSearchActive]}
+            onPress={handleVoiceSearch}
+            accessibilityLabel="Búsqueda por voz"
+            accessibilityRole="button"
+          >
+            <Mic size={18} color={isVoiceSearching ? "#ef4444" : "#64748b"} />
+          </Pressable>
+        )}
+
         {showFilters && (
           <Pressable
             style={styles.filterButton}
@@ -339,6 +397,48 @@ export function SearchWidget({
         </Pressable>
       </Animated.View>
 
+      {/* Quick Filters */}
+      {showQuickFilters && (
+        <Animated.View 
+          entering={FadeIn.delay(200)} 
+          style={styles.quickFiltersContainer}
+        >
+          <FlatList
+            data={quickFilters}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.quickFiltersList}
+            renderItem={({ item }) => {
+              const IconComponent = item.icon;
+              const isSelected = selectedQuickFilter === item.id;
+              
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.quickFilterChip,
+                    isSelected && styles.quickFilterChipSelected,
+                    { borderColor: item.color }
+                  ]}
+                  onPress={() => handleQuickFilter(item.id)}
+                  activeOpacity={0.7}
+                >
+                  <IconComponent 
+                    size={14} 
+                    color={isSelected ? '#ffffff' : item.color} 
+                  />
+                  <Text style={[
+                    styles.quickFilterText,
+                    isSelected && styles.quickFilterTextSelected
+                  ]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </Animated.View>
+      )}
 
       {/* Suggestions dropdown */}
       {isFocused && suggestions.length > 0 && (
@@ -360,14 +460,28 @@ export function SearchWidget({
         </Animated.View>
       )}
 
-      {/* Loading indicator */}
+      {/* Enhanced Loading indicator */}
       {isLoading && (
         <Animated.View 
           entering={FadeIn} 
           exiting={FadeOut}
           style={styles.loadingContainer}
         >
-          <Text style={styles.loadingText}>Buscando...</Text>
+          <View style={styles.loadingContent}>
+            <Animated.View 
+              style={[
+                styles.loadingSpinner,
+                {
+                  transform: [{ 
+                    rotate: useSharedValue(0).value + 'deg' 
+                  }]
+                }
+              ]}
+            >
+              <Search size={16} color="#0891b2" />
+            </Animated.View>
+            <Text style={styles.loadingText}>Buscando escalas...</Text>
+          </View>
         </Animated.View>
       )}
     </View>
@@ -423,6 +537,52 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     padding: 4,
+  },
+  voiceSearchActive: {
+    backgroundColor: '#fef2f2',
+    borderRadius: 6,
+  },
+  quickFiltersContainer: {
+    marginTop: 12,
+  },
+  quickFiltersList: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  quickFilterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    backgroundColor: '#ffffff',
+    marginRight: 8,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+      },
+    }),
+  },
+  quickFilterChipSelected: {
+    backgroundColor: '#0891b2',
+    borderColor: '#0891b2',
+  },
+  quickFilterText: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 6,
+    color: '#374151',
+  },
+  quickFilterTextSelected: {
+    color: '#ffffff',
   },
   suggestionsContainer: {
     position: 'absolute',
@@ -511,9 +671,17 @@ const styles = StyleSheet.create({
     }),
     zIndex: 10000,
   },
+  loadingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loadingSpinner: {
+    padding: 4,
+  },
   loadingText: {
     fontSize: 14,
     color: '#64748b',
-    fontStyle: 'italic',
+    fontWeight: '500',
   },
 });

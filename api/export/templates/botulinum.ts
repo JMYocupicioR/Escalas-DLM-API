@@ -299,6 +299,13 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             padding: 10px;
             margin-bottom: 15px;
             background: white;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+          }
+          .punto-motor-content {
+            flex: 1;
+            min-width: 0;
           }
           .punto-motor-nombre {
             font-weight: bold;
@@ -312,17 +319,21 @@ export const generateHtml = (payload: BotulinumPayload): string => {
             font-size: 9pt;
             color: #000;
             line-height: 1.4;
-            margin-bottom: 10px;
+            margin: 0;
           }
           .imagen-placeholder {
             border: 2px dashed #666;
-            height: 150px;
+            height: 120px;
+            width: 180px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9pt;
+            font-size: 8pt;
             color: #666;
             font-style: italic;
+            text-align: center;
+            padding: 5px;
           }
           
           /* Cards de resumen compactas */
@@ -479,8 +490,10 @@ export const generateHtml = (payload: BotulinumPayload): string => {
           <div style="padding: 10px 0;">
             ${puntosMotoresUnicos.map(pm => `
               <div class="punto-motor-item">
-                <div class="punto-motor-nombre">${pm.nombre}</div>
-                <div class="punto-motor-descripcion">${pm.puntoMotor}</div>
+                <div class="punto-motor-content">
+                  <div class="punto-motor-nombre">${pm.nombre}</div>
+                  <div class="punto-motor-descripcion">${pm.puntoMotor}</div>
+                </div>
                 <div class="imagen-placeholder">
                   [Espacio reservado para imagen anatómica del punto motor]
                 </div>

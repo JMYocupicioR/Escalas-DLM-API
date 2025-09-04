@@ -211,10 +211,22 @@ export default function BotulinumCalculator() {
         selectedValue={selectedValue}
         onValueChange={onValueChange}
         style={[styles.picker, !selectedValue && { color: colors.mutedText }]}
+        itemStyle={Platform.OS === 'ios' ? styles.pickerItem : undefined}
+        dropdownIconColor={colors.text}
       >
-        <Picker.Item label={placeholder} value="" enabled={false} />
+        <Picker.Item 
+          label={placeholder} 
+          value="" 
+          enabled={false}
+          style={{ color: colors.mutedText }}
+        />
         {items.map(item => (
-          <Picker.Item key={item.value} label={item.label} value={item.value} />
+          <Picker.Item 
+            key={item.value} 
+            label={item.label} 
+            value={item.value}
+            style={{ color: colors.text }}
+          />
         ))}
       </Picker>
     </View>
@@ -488,10 +500,18 @@ const createStyles = (colors: any) =>
       borderColor: colors.border,
       marginBottom: 12,
       justifyContent: 'center',
+      minHeight: 56,
+      paddingHorizontal: Platform.OS === 'ios' ? 0 : 8,
     },
     picker: {
       color: colors.text,
-      height: 50,
+      height: Platform.OS === 'ios' ? 56 : 56,
+      fontSize: 16,
+    },
+    pickerItem: {
+      fontSize: 16,
+      height: 56,
+      color: colors.text,
     },
     button: {
       backgroundColor: colors.primary,
