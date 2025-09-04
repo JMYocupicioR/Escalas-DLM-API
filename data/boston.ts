@@ -1,118 +1,287 @@
-import { BostonQuestion } from '@/types/question';
+import { Scale } from '@/types/scale';
 
-export const symptomSeverityQuestions: BostonQuestion[] = [
-  {
-    id: 'pain_severity',
-    type: 'symptom',
-    question: 'Severidad del dolor nocturno',
-    description: '¿Cómo calificaría el dolor en la mano o muñeca que tiene por la noche?',
-    options: [
-      {
-        value: 1,
-        label: 'No tengo dolor',
-        description: 'No experimento dolor durante la noche',
-      },
-      {
-        value: 2,
-        label: 'Dolor leve',
-        description: 'Dolor ocasional y leve',
-      },
-      {
-        value: 3,
-        label: 'Dolor moderado',
-        description: 'Dolor que ocasionalmente me despierta',
-      },
-      {
-        value: 4,
-        label: 'Dolor intenso',
-        description: 'Dolor que frecuentemente me despierta',
-      },
-      {
-        value: 5,
-        label: 'Dolor severo',
-        description: 'Dolor intenso que me impide dormir',
-      },
-    ],
-  },
-  // Add remaining symptom questions...
-];
-
-export const functionalStatusQuestions: BostonQuestion[] = [
-  {
-    id: 'writing',
-    type: 'functional',
-    question: 'Escritura',
-    description: '¿Tiene dificultad para escribir a mano o usar un teclado debido a sus síntomas?',
-    options: [
-      {
-        value: 1,
-        label: 'Sin dificultad',
-        description: 'Puedo realizar esta actividad sin dificultad',
-      },
-      {
-        value: 2,
-        label: 'Dificultad leve',
-        description: 'Puedo realizar esta actividad con poca dificultad',
-      },
-      {
-        value: 3,
-        label: 'Dificultad moderada',
-        description: 'Tengo dificultad moderada para realizar esta actividad',
-      },
-      {
-        value: 4,
-        label: 'Dificultad severa',
-        description: 'Tengo mucha dificultad para realizar esta actividad',
-      },
-      {
-        value: 5,
-        label: 'No puedo realizar',
-        description: 'No puedo realizar esta actividad en absoluto debido a los síntomas',
-      },
-    ],
-  },
-  // Add remaining functional questions...
-];
-
-export const scoreInterpretation = {
-  symptomSeverity: [
-    { 
-      min: 1.0, 
-      max: 2.0, 
-      level: 'Leve', 
-      description: 'Síntomas mínimos que no interfieren significativamente con las actividades diarias.' 
+export const boston: Scale = {
+  id: 'boston',
+  name: 'Cuestionario del Túnel Carpiano de Boston (BCTSQ)',
+  shortName: 'BCTSQ',
+  description: 'Evalúa la severidad de los síntomas y el estado funcional en pacientes con síndrome del túnel carpiano.',
+  information: 'Este cuestionario consta de dos partes: la Escala de Severidad de Síntomas (SSS) y la Escala de Estado Funcional (FSS). El paciente debe valorar sus síntomas y dificultades en una escala de 1 a 5.',
+  questions: [
+    // Subescala de Severidad de Síntomas (SSS)
+    {
+      id: 'sss-1',
+      question: '¿Qué tan severo es el dolor en la mano/muñeca durante la noche?',
+      options: [
+        { score: 1, text: 'Sin dolor' },
+        { score: 2, text: 'Leve' },
+        { score: 3, text: 'Moderado' },
+        { score: 4, text: 'Severo' },
+        { score: 5, text: 'Muy severo' },
+      ],
+      subscale: 'SSS',
     },
-    { 
-      min: 2.1, 
-      max: 3.0, 
-      level: 'Moderado', 
-      description: 'Síntomas que causan algunas limitaciones en actividades diarias.' 
+    {
+      id: 'sss-2',
+      question: '¿Con qué frecuencia el dolor lo despierta durante la noche?',
+      options: [
+        { score: 1, text: 'Nunca' },
+        { score: 2, text: 'Una vez' },
+        { score: 3, text: '2-3 veces' },
+        { score: 4, text: '4-5 veces' },
+        { score: 5, text: 'Más de 5 veces' },
+      ],
+      subscale: 'SSS',
     },
-    { 
-      min: 3.1, 
-      max: 5.0, 
-      level: 'Severo', 
-      description: 'Síntomas que interfieren notablemente con las actividades diarias. Se recomienda evaluación médica urgente.' 
-    }
+    {
+        id: 'sss-3',
+        question: '¿Suele tener dolor en la mano/muñeca durante el día?',
+        options: [
+            { score: 1, text: 'No' },
+            { score: 2, text: 'Leve' },
+            { score: 3, text: 'Moderado' },
+            { score: 4, text: 'Severo' },
+            { score: 5, text: 'Muy severo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-4',
+        question: '¿Con qué frecuencia tiene dolor durante el día?',
+        options: [
+            { score: 1, text: 'Nunca' },
+            { score: 2, text: '1-2 veces/día' },
+            { score: 3, text: '3-5 veces/día' },
+            { score: 4, text: 'Más de 5 veces/día' },
+            { score: 5, text: 'Continuo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-5',
+        question: '¿Cuánto dura en promedio un episodio de dolor durante el día?',
+        options: [
+            { score: 1, text: 'No tengo dolor' },
+            { score: 2, text: '<10 min' },
+            { score: 3, text: '10-60 min' },
+            { score: 4, text: '>60 min' },
+            { score: 5, text: 'Continuo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-6',
+        question: '¿Tiene adormecimiento en la mano/muñeca?',
+        options: [
+            { score: 1, text: 'No' },
+            { score: 2, text: 'Leve' },
+            { score: 3, text: 'Moderado' },
+            { score: 4, text: 'Severo' },
+            { score: 5, text: 'Muy severo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-7',
+        question: '¿Tiene debilidad en la mano/muñeca?',
+        options: [
+            { score: 1, text: 'No' },
+            { score: 2, text: 'Leve' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Severa' },
+            { score: 5, text: 'Muy severa' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-8',
+        question: '¿Tiene sensaciones de hormigueo en la mano?',
+        options: [
+            { score: 1, text: 'No' },
+            { score: 2, text: 'Leve' },
+            { score: 3, text: 'Moderado' },
+            { score: 4, text: 'Severo' },
+            { score: 5, text: 'Muy severo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-9',
+        question: '¿Qué tan severo es el adormecimiento u hormigueo en la noche?',
+        options: [
+            { score: 1, text: 'No tengo' },
+            { score: 2, text: 'Leve' },
+            { score: 3, text: 'Moderado' },
+            { score: 4, text: 'Severo' },
+            { score: 5, text: 'Muy severo' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-10',
+        question: '¿Con qué frecuencia la debilidad o el hormigueo lo despiertan?',
+        options: [
+            { score: 1, text: 'Nunca' },
+            { score: 2, text: 'Una vez' },
+            { score: 3, text: '2-3 veces' },
+            { score: 4, text: '4-5 veces' },
+            { score: 5, text: 'Más de 5 veces' },
+        ],
+        subscale: 'SSS',
+    },
+    {
+        id: 'sss-11',
+        question: '¿Tiene dificultad para agarrar objetos pequeños (llaves, bolígrafos)?',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Mucha' },
+            { score: 5, text: 'Muy severa' },
+        ],
+        subscale: 'SSS',
+    },
+    // Subescala de Estado Funcional (FSS)
+    {
+        id: 'fss-1',
+        question: 'Escritura',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-2',
+        question: 'Abotonarse la ropa',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-3',
+        question: 'Sostener un libro mientras lee',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-4',
+        question: 'Agarre del auricular del teléfono',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-5',
+        question: 'Apertura de frascos',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-6',
+        question: 'Tareas domésticas',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-7',
+        question: 'Llevar la cesta de la compra',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
+    {
+        id: 'fss-8',
+        question: 'Bañarse y vestirse',
+        options: [
+            { score: 1, text: 'Sin dificultad' },
+            { score: 2, text: 'Poca' },
+            { score: 3, text: 'Moderada' },
+            { score: 4, text: 'Intensa' },
+            { score: 5, text: 'No puede' },
+        ],
+        subscale: 'FSS',
+    },
   ],
-  functionalStatus: [
-    { 
-      min: 1.0, 
-      max: 2.0, 
-      level: 'Funcionalidad normal', 
-      description: 'Capacidad funcional preservada para la mayoría de actividades.' 
+  subscales: [
+    {
+      id: 'SSS',
+      name: 'Escala de Severidad de Síntomas',
+      longName: 'Escala de Severidad de Síntomas (SSS)',
+      interpretation: [
+        {
+          score: [1, 1.9],
+          text: 'Síntomas leves',
+        },
+        {
+          score: [2, 3.4],
+          text: 'Síntomas moderados',
+        },
+        {
+            score: [3.5, 5],
+            text: 'Síntomas severos',
+        },
+      ],
     },
-    { 
-      min: 2.1, 
-      max: 3.0, 
-      level: 'Limitación funcional moderada', 
-      description: 'Dificultades para realizar algunas actividades cotidianas.' 
+    {
+      id: 'FSS',
+      name: 'Escala de Estado Funcional',
+      longName: 'Escala de Estado Funcional (FSS)',
+      interpretation: [
+        {
+          score: [1, 1.9],
+          text: 'Función normal/leve',
+        },
+        {
+          score: [2, 3.4],
+          text: 'Dificultad moderada',
+        },
+        {
+            score: [3.5, 5],
+            text: 'Dificultad severa',
+        },
+      ],
     },
-    { 
-      min: 3.1, 
-      max: 5.0, 
-      level: 'Limitación funcional severa', 
-      description: 'Dificultad significativa para realizar actividades básicas. Se recomienda intervención.' 
-    }
-  ]
+  ],
+  meta: {
+    // Aquí puedes agregar metadatos para la búsqueda y filtros
+    specialty: ['Neurología', 'Rehabilitación'],
+    bodySegment: ['Miembro Superior'],
+    functionalArea: ['Actividades de la Vida Diaria'],
+  },
 };

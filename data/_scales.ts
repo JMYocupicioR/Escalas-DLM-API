@@ -1,6 +1,9 @@
 import type { Scale } from '@/types/scale';
+import { denver2 } from './denver';
+import { boston } from './boston';
 
 export const scales: Scale[] = [
+  denver2,
   // From functional.tsx
   {
     id: 'barthel',
@@ -160,3 +163,12 @@ export const scalesById = scales.reduce((acc, scale) => {
   acc[scale.id] = scale;
   return acc;
 }, {} as Record<string, Scale>);
+
+const existingBostonIndex = scales.findIndex(s => s.id === 'boston');
+if (existingBostonIndex !== -1) {
+  scales[existingBostonIndex] = boston;
+} else {
+  scales.unshift(boston);
+}
+
+scalesById['boston'] = boston;
