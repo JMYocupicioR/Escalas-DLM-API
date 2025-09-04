@@ -130,16 +130,13 @@ export function QuickActions({ onActionPress }: QuickActionsProps) {
         {quickActions.map((action, index) => {
           const IconComponent = action.icon;
           
-          return (
-            <TouchableOpacity
-              key={action.id}
-              style={[
-                styles.actionCard,
-                index % 2 === 0 ? styles.actionCardLeft : styles.actionCardRight
-              ]}
-              onPress={() => handleActionPress(action)}
-              activeOpacity={0.8}
-            >
+                        return (
+                <TouchableOpacity
+                  key={action.id}
+                  style={styles.actionCard}
+                  onPress={() => handleActionPress(action)}
+                  activeOpacity={0.8}
+                >
               <LinearGradient
                 colors={action.gradient}
                 style={styles.actionGradient}
@@ -224,20 +221,26 @@ const createStyles = (colors: any) => StyleSheet.create({
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -4,
+    gap: 8,
+    justifyContent: 'space-between',
   },
   actionCard: {
     width: '48%',
-    marginHorizontal: '1%',
+    minWidth: 140,
     marginBottom: 8,
     borderRadius: 12,
     overflow: 'hidden',
+    ...Platform.select({
+      web: {
+        minWidth: 160,
+      },
+    }),
   },
   actionCardLeft: {
-    marginRight: '2%',
+    // Removed specific margins
   },
   actionCardRight: {
-    marginLeft: '2%',
+    // Removed specific margins
   },
   actionGradient: {
     padding: 12,

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { 
   View, 
   TextInput, 
@@ -21,7 +21,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring 
 } from 'react-native-reanimated';
-import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { useScalesStore } from '@/store/scales';
 import { useAutoUpdatingScales } from '@/hooks/useAutoUpdatingScales';
 import { DEV_CONFIG } from '@/config/development';
@@ -63,16 +63,13 @@ export function SearchWidget({
   const [isVoiceSearching, setIsVoiceSearching] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const recentlyViewed = useScalesStore((state) => state.recentlyViewed);
+  const navigation = useNavigation();
   
   // Use advanced auto-updating scales hook
   const { 
     scales: realScales, 
-    lastUpdate, 
     forceUpdate, 
-    isUpdating, 
-    error,
-    searchScales: hookSearchScales,
-    totalScales 
+    searchScales: hookSearchScales
   } = useAutoUpdatingScales({
     updateInterval: DEV_CONFIG.SCALES.AUTO_UPDATE_INTERVAL,
     enableAutoUpdate: true,
@@ -223,10 +220,7 @@ export function SearchWidget({
     onSearch?.(query);
     
     // Navigate to search results
-    router.push({
-      pathname: '/search',
-      params: { q: query }
-    });
+    (navigation as any).navigate('search', { q: query });
     
     setIsFocused(false);
     setSuggestions([]);
@@ -234,23 +228,20 @@ export function SearchWidget({
 
   // Handle suggestion tap
   const handleSuggestionTap = useCallback((suggestion: SearchSuggestion) => {
+    // Immediately hide keyboard and suggestions
+    Keyboard.dismiss();
+    setIsFocused(false);
+    setSuggestions([]);
+    inputRef.current?.blur();
+    
+    // Navigate based on suggestion type
     try {
-      // Immediately hide keyboard and suggestions
-      Keyboard.dismiss();
-      setIsFocused(false);
-      setSuggestions([]);
-      inputRef.current?.blur();
-      
-      // Navigate based on suggestion type
       if (suggestion.type === 'scale') {
-        router.push(`/scales/${suggestion.id}`);
+        (navigation as any).navigate('scales', { screen: suggestion.id });
       } else if (suggestion.type === 'category') {
-        router.push({
-          pathname: '/search',
-          params: { category: suggestion.id }
-        });
+        (navigation as any).navigate('search', { category: suggestion.id });
       } else if (suggestion.type === 'recent') {
-        router.push(`/scales/${suggestion.id}`);
+        (navigation as any).navigate('scales', { screen: suggestion.id });
       }
     } catch (error) {
       console.error('Error handling suggestion tap:', error);
@@ -276,9 +267,10 @@ export function SearchWidget({
     const filter = quickFilters.find(f => f.id === filterId);
     
     if (filter) {
-      router.push({
-        pathname: '/search',
-        params: { filter: filterId, category: filter.label.toLowerCase() }
+      // Use navigation.navigate for React Navigation compatibility
+      (navigation as any).navigate('search', { 
+        filter: filterId, 
+        category: filter.label.toLowerCase() 
       });
     }
   }, [quickFilters]);
@@ -389,7 +381,7 @@ export function SearchWidget({
         {showFilters && (
           <Pressable
             style={styles.filterButton}
-            onPress={() => router.push('/search?filter=true')}
+            onPress={() => (navigation as any).navigate('search', { filter: 'true' })}
             accessibilityLabel="Mostrar filtros"
             accessibilityRole="button"
           >
@@ -555,9 +547,10 @@ const styles = StyleSheet.create({
   },
   quickFiltersContainer: {
     marginTop: 12,
+    paddingHorizontal: 16,
   },
   quickFiltersList: {
-    paddingHorizontal: 16,
+    paddingVertical: 8,
     gap: 8,
   },
   quickFilterChip: {

@@ -49,7 +49,7 @@ export default function HomeScreen() {
   
   // Responsive breakpoints for better mobile web experience
   const isCompact = !isTablet && !isDesktop;
-  const shouldShowQuickActions = !isCompact || recentlyViewed.length === 0;
+  const shouldShowQuickActions = true; // Always show for better UX
 
   return (
     <SafeAreaView style={styles.container}>
@@ -135,24 +135,10 @@ export default function HomeScreen() {
                   onPress={() => router.push(`/scales/${s.id}`)}
                   activeOpacity={0.7}
                 >
-                  {/* Header with icon, stats and favorite */}
+                  {/* Header with icon and favorite */}
                   <View style={styles.cardHeader}>
-                    <View style={styles.cardHeaderLeft}>
-                      <View style={[styles.iconBadge, { backgroundColor: `${iconColor}15` }]}>
-                        <IconComponent size={18} color={iconColor} />
-                      </View>
-                      {stats && (
-                        <View style={styles.statsContainer}>
-                          <View style={styles.statItem}>
-                            <Users size={12} color={colors.mutedText} />
-                            <Text style={styles.statText}>{stats.uses.toLocaleString()}</Text>
-                          </View>
-                          <View style={styles.statItem}>
-                            <Star size={12} color="#f59e0b" />
-                            <Text style={styles.statText}>{stats.rating}</Text>
-                          </View>
-                        </View>
-                      )}
+                    <View style={[styles.iconBadge, { backgroundColor: `${iconColor}15` }]}>
+                      <IconComponent size={18} color={iconColor} />
                     </View>
                     <FavoriteButton scaleId={s.id} size={16} />
                   </View>
@@ -161,12 +147,24 @@ export default function HomeScreen() {
                   <Text style={styles.cardTitle}>{s.name}</Text>
                   <Text style={styles.cardDesc} numberOfLines={2}>{s.description}</Text>
                   
-                  {/* Category badge */}
+                  {/* Stats and category */}
                   {stats && (
-                    <View style={[styles.categoryBadge, { backgroundColor: `${iconColor}10` }]}>
-                      <Text style={[styles.categoryText, { color: iconColor }]}>
-                        {stats.category}
-                      </Text>
+                    <View style={styles.cardFooter}>
+                      <View style={styles.statsContainer}>
+                        <View style={styles.statItem}>
+                          <Users size={10} color={colors.mutedText} />
+                          <Text style={styles.statText}>{stats.uses.toLocaleString()}</Text>
+                        </View>
+                        <View style={styles.statItem}>
+                          <Star size={10} color="#f59e0b" />
+                          <Text style={styles.statText}>{stats.rating}</Text>
+                        </View>
+                      </View>
+                      <View style={[styles.categoryBadge, { backgroundColor: `${iconColor}10` }]}>
+                        <Text style={[styles.categoryText, { color: iconColor }]}>
+                          {stats.category}
+                        </Text>
+                      </View>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -230,21 +228,27 @@ const createStyles = (colors: any) => StyleSheet.create({
     }),
   },
   content: { 
-    paddingBottom: 32,
+    paddingBottom: 40,
     ...Platform.select({
       web: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
+        paddingBottom: 48,
       },
     }),
   },
 
   hero: {
     margin: 16,
-    padding: 16,
+    padding: 20,
     backgroundColor: colors.card,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
+    ...Platform.select({
+      web: {
+        padding: 24,
+      },
+    }),
   },
   heroLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   heroTitle: { fontSize: 20, fontWeight: '800', color: colors.text },
@@ -265,39 +269,74 @@ const createStyles = (colors: any) => StyleSheet.create({
 
   searchSection: { paddingHorizontal: 16, zIndex: 10 },
 
-  section: { paddingHorizontal: 16, marginTop: 24 },
+  section: { 
+    paddingHorizontal: 16, 
+    marginTop: 20,
+    ...Platform.select({
+      web: {
+        marginTop: 24,
+      },
+    }),
+  },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
   link: { color: colors.linkText, fontWeight: '600' },
   emptyText: { color: colors.mutedText },
 
-  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chipsRow: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    gap: 8,
+    marginTop: 4,
+  },
   chip: {
     backgroundColor: colors.sectionBackground,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 1,
+      },
+    }),
   },
-  chipText: { color: colors.text },
+  chipText: { 
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '500',
+  },
 
   grid: (_cols: number) => ({
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -6,
+    marginHorizontal: -8,
+    gap: 8,
   }),
   col: (cols: number) => ({
-    width: cols === 3 ? '31.5%' : cols === 2 ? '48%' : '100%',
+    width: cols === 3 ? 'calc(33.333% - 8px)' : cols === 2 ? 'calc(50% - 8px)' : '100%',
+    ...Platform.select({
+      default: {
+        width: cols === 3 ? '31%' : cols === 2 ? '47%' : '100%',
+      },
+    }),
   }),
   card: {
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
-    padding: 14,
-    margin: 6,
+    padding: 16,
+    margin: 4,
     ...Platform.select({
       web: {
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
@@ -316,22 +355,31 @@ const createStyles = (colors: any) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   cardHeaderLeft: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flex: 1,
-    gap: 8,
+    gap: 10,
+  },
+  cardFooter: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 12,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 4,
   },
   statText: {
     fontSize: 11,
@@ -355,12 +403,17 @@ const createStyles = (colors: any) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
-    padding: 14,
+    padding: 16,
     marginRight: 12,
-    minWidth: 260,
+    minWidth: 280,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
+    ...Platform.select({
+      web: {
+        minWidth: 320,
+      },
+    }),
   },
   iconBadge: {
     width: 32,

@@ -25,7 +25,9 @@
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
-      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)"
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\components/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\hooks/**)"
     ],
     "deny": [],
     "ask": []
