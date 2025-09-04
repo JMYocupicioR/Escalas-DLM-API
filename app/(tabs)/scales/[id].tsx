@@ -4,13 +4,13 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScaleEvaluation } from '@/components/ScaleEvaluation';
 import { ScaleInfo, ScaleInfoData } from '@/components/ScaleInfo';
-import { LoadingState } from '@/components/errors/LoadingState';
-import { EmptyState } from '@/components/errors/EmptyState';
+import LoadingState from '@/components/errors/LoadingState';
+import EmptyState from '@/components/errors/EmptyState';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { ScaleAssessmentRequest } from '@/api/scales/types';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useScaleDetails } from '@/hooks/useScaleDetails';
-import { Scale } from '@/types/scale';
+import Denver2Screen from '@/app/(tabs)/scales/denver2';
 
 export default function ScaleDetailsScreen() {
   const { colors } = useScaleStyles();
@@ -149,14 +149,20 @@ export default function ScaleDetailsScreen() {
         />
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
           <EmptyState
-            title="Error"
-            message={error?.message || 'No se pudo cargar la escala'}
-            actionLabel="Reintentar"
-            onAction={refetch}
+            title="Error al cargar la escala"
+            message="No se pudo cargar la información de la escala. Por favor, intente de nuevo."
+            actionText="Reintentar"
+            onAction={() => refetch()}
           />
         </SafeAreaView>
       </>
     );
+  }
+
+  if (id === 'denver2') {
+    // Render the custom Denver II component here
+    // This will be implemented in the next step.
+    return <Denver2Screen />;
   }
 
   if (isDesktop) {

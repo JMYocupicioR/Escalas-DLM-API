@@ -11,7 +11,21 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run lint)",
       "Bash(ls:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\types/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\hooks/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\store/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\hooks/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\api\\export\\templates/**)"
     ],
     "deny": [],
     "ask": []

@@ -4,7 +4,7 @@ import { useScaleStyles } from '@/hooks/useScaleStyles';
 
 export interface ScaleReference {
 	title: string;
-	authors?: string[];
+	authors?: string | string[];
 	year?: number;
 	doi?: string;
 	url?: string;
