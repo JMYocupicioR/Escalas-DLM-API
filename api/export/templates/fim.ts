@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const FimAssessmentSchema = z.object({
   patientData: z.object({
+    id: z.string().optional(),
     name: z.string().optional(),
     age: z.union([z.number(), z.string()]).optional(),
     gender: z.string().optional(),
@@ -120,6 +121,7 @@ export const generateHtml = (payload: FimPayload): string => {
               <p>Reporte de Evaluación Médica</p>
           </div>
           <div class="patient-info">
+              <div class="info-field"><strong>ID Paciente:</strong> ${patientData?.id || 'No especificado'}</div>
               <div class="info-field"><strong>Paciente:</strong> ${patientData?.name || 'No especificado'}</div>
               <div class="info-field"><strong>Edad:</strong> ${patientData?.age ? patientData.age + ' años' : 'No especificada'}</div>
           </div>

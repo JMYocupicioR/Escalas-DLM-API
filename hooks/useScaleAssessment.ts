@@ -8,6 +8,7 @@ export const useScaleAssessment = (scale: Scale) => {
   const [assessment, setAssessment] = useState<Partial<Assessment>>({
     scaleId: scale.id,
     patientData: {
+      id: '',
       name: '',
       age: '',
       gender: '',
@@ -95,6 +96,7 @@ export const useScaleAssessment = (scale: Scale) => {
     setAssessment({
       scaleId: scale.id,
       patientData: {
+        id: '',
         name: '',
         age: '',
         gender: '',

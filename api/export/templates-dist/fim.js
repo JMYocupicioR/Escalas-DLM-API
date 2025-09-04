@@ -4,6 +4,7 @@ exports.generateHtml = void 0;
 const zod_1 = require("zod");
 const FimAssessmentSchema = zod_1.z.object({
     patientData: zod_1.z.object({
+        id: zod_1.z.string().optional(),
         name: zod_1.z.string().optional(),
         age: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
         gender: zod_1.z.string().optional(),
@@ -116,6 +117,7 @@ const generateHtml = (payload) => {
               <p>Reporte de Evaluación Médica</p>
           </div>
           <div class="patient-info">
+              <div class="info-field"><strong>ID Paciente:</strong> ${patientData?.id || 'No especificado'}</div>
               <div class="info-field"><strong>Paciente:</strong> ${patientData?.name || 'No especificado'}</div>
               <div class="info-field"><strong>Edad:</strong> ${patientData?.age ? patientData.age + ' años' : 'No especificada'}</div>
           </div>

@@ -1,5 +1,6 @@
 export type GenericAssessmentForPDF = {
   patientData: {
+    id?: string;
     name?: string;
     age?: number | string;
     gender?: string;

@@ -16,6 +16,7 @@ export interface Assessment {
   id: string;
   scaleId: string;
   patientData: {
+    id?: string;
     name: string;
     age: string;
     gender: string;

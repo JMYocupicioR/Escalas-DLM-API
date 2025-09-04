@@ -4,6 +4,7 @@ import { z } from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BotulinumAssessmentSchema = z.object({
   medico: z.string().optional(),
+  pacienteId: z.string().optional(),
   pacienteNombre: z.string().optional(),
   pacienteEdad: z.string().optional(),
   pacientePeso: z.string().optional(),
@@ -56,6 +57,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
   const dosisDataComplete: BotulinumPayload['dosisDataComplete'] = (payload as any).dosisDataComplete || (assessment as any)?.dosisDataComplete;
   const {
     medico,
+    pacienteId,
     pacienteNombre,
     pacienteEdad,
     pacientePeso,
@@ -208,7 +210,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
           /* Grid compacto */
           .grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr; 
             gap: 6px 12px; 
           }
           .info-campo { 
@@ -423,6 +425,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
           <section class="seccion-paciente">
             <h2 class="seccion-titulo">Información del Paciente</h2>
             <div class="grid">
+              <div class="info-campo"><span class="etiqueta">ID Paciente:</span><span class="valor">${pacienteId || 'No especificado'}</span></div>
               <div class="info-campo"><span class="etiqueta">Paciente:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
               <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad ? `${pacienteEdad} años` : 'No especificada'}</span></div>
               <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso ? `${pacientePeso} kg` : 'No especificado'}</span></div>

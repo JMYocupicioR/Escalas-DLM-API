@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const LequesneAssessmentSchema = z.object({
   patientData: z.object({
+    id: z.string().optional(),
     name: z.string().optional(),
     age: z.union([z.number(), z.string()]).optional(),
     gender: z.string().optional(),
@@ -108,6 +109,7 @@ export const generateHtml = (payload: LequesnePayload): string => {
     <div class="patient-info">
       <h2>Información del Paciente</h2>
       <div class="info-grid">
+        <div class="info-item"><span class="info-label">ID Paciente:</span><span class="info-value">${patientData?.id || 'No especificado'}</span></div>
         <div class="info-item"><span class="info-label">Nombre:</span><span class="info-value">${patientData?.name || 'No especificado'}</span></div>
         <div class="info-item"><span class="info-label">Edad:</span><span class="info-value">${patientData?.age ? patientData.age + ' años' : 'No especificada'}</span></div>
         <div class="info-item"><span class="info-label">Fecha de Evaluación:</span><span class="info-value">${formattedDate}</span></div>

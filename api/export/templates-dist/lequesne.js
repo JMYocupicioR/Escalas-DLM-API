@@ -4,6 +4,7 @@ exports.generateHtml = void 0;
 const zod_1 = require("zod");
 const LequesneAssessmentSchema = zod_1.z.object({
     patientData: zod_1.z.object({
+        id: zod_1.z.string().optional(),
         name: zod_1.z.string().optional(),
         age: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
         gender: zod_1.z.string().optional(),
@@ -103,6 +104,7 @@ const generateHtml = (payload) => {
     <div class="patient-info">
       <h2>Información del Paciente</h2>
       <div class="info-grid">
+        <div class="info-item"><span class="info-label">ID Paciente:</span><span class="info-value">${patientData?.id || 'No especificado'}</span></div>
         <div class="info-item"><span class="info-label">Nombre:</span><span class="info-value">${patientData?.name || 'No especificado'}</span></div>
         <div class="info-item"><span class="info-label">Edad:</span><span class="info-value">${patientData?.age ? patientData.age + ' años' : 'No especificada'}</span></div>
         <div class="info-item"><span class="info-label">Fecha de Evaluación:</span><span class="info-value">${formattedDate}</span></div>

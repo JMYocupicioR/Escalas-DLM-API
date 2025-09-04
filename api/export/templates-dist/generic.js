@@ -4,6 +4,7 @@ exports.generateHtml = void 0;
 const zod_1 = require("zod");
 const AssessmentSchema = zod_1.z.object({
     patientData: zod_1.z.object({
+        id: zod_1.z.string().optional(),
         name: zod_1.z.string().optional(),
         age: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
         gender: zod_1.z.string().optional(),
@@ -86,7 +87,7 @@ const generateHtml = (payload) => {
     .headerText p { font-size: ${px(11)}; color: ${theme.muted}; margin: 0; }
     .section { margin-bottom: ${px(14)}; padding: ${px(12)}; border-radius: ${px(8)}; background: ${theme.card}; border: 1px solid ${theme.border}; }
     .section h2 { font-size: ${px(14)}; font-weight: 700; margin: 0 0 ${px(6)} 0; letter-spacing: 0.3px; text-transform: uppercase; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: ${px(6)} ${px(12)}; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: ${px(6)} ${px(12)}; }
     .label { font-weight: 600; }
     .value { color: ${theme.text}; }
     .muted { color: ${theme.muted}; }
@@ -107,6 +108,7 @@ const generateHtml = (payload) => {
           ${options?.showPatientSummary !== false ? `
             <p class="muted">
               ${[
+        assessment.patientData.id ? `ID: <span class='value'>${assessment.patientData.id}</span>` : '',
         assessment.patientData.name ? `Paciente: <span class='value'>${assessment.patientData.name}</span>` : '',
         assessment.patientData.age ? `Edad: <span class='value'>${assessment.patientData.age}</span>` : '',
         assessment.patientData.gender ? `Género: <span class='value'>${assessment.patientData.gender}</span>` : '',
@@ -118,6 +120,7 @@ const generateHtml = (payload) => {
       <div class="section">
         <h2>Datos del Paciente</h2>
         <div class="grid">
+          <div><span class="label">ID Paciente:</span> <span class="value">${assessment.patientData.id ?? 'No especificado'}</span></div>
           <div><span class="label">Nombre:</span> <span class="value">${assessment.patientData.name ?? ''}</span></div>
           <div><span class="label">Edad:</span> <span class="value">${assessment.patientData.age ?? ''}</span></div>
           <div><span class="label">Género:</span> <span class="value">${assessment.patientData.gender ?? ''}</span></div>

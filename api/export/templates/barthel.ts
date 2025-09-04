@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const BarthelAssessmentSchema = z.object({
   patientData: z.object({
+    id: z.string().optional(),
     name: z.string().optional(),
     age: z.union([z.number(), z.string()]).optional(),
     gender: z.string().optional(),
@@ -92,6 +93,7 @@ export const generateHtml = (payload: BarthelPayload): string => {
           </div>
           <div class="section">
             <h2>Datos del Paciente</h2>
+            <p><strong>ID Paciente:</strong> ${patientData?.id || 'No especificado'}</p>
             <p><strong>Nombre:</strong> ${patientData?.name || 'No especificado'}</p>
             <p><strong>Edad:</strong> ${patientData?.age || 'No especificada'}</p>
             <p><strong>Género:</strong> ${patientData?.gender || 'No especificado'}</p>

@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useScalesStore, Patient } from '@/store/scales';
 
 export type PatientIntake = Pick<Patient, 'name' | 'age' | 'gender' | 'notes'> & {
+  id?: string;
   doctorName?: string;
 };
 
 const defaultIntake: PatientIntake = {
+  id: undefined,
   name: '',
   age: 0,
   gender: 'No especificado',
@@ -31,6 +33,7 @@ export function usePatientIntake(scaleId?: string) {
     if (p) {
       setIntake((prev) => ({
         ...prev,
+        id: p.id,
         name: p.name ?? '',
         age: p.age ?? 0,
         gender: p.gender ?? 'No especificado',

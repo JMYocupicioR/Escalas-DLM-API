@@ -6,6 +6,7 @@ const zod_1 = require("zod");
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BotulinumAssessmentSchema = zod_1.z.object({
     medico: zod_1.z.string().optional(),
+    pacienteId: zod_1.z.string().optional(),
     pacienteNombre: zod_1.z.string().optional(),
     pacienteEdad: zod_1.z.string().optional(),
     pacientePeso: zod_1.z.string().optional(),
@@ -30,7 +31,7 @@ const generateHtml = (payload) => {
     const puntosMotoresData = payload.puntosMotoresData || assessment?.puntosMotoresData || {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dosisDataComplete = payload.dosisDataComplete || assessment?.dosisDataComplete;
-    const { medico, pacienteNombre, pacienteEdad, pacientePeso, marca, musculos, totalDosisAjustada, advertencia, dilucion } = assessment;
+    const { medico, pacienteId, pacienteNombre, pacienteEdad, pacientePeso, marca, musculos, totalDosisAjustada, advertencia, dilucion } = assessment;
     const fecha = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
         month: 'long',
@@ -163,7 +164,7 @@ const generateHtml = (payload) => {
           /* Grid compacto */
           .grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr; 
             gap: 6px 12px; 
           }
           .info-campo { 
@@ -378,6 +379,7 @@ const generateHtml = (payload) => {
           <section class="seccion-paciente">
             <h2 class="seccion-titulo">Información del Paciente</h2>
             <div class="grid">
+              <div class="info-campo"><span class="etiqueta">ID Paciente:</span><span class="valor">${pacienteId || 'No especificado'}</span></div>
               <div class="info-campo"><span class="etiqueta">Paciente:</span><span class="valor">${pacienteNombre || 'No especificado'}</span></div>
               <div class="info-campo"><span class="etiqueta">Edad:</span><span class="valor">${pacienteEdad ? `${pacienteEdad} años` : 'No especificada'}</span></div>
               <div class="info-campo"><span class="etiqueta">Peso:</span><span class="valor">${pacientePeso ? `${pacientePeso} kg` : 'No especificado'}</span></div>

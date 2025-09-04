@@ -4,6 +4,7 @@ exports.generateHtml = void 0;
 const zod_1 = require("zod");
 const BarthelAssessmentSchema = zod_1.z.object({
     patientData: zod_1.z.object({
+        id: zod_1.z.string().optional(),
         name: zod_1.z.string().optional(),
         age: zod_1.z.union([zod_1.z.number(), zod_1.z.string()]).optional(),
         gender: zod_1.z.string().optional(),
@@ -87,6 +88,7 @@ const generateHtml = (payload) => {
           </div>
           <div class="section">
             <h2>Datos del Paciente</h2>
+            <p><strong>ID Paciente:</strong> ${patientData?.id || 'No especificado'}</p>
             <p><strong>Nombre:</strong> ${patientData?.name || 'No especificado'}</p>
             <p><strong>Edad:</strong> ${patientData?.age || 'No especificada'}</p>
             <p><strong>Género:</strong> ${patientData?.gender || 'No especificado'}</p>
