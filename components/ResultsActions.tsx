@@ -119,11 +119,29 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           puntosMotoresData: (assessment as any).puntosMotoresData,
           dosisDataComplete: (assessment as any).dosisDataComplete,
         } : {};
+
+        // Provide questions to templates that expect them (Barthel, FIM, Lequesne)
+        let questions: any[] | undefined;
+        try {
+          if (scale.id === 'barthel') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'fim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/fim').questions;
+          } else if (scale.id === 'lequesne-rodilla-es-v1' || scale.id === 'lequesne') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/lequesne').lequesneQuestions;
+          }
+        } catch {
+          questions = undefined;
+        }
         
         const payload = { 
           assessment, 
           scale: { id: (scale as Scale).id, name: (scale as Scale).name }, 
           options,
+          ...(questions ? { questions } : {}),
           ...additionalData
         };
 
@@ -179,8 +197,29 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           puntosMotoresData: (assessment as any).puntosMotoresData,
           dosisDataComplete: (assessment as any).dosisDataComplete,
         } : assessment;
+        // Provide questions for native too so server templates can render detailed tables
+        let questions: any[] | undefined;
+        try {
+          if (scale.id === 'barthel') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'fim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/fim').questions;
+          } else if (scale.id === 'lequesne-rodilla-es-v1' || scale.id === 'lequesne') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/lequesne').lequesneQuestions;
+          }
+        } catch {
+          questions = undefined;
+        }
         
-        const base64Pdf = await generatePdfFromService(enhancedAssessment, scale as Scale, options);
+        const base64Pdf = await generatePdfFromService(
+          { ...(enhancedAssessment as any) },
+          scale as Scale,
+          options,
+          questions
+        );
         const fileName = `${(scale.name || 'reporte').replace(/\s+/g, '_').toLowerCase()}.pdf`;
         const filePath = `${FileSystem.cacheDirectory}${fileName}`;
         await FileSystem.writeAsStringAsync(filePath, base64Pdf, { encoding: FileSystem.EncodingType.Base64 });
@@ -193,7 +232,21 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
     } catch (error) {
       console.error('Error al exportar PDF (Netlify):', error);
       try {
-        const ok = await exportAssessmentServerPDF(assessment, scale as Scale, options);
+        // Try server fallback with questions if available
+        let questions: any[] | undefined;
+        try {
+          if (scale.id === 'barthel') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'fim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/fim').questions;
+          } else if (scale.id === 'lequesne-rodilla-es-v1' || scale.id === 'lequesne') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/lequesne').lequesneQuestions;
+          }
+        } catch { questions = undefined; }
+        const ok = await exportAssessmentServerPDF(assessment, scale as Scale, options, questions);
         if (ok) return;
       } catch (fallbackErr) {
         console.error('Fallback PDF service failed:', fallbackErr);

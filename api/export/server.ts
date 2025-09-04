@@ -29,17 +29,19 @@ const getPdfServiceUrl = (): string | null => {
 export const printAssessmentServerPDF = async (
   assessment: GenericAssessmentForPDF,
   scale: Scale,
-  options?: PdfOptions
+  options?: PdfOptions,
+  questions?: any[]
 ): Promise<boolean> => {
   try {
     const serviceBase = getPdfServiceUrl();
     if (!serviceBase) return false;
     const endpoint = `${serviceBase}/api/pdf/export?binary=1${__DEV__ ? '&debug=1' : ''}`;
-    const payload = {
+    const payload: any = {
       assessment,
       scale: { id: scale.id, name: scale.name },
       options,
     };
+    if (questions) payload.questions = questions;
 
     const res = await fetch(endpoint, {
       method: 'POST',
@@ -107,7 +109,8 @@ export const printAssessmentServerPDF = async (
 export const exportAssessmentServerPDF = async (
   assessment: GenericAssessmentForPDF,
   scale: Scale,
-  options?: PdfOptions
+  options?: PdfOptions,
+  questions?: any[]
 ): Promise<boolean> => {
   try {
     const serviceBase = getPdfServiceUrl();
@@ -118,11 +121,12 @@ export const exportAssessmentServerPDF = async (
     const qs = q.length ? `?${q.join('&')}` : '';
     const endpoint = `${serviceBase}/api/pdf/export${qs}`;
 
-    const payload = {
+    const payload: any = {
       assessment,
       scale: { id: scale.id, name: scale.name },
       options,
     };
+    if (questions) payload.questions = questions;
 
     if (Platform.OS === 'web') {
       const res = await fetch(endpoint, {

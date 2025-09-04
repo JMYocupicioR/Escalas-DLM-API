@@ -8,7 +8,8 @@ import { GenericAssessmentForPDF, PdfOptions } from '@/api/export/types';
 export const generatePdfFromService = async (
   assessment: GenericAssessmentForPDF,
   scale: Scale,
-  options?: PdfOptions
+  options?: PdfOptions,
+  questions?: any[]
 ): Promise<string> => {
   try {
     const dbg = __DEV__ ? '?debug=1' : '';
@@ -18,12 +19,13 @@ export const generatePdfFromService = async (
       dosisDataComplete: (assessment as any).dosisDataComplete,
     } : {};
     
-    const payload = {
+    const payload: any = {
       assessment,
       scale,
       options: options || {},
       ...additionalData
     };
+    if (questions) payload.questions = questions;
 
     // Make the API call to our Netlify Function first
     const response = await fetch(`/api/pdf/export${dbg}` as any, {

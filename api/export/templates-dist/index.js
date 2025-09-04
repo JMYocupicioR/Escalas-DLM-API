@@ -24,7 +24,7 @@ const renderHtmlForScale = (payload) => {
     if (id === 'barthel') {
         return require('./barthel').generateHtml(payload);
     }
-    if (id === 'lequesne') {
+    if (id === 'lequesne' || id === 'lequesne-rodilla-es-v1') {
         return require('./lequesne').generateHtml(payload);
     }
     return require('./generic').generateHtml(payload);
@@ -36,6 +36,7 @@ exports.TEMPLATE_MAP = {
     fim: (payload) => require('./fim').generateHtml(payload),
     barthel: (payload) => require('./barthel').generateHtml(payload),
     lequesne: (payload) => require('./lequesne').generateHtml(payload),
+    'lequesne-rodilla-es-v1': (payload) => require('./lequesne').generateHtml(payload),
     generic: (payload) => require('./generic').generateHtml(payload),
 };
 const getTemplateFunction = (scaleId) => {
