@@ -82,6 +82,7 @@ export function SearchWidget({
   // Animation values
   const focusScale = useSharedValue(1);
   const borderColor = useSharedValue('#e2e8f0');
+  const spinnerRotation = useSharedValue(0);
 
 
   const categories = [
@@ -120,14 +121,17 @@ export function SearchWidget({
   // Handle blur
   const handleBlur = useCallback(() => {
     // Don't immediately hide suggestions to allow tap
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsFocused(false);
       focusScale.value = withSpring(1);
       borderColor.value = '#e2e8f0';
       onBlur?.();
       setSuggestions([]);
     }, 150);
-  }, [onBlur]);
+    
+    // Store timer for potential cleanup
+    return () => clearTimeout(timer);
+  }, [onBlur, focusScale, borderColor]);
 
   // Generate recent search suggestions
   const generateRecentSuggestions = useCallback(() => {
@@ -166,8 +170,8 @@ export function SearchWidget({
 
     setIsLoading(true);
     
-    // Simulate API delay
-    setTimeout(() => {
+    // Simulate API delay with cleanup
+    const timer = setTimeout(() => {
       try {
         // Use the advanced search function from the hook
         const scaleSuggestions: SearchSuggestion[] = hookSearchScales(searchQuery)
@@ -200,6 +204,9 @@ export function SearchWidget({
         setIsLoading(false);
       }
     }, 300);
+
+    // Return cleanup function
+    return () => clearTimeout(timer);
   }, [generateRecentSuggestions, realScales, categories, hookSearchScales]);
 
   // Handle text change with debouncing
@@ -227,22 +234,26 @@ export function SearchWidget({
 
   // Handle suggestion tap
   const handleSuggestionTap = useCallback((suggestion: SearchSuggestion) => {
-    // Immediately hide keyboard and suggestions
-    Keyboard.dismiss();
-    setIsFocused(false);
-    setSuggestions([]);
-    inputRef.current?.blur();
-    
-    // Navigate based on suggestion type
-    if (suggestion.type === 'scale') {
-      router.push(`/scales/${suggestion.id}`);
-    } else if (suggestion.type === 'category') {
-      router.push({
-        pathname: '/search',
-        params: { category: suggestion.id }
-      });
-    } else if (suggestion.type === 'recent') {
-      router.push(`/scales/${suggestion.id}`);
+    try {
+      // Immediately hide keyboard and suggestions
+      Keyboard.dismiss();
+      setIsFocused(false);
+      setSuggestions([]);
+      inputRef.current?.blur();
+      
+      // Navigate based on suggestion type
+      if (suggestion.type === 'scale') {
+        router.push(`/scales/${suggestion.id}`);
+      } else if (suggestion.type === 'category') {
+        router.push({
+          pathname: '/search',
+          params: { category: suggestion.id }
+        });
+      } else if (suggestion.type === 'recent') {
+        router.push(`/scales/${suggestion.id}`);
+      }
+    } catch (error) {
+      console.error('Error handling suggestion tap:', error);
     }
   }, []);
 
@@ -473,7 +484,7 @@ export function SearchWidget({
                 styles.loadingSpinner,
                 {
                   transform: [{ 
-                    rotate: useSharedValue(0).value + 'deg' 
+                    rotate: spinnerRotation.value + 'deg' 
                   }]
                 }
               ]}

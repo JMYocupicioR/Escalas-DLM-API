@@ -171,7 +171,7 @@ export function useDenverAssessment() {
         recommendation = "El desarrollo del niño se considera apropiado para la edad. Realizar el tamizaje de rutina en la siguiente visita de control.";
     }
     
-    return { delays: totalDelays, cautions: totalCautions, interpretation, recommendation };
+    return { delays: totalDelays, cautions: totalCautions, interpretation, recommendation, ageForEval };
   }, [answers, ageForEval]);
 
   /**

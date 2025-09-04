@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useDenverAssessment } from '@/hooks/useDenverAssessment';
-import { denver2 as denverScale, denverItems } from '@/data/denver';
+import { DenverGuide, DenverInfoButton, DenverQuickTips } from '@/components/DenverGuide';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 
-const DOMAINS = ['Motor Grueso', 'Motor Fino-Adaptativo', 'Personal-Social', 'Lenguaje'];
 
 export default function Denver2Screen() {
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [showGuide, setShowGuide] = useState(false);
   
   const {
     currentStep,
@@ -40,7 +40,7 @@ export default function Denver2Screen() {
           <Text style={styles.title}>Resultados de la Evaluación</Text>
           <View style={styles.resultsCard}>
             <Text style={styles.resultsTitle}>Interpretación: {interpretation}</Text>
-            <Text style={styles.resultsText}>Edad de Evaluación: {ageForEval.toFixed(2)} meses</Text>
+            <Text style={styles.resultsText}>Edad de Evaluación: {ageForEval.toFixed(1)} meses</Text>
             <Text style={styles.resultsText}>Retrasos: {delays}</Text>
             <Text style={styles.resultsText}>Precauciones: {cautions}</Text>
             <Text style={styles.recommendation}>{recommendation}</Text>
@@ -52,10 +52,27 @@ export default function Denver2Screen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ title: currentStep === 'form' ? 'Datos del Paciente' : `Área: ${currentStep}` }} />
+      <Stack.Screen 
+        options={{ 
+          title: currentStep === 'form' ? 'Denver II - Datos del Paciente' : `Denver II - ${currentStep}`,
+          headerRight: () => (
+            <DenverInfoButton onPress={() => setShowGuide(true)} />
+          )
+        }} 
+      />
       <View style={styles.progressBarContainer}>
         <View style={[styles.progressBar, { width: `${progress}%` }]} />
+        <Text style={styles.progressText}>
+          {currentStep === 'form' ? 'Datos del paciente' : 
+           currentStep === 'results' ? 'Resultados' : 
+           `Evaluando: ${currentStep}`}
+        </Text>
       </View>
+      
+      {/* Quick Tips for current step */}
+      {currentStep !== 'results' && (
+        <DenverQuickTips step={currentStep} />
+      )}
       <ScrollView contentContainerStyle={styles.content}>
         {currentStep === 'form' ? (
           <View>
@@ -96,6 +113,12 @@ export default function Denver2Screen() {
           <ArrowRight color={colors.text} />
         </TouchableOpacity>
       </View>
+
+      {/* Denver Guide Modal */}
+      <DenverGuide 
+        visible={showGuide} 
+        onClose={() => setShowGuide(false)} 
+      />
     </SafeAreaView>
   );
 }
@@ -115,12 +138,22 @@ const createStyles = (colors: any) => StyleSheet.create({
     fontSize: 16
   },
   progressBarContainer: {
-    height: 4,
-    backgroundColor: colors.border,
+    backgroundColor: colors.card,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   progressBar: {
     height: 4,
     backgroundColor: colors.primary,
+  },
+  progressText: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: colors.mutedText,
+    marginTop: 4,
+    fontWeight: '500',
   },
   questionCard: {
     backgroundColor: colors.card,
