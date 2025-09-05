@@ -40,7 +40,7 @@ export default function NotificationsSettings() {
       <View style={styles.iconContainer}>
         <Icon size={20} color={disabled ? colors.mutedText : colors.primary} />
       </View>
-      <View style={styles.content}>
+      <View style={styles.itemContent}>
         <Text style={[styles.title, disabled && styles.titleDisabled]}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
@@ -115,7 +115,7 @@ export default function NotificationsSettings() {
       alignItems: 'center',
       marginRight: 12,
     },
-    content: {
+    itemContent: {
       flex: 1,
       marginRight: 12,
     },

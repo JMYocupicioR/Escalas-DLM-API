@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+﻿import React, { useMemo, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useDenverAssessment } from '@/hooks/useDenverAssessment';
 import { DenverGuide, DenverInfoButton, DenverQuickTips } from '@/components/DenverGuide';
+import { ResultsActions } from '@/components/ResultsActions';
+import { denverItems } from '@/data/denver';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 
 
@@ -12,6 +14,8 @@ export default function Denver2Screen() {
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [showGuide, setShowGuide] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const webDateInputRef = useRef<any>(null);
   
   const {
     currentStep,
@@ -31,8 +35,93 @@ export default function Denver2Screen() {
     setPatientData(prev => ({ ...prev, [field]: value }));
   };
 
+  const parseBirthDate = () => {
+    if (!patientData.birthDate) return new Date();
+    const d = new Date(patientData.birthDate + 'T00:00:00');
+    return isNaN(d.getTime()) ? new Date() : d;
+  };
+
+  const formatDate = (date: Date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  // Lazy-require community DateTimePicker if available (native)
+  let CommunityDateTimePicker: any = null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    CommunityDateTimePicker = require('@react-native-community/datetimepicker').default;
+  } catch (e) {
+    CommunityDateTimePicker = null;
+  }
+
+  const openDateSelector = () => {
+    if (Platform.OS === 'web') {
+      const doc: any = (globalThis as any)?.document;
+      if (!doc) return;
+      if (!webDateInputRef.current) {
+        const input = doc.createElement('input');
+        input.type = 'date';
+        input.max = formatDate(new Date());
+        input.value = patientData.birthDate || '';
+        input.style.position = 'absolute';
+        input.style.opacity = '0';
+        input.style.pointerEvents = 'none';
+        input.onchange = (ev: any) => {
+          const value = ev.target?.value;
+          if (value) handleInputChange('birthDate')(value);
+        };
+        doc.body.appendChild(input);
+        webDateInputRef.current = input;
+      }
+      // @ts-ignore - not all browsers expose showPicker
+      webDateInputRef.current?.showPicker?.();
+      webDateInputRef.current?.click();
+      return;
+    }
+
+    if (CommunityDateTimePicker) {
+      setShowDatePicker(true);
+    }
+  };
+
   if (currentStep === 'results') {
     const { delays, cautions, interpretation, recommendation, ageForEval } = calculateResults();
+    const answerLabelMap: Record<string, string> = { P: 'Pasó', F: 'Falló', R: 'Rehusó', NO: 'Sin oportunidad' } as any;
+    const answersArray = Object.entries(answers).map(([id, value]) => {
+      const q = denverItems.find(item => item.id === id);
+      return {
+        id,
+        question: q ? `${q.domain}: ${q.text}` : id,
+        label: (answerLabelMap as any)[value] ?? String(value),
+        value: String(value),
+      };
+    });
+    const responseCounts = { P: 0, F: 0, R: 0, NO: 0 } as Record<string, number>;
+    Object.values(answers).forEach(v => { if (responseCounts[v as string] !== undefined) responseCounts[v as string]++; });
+    const flagged = denverItems.reduce(
+      (acc, q) => {
+        const a = (answers as any)[q.id];
+        if (!a || (a !== 'F' && a !== 'R')) return acc;
+        const [ , , p75, p90 ] = q.percentiles;
+        if (ageForEval > p90) acc.delays.push(q);
+        else if (ageForEval > p75) acc.cautions.push(q);
+        return acc;
+      },
+      { delays: [] as typeof denverItems, cautions: [] as typeof denverItems }
+    );
+    const birth = patientData.birthDate ? new Date(patientData.birthDate + 'T00:00:00') : null;
+    const now = new Date();
+    let chronologicalMonths = 0;
+    if (birth && !isNaN(birth.getTime())) {
+      const years = now.getFullYear() - birth.getFullYear();
+      const months = now.getMonth() - birth.getMonth();
+      const days = now.getDate() - birth.getDate();
+      chronologicalMonths = years * 12 + months + (days / 30.44);
+    }
+    const correctedApplied = chronologicalMonths > 0 && Math.abs(chronologicalMonths - ageForEval) > 0.2;
     return (
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ title: 'Resultados Denver II' }} />
@@ -45,6 +134,54 @@ export default function Denver2Screen() {
             <Text style={styles.resultsText}>Precauciones: {cautions}</Text>
             <Text style={styles.recommendation}>{recommendation}</Text>
           </View>
+          <View style={styles.resultsCard}>
+            <Text style={styles.resultsTitle}>Resumen del Caso</Text>
+            {!!patientData.name && (<Text style={styles.resultsText}>Paciente: {patientData.name}</Text>)}
+            {!!patientData.examiner && (<Text style={styles.resultsText}>Examinador: {patientData.examiner}</Text>)}
+            {!!patientData.birthDate && (<Text style={styles.resultsText}>Fecha de nacimiento: {patientData.birthDate}</Text>)}
+            {!!patientData.gestationalWeeks && (<Text style={styles.resultsText}>Semanas de gestación: {patientData.gestationalWeeks}</Text>)}
+            {chronologicalMonths > 0 && (
+              <Text style={styles.resultsText}>
+                Edad cronológica: {chronologicalMonths.toFixed(1)} meses {correctedApplied ? '(se aplicó corrección por prematuridad)' : ''}
+              </Text>
+            )}
+          </View>
+          <View style={styles.resultsCard}>
+            <Text style={styles.resultsTitle}>Distribución de Respuestas</Text>
+            <Text style={styles.resultsText}>P: {responseCounts.P}  |  F: {responseCounts.F}  |  R: {responseCounts.R}  |  NO: {responseCounts.NO}</Text>
+            <Text style={styles.recommendation}>
+              "Retraso" = fallo/rehuso en ítems &gt; p90 para la edad. "Precaución" = ítems &gt; p75.
+            </Text>
+          </View>
+          {(flagged.delays.length > 0 || flagged.cautions.length > 0) && (
+            <View style={styles.resultsCard}>
+              <Text style={styles.resultsTitle}>Hallazgos Clave</Text>
+              {flagged.delays.length > 0 && (
+                <Text style={styles.resultsText}>
+                  Retrasos: {flagged.delays.slice(0, 6).map(q => `${q.domain} - ${q.text}`).join('; ')}{flagged.delays.length > 6 ? '…' : ''}
+                </Text>
+              )}
+              {flagged.cautions.length > 0 && (
+                <Text style={styles.resultsText}>
+                  Precauciones: {flagged.cautions.slice(0, 6).map(q => `${q.domain} - ${q.text}`).join('; ')}{flagged.cautions.length > 6 ? '…' : ''}
+                </Text>
+              )}
+            </View>
+          )}
+          <ResultsActions
+            assessment={{
+              patientData: {
+                name: patientData.name,
+                doctorName: patientData.examiner,
+                age: `${ageForEval.toFixed(1)} meses (${correctedApplied ? 'ajustada' : 'cronológica'})`,
+              },
+              score: `Retrasos: ${delays} | Precauciones: ${cautions}`,
+              interpretation,
+              answers: answersArray,
+            }}
+            scale={{ id: 'denver2', name: 'Denver II' } as any}
+            containerStyle={{ marginTop: 12 }}
+          />
         </ScrollView>
       </SafeAreaView>
     );
@@ -79,7 +216,49 @@ export default function Denver2Screen() {
             <Text style={styles.title}>Datos de Identificación</Text>
             <TextInput placeholder="Nombre del Paciente" style={styles.input} value={patientData.name} onChangeText={handleInputChange('name')} />
             <TextInput placeholder="Nombre del Examinador" style={styles.input} value={patientData.examiner} onChangeText={handleInputChange('examiner')} />
-            <TextInput placeholder="Fecha de Nacimiento (YYYY-MM-DD)" style={styles.input} value={patientData.birthDate} onChangeText={handleInputChange('birthDate')} />
+            {(Platform.OS !== 'web' && !CommunityDateTimePicker) ? (
+              <TextInput placeholder="Fecha de Nacimiento (YYYY-MM-DD)" style={styles.input} value={patientData.birthDate} onChangeText={handleInputChange('birthDate')} />
+            ) : (
+              <>
+                <TouchableOpacity onPress={openDateSelector} activeOpacity={0.8}>
+                  <View style={styles.inputLikeButton}>
+                    <Text style={styles.inputLikeText}>
+                      {patientData.birthDate ? patientData.birthDate : 'Seleccionar fecha de nacimiento'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                {Platform.OS !== 'web' && CommunityDateTimePicker && (
+              <Modal visible={showDatePicker} transparent animationType="fade" onRequestClose={() => setShowDatePicker(false)}>
+                <View style={styles.modalBackdrop}>
+                  <View style={styles.modalCard}>
+                    <Text style={styles.modalTitle}>Selecciona la fecha de nacimiento</Text>
+                    <CommunityDateTimePicker
+                      value={parseBirthDate()}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
+                      maximumDate={new Date()}
+                      onChange={(event: any, date?: Date) => {
+                        if (Platform.OS === 'android') {
+                          if (event.type === 'set' && date) {
+                            handleInputChange('birthDate')(formatDate(date));
+                          }
+                          setShowDatePicker(false);
+                        } else if (date) {
+                          handleInputChange('birthDate')(formatDate(date));
+                        }
+                      }}
+                    />
+                    <View style={styles.modalActions}>
+                      <TouchableOpacity style={styles.modalButton} onPress={() => setShowDatePicker(false)}>
+                        <Text style={styles.modalButtonText}>Hecho</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+                )}
+              </>
+            )}
             <TextInput placeholder="Semanas de Gestación" style={styles.input} keyboardType="numeric" value={patientData.gestationalWeeks} onChangeText={handleInputChange('gestationalWeeks')} />
           </View>
         ) : (
@@ -136,6 +315,18 @@ const createStyles = (colors: any) => StyleSheet.create({
     borderColor: colors.border,
     marginBottom: 12,
     fontSize: 16
+  },
+  inputLikeButton: {
+    backgroundColor: colors.card,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 12,
+  },
+  inputLikeText: {
+    color: colors.text,
+    fontSize: 16,
   },
   progressBarContainer: {
     backgroundColor: colors.card,
@@ -224,5 +415,41 @@ const createStyles = (colors: any) => StyleSheet.create({
     borderTopWidth: 1,
     borderColor: colors.border,
     paddingTop: 12,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  modalActions: {
+    marginTop: 12,
+    alignItems: 'flex-end',
+  },
+  modalButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: '600',
   }
 });

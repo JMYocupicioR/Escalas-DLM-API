@@ -6,10 +6,10 @@ type DenverStep = 'form' | 'Motor Grueso' | 'Motor Fino-Adaptativo' | 'Personal-
 type DenverAnswer = 'P' | 'F' | 'R' | 'NO';
 
 interface DenverPatientData {
-  name: string;
-  examiner: string;
-  birthDate: string;
-  gestationalWeeks: string;
+ name: string;
+ examiner: string;
+ birthDate: string;
+ gestationalWeeks: string;
 }
 
 // Constante para los dominios de la evaluación
@@ -19,17 +19,17 @@ const DOMAINS: DenverStep[] = ['Motor Grueso', 'Motor Fino-Adaptativo', 'Persona
  * Hook personalizado para gestionar la lógica completa del Test de Denver II.
  */
 export function useDenverAssessment() {
-  const [currentStep, setCurrentStep] = useState<DenverStep>('form');
-  const [patientData, setPatientData] = useState<DenverPatientData>({
-    name: '',
-    examiner: '',
-    birthDate: '',
-    gestationalWeeks: '',
-  });
-  const [answers, setAnswers] = useState<Record<string, DenverAnswer>>({});
-  const [ageForEval, setAgeForEval] = useState(0); // Edad para evaluación en meses
+ const [currentStep, setCurrentStep] = useState<DenverStep>('form');
+ const [patientData, setPatientData] = useState<DenverPatientData>({
+ name: '',
+   examiner: '',
+   birthDate: '',
+   gestationalWeeks: '',
+  });
+  const [answers, setAnswers] = useState<Record<string, DenverAnswer>>({});
+  const [ageForEval, setAgeForEval] = useState(0); // Edad para evaluación en meses
 
-  /**
+ /**
    * Calcula la edad cronológica.
    */
   const calculateAge = (birthDate: Date, testDate: Date = new Date()) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -40,6 +40,12 @@ interface EvaluationState {
   endTime?: Date;
   totalScore?: number;
   interpretation?: Interpretation | null;
+  bostonSubscores?: {
+    sssAvg: number;
+    fssAvg: number;
+    sssLevel: string;
+    fssLevel: string;
+  } | null;
 }
 
 export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
@@ -158,7 +164,41 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
     }
 
     // Find interpretation based on scoring ranges
-    const interpretation = findInterpretation(totalScore, scoring.ranges);
+    let interpretation = findInterpretation(totalScore, scoring.ranges);
+
+    // Boston: calcular subescalas SSS/FSS y enriquecer interpretación
+    let bostonSubscores: EvaluationState['bostonSubscores'] = null;
+    if (scale.id === 'boston') {
+      const sssIds = new Set(
+        sortedQuestions.filter(q => (q.category || '').toUpperCase().includes('SSS')).map(q => q.question_id)
+      );
+      const fssIds = new Set(
+        sortedQuestions.filter(q => (q.category || '').toUpperCase().includes('FSS')).map(q => q.question_id)
+      );
+      const entries = (
+        Object.entries(workingResponses).filter(([, v]) => typeof v === 'number') as Array<[string, number]>
+      ).map(([id, v]) => [id, Number(v)] as [string, number]);
+      const sssVals = entries.filter(([id]) => sssIds.has(id)).map(([, v]) => v);
+      const fssVals = entries.filter(([id]) => fssIds.has(id)).map(([, v]) => v);
+      const avg = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+      const sssAvg = Number(avg(sssVals).toFixed(2));
+      const fssAvg = Number(avg(fssVals).toFixed(2));
+      const mapLevel = (score: number, ranges: { min: number; max: number; level: string }[]) =>
+        (ranges.find(r => score >= r.min && score <= r.max)?.level) || 'No determinado';
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const interp = require('@/data/boston').scoreInterpretation as { symptomSeverity: any[]; functionalStatus: any[] };
+        const sssLevel = mapLevel(sssAvg, interp.symptomSeverity);
+        const fssLevel = mapLevel(fssAvg, interp.functionalStatus);
+        bostonSubscores = { sssAvg, fssAvg, sssLevel, fssLevel };
+        interpretation = {
+          level: 'Resultados por subescalas',
+          text: `SSS: ${sssLevel} (${sssAvg}) | FSS: ${fssLevel} (${fssAvg})`,
+        } as Interpretation;
+      } catch {
+        bostonSubscores = { sssAvg, fssAvg, sssLevel: 'No determinado', fssLevel: 'No determinado' };
+      }
+    }
 
     setState(prev => ({
       ...prev,
@@ -166,6 +206,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       endTime: new Date(),
       totalScore,
       interpretation,
+      bostonSubscores,
     }));
   }, [scale.scoring, state.responses]);
 
@@ -207,6 +248,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   );
 
   const renderEvaluationStep = () => {
+    const autoAdvance = scale.id === 'boston';
     if (!currentQuestion) {
       return <LoadingState message="Cargando pregunta..." />;
     }
@@ -292,7 +334,14 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
                     styles.optionButton,
                     isSelected && styles.optionButtonSelected,
                   ]}
-                  onPress={() => handleAnswerSelect(option.option_value)}
+                  onPress={() => {
+                    handleAnswerSelect(option.option_value);
+                    if (autoAdvance) {
+                      setTimeout(() => {
+                        handleNext();
+                      }, 150);
+                    }
+                  }}
                 >
                   <View style={styles.optionContent}>
                     <View style={[
@@ -421,6 +470,21 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           </View>
         )}
 
+        {/* Boston subscales breakdown */}
+        {scale.id === 'boston' && state.bostonSubscores && (
+          <View style={styles.summaryContainer}>
+            <Text style={styles.summaryTitle}>Desglose por Subescalas</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>SSS (Síntomas):</Text>
+              <Text style={styles.summaryValue}>{state.bostonSubscores.sssAvg} — {state.bostonSubscores.sssLevel}</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>FSS (Funcional):</Text>
+              <Text style={styles.summaryValue}>{state.bostonSubscores.fssAvg} — {state.bostonSubscores.fssLevel}</Text>
+            </View>
+          </View>
+        )}
+
         {/* Summary */}
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>Resumen de la Evaluación</Text>
@@ -450,7 +514,9 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           assessment={{
             patientData: {},
             score: state.totalScore!,
-            interpretation: state.interpretation?.text || '',
+            interpretation: (scale.id === 'boston' && state.bostonSubscores)
+              ? `SSS: ${state.bostonSubscores.sssLevel} (${state.bostonSubscores.sssAvg}) | FSS: ${state.bostonSubscores.fssLevel} (${state.bostonSubscores.fssAvg})`
+              : (state.interpretation?.text || ''),
             answers: Object.entries(state.responses).map(([id, value]) => ({ id, value }))
           }}
           scale={{ id: scale.id, name: scale.name } as any}
@@ -802,4 +868,7 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     color: colors.text,
   },
 });
+
+
+
 

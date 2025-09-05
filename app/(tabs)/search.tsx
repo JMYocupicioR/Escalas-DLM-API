@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, TextInput, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Search as SearchIcon, SlidersHorizontal, X, ChevronRight } from 'lucide-react-native';
@@ -194,7 +194,15 @@ export default function SearchScreen() {
         accessibilityRole="button"
       >
         <View style={styles.imageContainer}>
-          <View style={styles.image} />
+          {item.imageUrl ? (
+            <Image 
+              source={{ uri: item.imageUrl }} 
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.imagePlaceholder} />
+          )}
         </View>
         <View style={styles.cardContent}>
           <Text style={styles.scaleName}>{item.name}</Text>
@@ -558,6 +566,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f5f9',
   },
   image: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  imagePlaceholder: {
     flex: 1,
     backgroundColor: '#e2e8f0',
   },

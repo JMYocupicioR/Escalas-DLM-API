@@ -3,7 +3,12 @@ module.exports = {
   extends: 'expo',
   ignorePatterns: [
     '/dist/*',
+    'dist/**',
+    'dist-test/**',
+    'dist-functions/**',
     'scripts/**',
+    'api/export/templates-dist/**',
+    'test-printing.js',
   ],
   rules: {
     // Resolve TS path aliases with tsc; avoid false positives

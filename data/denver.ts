@@ -11,6 +11,7 @@ export const denver2: Scale = {
   bodySystem: 'Neurológico',
   version: '2.0',
   timeToComplete: '15-25 min',
+  imageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=300&fit=crop&crop=center',
   tags: ['desarrollo', 'neurodesarrollo', 'pediatría', 'tamizaje', 'infantil'],
   scoring: {
     method: 'custom_interpretation',
