@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { dosisData, puntosMotoresData } from '@/data/botulinum';
-import { PlusCircle, RotateCcw, Trash2, TrendingUp } from 'lucide-react-native';
+import { getMusculoImage, hasMusculoImage } from '@/data/botulinumImages';
+import { PlusCircle, RotateCcw, Trash2, TrendingUp, Image as ImageIcon } from 'lucide-react-native';
 import { ResultsActions } from '@/components/ResultsActions';
 
 // Define types for state management
@@ -364,12 +366,33 @@ export default function BotulinumCalculator() {
                           keyboardType="numeric"
                         />
                       </View>
-                      <Text style={styles.puntoMotorInfo}>
-                        <Text style={{fontWeight: 'bold'}}>Punto motor: </Text>
-                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                        {/*@ts-ignore */}
-                        {puntosMotoresData[m.nombre] || 'No disponible.'}
-                      </Text>
+                      <View style={styles.puntoMotorContainer}>
+                        <View style={styles.puntoMotorText}>
+                          <Text style={styles.puntoMotorInfo}>
+                            <Text style={{fontWeight: 'bold'}}>Punto motor: </Text>
+                            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                            {/*@ts-ignore */}
+                            {puntosMotoresData[m.nombre] || 'No disponible.'}
+                          </Text>
+                        </View>
+                        
+                        {hasMusculoImage(m.nombre) && (
+                          <View style={styles.musculoImageContainer}>
+                            <View style={styles.imageHeader}>
+                              <ImageIcon size={16} color={colors.primary} />
+                              <Text style={styles.imageLabel}>Anatomía</Text>
+                            </View>
+                            <Image
+                              source={{ uri: getMusculoImage(m.nombre)?.url }}
+                              style={styles.musculoImage}
+                              resizeMode="contain"
+                            />
+                            <Text style={styles.imageDescription}>
+                              {getMusculoImage(m.nombre)?.description}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
                     </View>
                   )}
                 </View>
@@ -658,6 +681,44 @@ const createStyles = (colors: any) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 8,
+    },
+    puntoMotorContainer: {
+      marginTop: 8,
+    },
+    puntoMotorText: {
+      marginBottom: 12,
+    },
+    musculoImageContainer: {
+      backgroundColor: colors.sectionBackground,
+      borderRadius: 8,
+      padding: 12,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    imageHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 8,
+    },
+    imageLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    musculoImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: 6,
+      backgroundColor: colors.background,
+      marginBottom: 8,
+    },
+    imageDescription: {
+      fontSize: 12,
+      color: colors.mutedText,
+      fontStyle: 'italic',
+      lineHeight: 16,
     },
   });
 

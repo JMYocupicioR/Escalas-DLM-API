@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getMusculoImage, hasMusculoImage } from '@/data/botulinumImages';
 
 // Schema para validación de datos de entrada
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -122,7 +123,9 @@ export const generateHtml = (payload: BotulinumPayload): string => {
   const puntosMotoresUnicos = Array.from(new Set((musculos || []).map(m => m.nombre)))
     .map(nombreMusculo => ({
       nombre: nombreMusculo,
-      puntoMotor: getPuntoMotor(nombreMusculo)
+      puntoMotor: getPuntoMotor(nombreMusculo),
+      imagen: getMusculoImage(nombreMusculo),
+      tieneImagen: hasMusculoImage(nombreMusculo)
     }))
     .filter(pm => pm.puntoMotor && !pm.puntoMotor.includes('no disponible'));
 
@@ -497,9 +500,26 @@ export const generateHtml = (payload: BotulinumPayload): string => {
                   <div class="punto-motor-nombre">${pm.nombre}</div>
                   <div class="punto-motor-descripcion">${pm.puntoMotor}</div>
                 </div>
-                <div class="imagen-placeholder">
-                  [Espacio reservado para imagen anatómica del punto motor]
-                </div>
+                ${pm.tieneImagen ? `
+                  <div class="imagen-container">
+                    <img src="${pm.imagen?.url}" 
+                         alt="${pm.imagen?.alt}" 
+                         style="width: 180px; height: 120px; object-fit: contain; border: 1px solid #ccc; border-radius: 4px;"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="imagen-placeholder" style="display: none;">
+                      [Error al cargar imagen anatómica]
+                    </div>
+                    ${pm.imagen?.description ? `
+                      <div style="font-size: 7pt; color: #666; margin-top: 4px; font-style: italic;">
+                        ${pm.imagen.description}
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : `
+                  <div class="imagen-placeholder">
+                    [Imagen anatómica no disponible]
+                  </div>
+                `}
               </div>
             `).join('')}
           </div>
