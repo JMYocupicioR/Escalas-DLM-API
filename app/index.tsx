@@ -4,5 +4,5 @@ const Router: any = require('expo-router');
 const Redirect = Router.Redirect || (() => null);
 
 export default function App() {
-  return <Redirect href="/landing" />;
+  return <Redirect href="/(tabs)" />;
 }

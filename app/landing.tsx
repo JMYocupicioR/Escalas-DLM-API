@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -96,7 +96,7 @@ export default function LandingPage() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Text style={styles.ctaText}>Comenzar Evaluación</Text>
+              <Text style={styles.ctaText}>Comenzar evaluación</Text>
               <ArrowRight color="#ffffff" size={20} strokeWidth={2} />
             </LinearGradient>
           </Pressable>
@@ -255,3 +255,5 @@ const styles = StyleSheet.create({
     left: -75,
   },
 });
+
+
