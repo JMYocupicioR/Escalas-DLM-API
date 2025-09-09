@@ -8,12 +8,9 @@ import { PatientForm } from '@/components/PatientForm';
 import { ResultsActions } from '@/components/ResultsActions';
 import { useScalesStore } from '@/store/scales';
 import { ScaleInfo, ScaleInfoData } from '@/components/ScaleInfo';
-import { useGAS } from '@/hooks/useGAS';
 import { validateSMARTGoal, suggestGoalImprovement } from '@/utils/gasValidation';
 import { calculateAdvancedTScore } from '@/utils/gasCalculation';
-import { calculateAdvancedTScore } from '@/utils/gasCalculation';
-import SMARTValidationIndicator from '@/components/SMARTValidationIndicator';
-import { suggestGoalImprovement } from '@/utils/gasValidation';
+import { SMARTValidationIndicator } from '@/components/SMARTValidationIndicator';
 
 type GASLevelKey = '-2' | '-1' | '0' | '1' | '2';
 type GASCategory = 'funcion_pasiva' | 'funcion_activa' | 'dolor' | 'movilidad' | 'participacion' | 'habilidad';
@@ -146,6 +143,14 @@ export default function GASScale() {
 	const [nextCycleNotes, setNextCycleNotes] = useState('');
     const [showInfo, setShowInfo] = useState(false);
     const [showTDetails, setShowTDetails] = useState(false);
+
+	// Future comparison prep
+	const [isSecondEvaluation, setIsSecondEvaluation] = useState(false);
+	const [previousEvaluation, setPreviousEvaluation] = useState<{
+		goals: GASGoal[];
+		evaluations: GASEvaluation[];
+		tScore: number;
+	} | null>(null);
 
 	// Patient info from store (optional)
 	const getCurrentPatient = useScalesStore(state => state.getCurrentPatient);
@@ -435,6 +440,13 @@ export default function GASScale() {
 					<ScrollView contentContainerStyle={styles.content}>
 						<View style={styles.card}>
 							<Text style={styles.title}>EvaluaciÃ³n de Objetivos</Text>
+							{isSecondEvaluation && previousEvaluation ? (
+								<View style={{ marginTop: 8, borderLeftWidth: 4, borderLeftColor: '#3b82f6', backgroundColor: '#DBEAFE', padding: 10, borderRadius: 8 }}>
+									<Text style={{ color: '#1e3a8a', fontWeight: '700', marginBottom: 4 }}>Segunda Evaluación</Text>
+									<Text style={{ color: '#1e40af' }}>T-score previo: {previousEvaluation.tScore}</Text>
+									<Text style={{ color: '#1e40af', marginTop: 2 }}>Se comparará el progreso al finalizar esta evaluación.</Text>
+								</View>
+							) : null}
 							{goals.map(goal => {
 								const selected = evaluations.find(e => e.goalId === goal.id)?.score ?? null;
 								return (
