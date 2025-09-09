@@ -8,6 +8,8 @@ import { PatientForm } from '@/components/PatientForm';
 import { ResultsActions } from '@/components/ResultsActions';
 import { useScalesStore } from '@/store/scales';
 import { ScaleInfo, ScaleInfoData } from '@/components/ScaleInfo';
+import { GASWizard } from '@/components/GASWizard';
+import { GASGoalSuggestion, GASCategory } from '@/data/gasSuggestions';
 
 type GASLevelKey = '-2' | '-1' | '0' | '1' | '2';
 type GASCategory = 'funcion_pasiva' | 'funcion_activa' | 'dolor' | 'movilidad' | 'participacion' | 'habilidad';
@@ -55,6 +57,7 @@ export default function GASScale() {
 	const [goals, setGoals] = useState<GASGoal[]>([]);
 	const [evaluations, setEvaluations] = useState<GASEvaluation[]>([]);
 	const [showInfo, setShowInfo] = useState(false);
+	const [showWizard, setShowWizard] = useState(false);
 
 	// Patient info from store (optional)
 	const getCurrentPatient = useScalesStore(state => state.getCurrentPatient);
@@ -85,6 +88,24 @@ export default function GASScale() {
 
 	const updateGoalLevel = useCallback((id: string, level: GASLevelKey, text: string) => {
 		setGoals(prev => prev.map(g => (g.id === id ? { ...g, levels: { ...g.levels, [level]: text } } : g)));
+	}, []);
+
+	// Handle suggestion selection from wizard
+	const handleSuggestionSelect = useCallback((suggestion: GASGoalSuggestion, category: GASCategory) => {
+		const newGoal: GASGoal = {
+			id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+			title: suggestion.title,
+			weight: suggestion.weight || 1,
+			category,
+			levels: {
+				'-2': suggestion.levelMinus2 || '',
+				'-1': suggestion.levelMinus1 || '',
+				'0': suggestion.level0,
+				'1': suggestion.level1 || '',
+				'2': suggestion.level2 || '',
+			},
+		};
+		setGoals(prev => [...prev, newGoal]);
 	}, []);
 
 	// Evaluation selection
@@ -272,10 +293,16 @@ export default function GASScale() {
 								</View>
 							))}
 							
-							<TouchableOpacity style={[styles.addButton, { backgroundColor: colors.buttonSecondary }]} onPress={addGoal} accessibilityRole="button" accessibilityLabel="Añadir objetivo">
-								<Plus color={colors.buttonSecondaryText} size={18} />
-								<Text style={[styles.addButtonText, { color: colors.buttonSecondaryText }]}>Añadir objetivo</Text>
-							</TouchableOpacity>
+							<View style={styles.addButtonsRow}>
+								<TouchableOpacity style={[styles.addButton, { backgroundColor: colors.buttonSecondary }]} onPress={addGoal} accessibilityRole="button" accessibilityLabel="Añadir objetivo vacío">
+									<Plus color={colors.buttonSecondaryText} size={18} />
+									<Text style={[styles.addButtonText, { color: colors.buttonSecondaryText }]}>Objetivo vacío</Text>
+								</TouchableOpacity>
+								
+								<TouchableOpacity style={[styles.addButton, styles.wizardButton, { backgroundColor: colors.primary }]} onPress={() => setShowWizard(true)} accessibilityRole="button" accessibilityLabel="Usar asistente de objetivos">
+									<Text style={[styles.addButtonText, { color: '#fff' }]}>💡 Asistente SMART</Text>
+								</TouchableOpacity>
+							</View>
 
 							<View style={styles.actionsRow}>
 								<TouchableOpacity style={[styles.button, { backgroundColor: colors.buttonSecondary }]} onPress={() => setStep('form')} accessibilityRole="button" accessibilityLabel="Atrás">
@@ -399,6 +426,14 @@ export default function GASScale() {
 					</View>
 				</View>
 			)}
+
+			{/* GAS Wizard */}
+			<GASWizard
+				visible={showWizard}
+				onClose={() => setShowWizard(false)}
+				onSelectSuggestion={handleSuggestionSelect}
+				colors={colors}
+			/>
 		</>
 	);
 }
@@ -481,17 +516,25 @@ const createStyles = (colors: any) => StyleSheet.create({
 		fontWeight: '700',
 		color: colors.text,
 	},
+	addButtonsRow: {
+		flexDirection: 'row',
+		gap: 12,
+		marginTop: 8,
+	},
 	addButton: {
+		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: 8,
 		borderRadius: 8,
 		paddingVertical: 12,
-		marginTop: 8,
+	},
+	wizardButton: {
+		flex: 1.2,
 	},
 	addButtonText: {
-		fontSize: 16,
+		fontSize: 14,
 		fontWeight: '600',
 	},
 	actionsRow: {
