@@ -28,7 +28,8 @@ export default function Denver2Screen() {
     nextStep,
     prevStep,
     calculateResults,
-    progress
+    progress,
+    ageForEval: hookAgeForEval
   } = useDenverAssessment();
 
   const handleInputChange = (field: keyof typeof patientData) => (value: string) => {
@@ -88,7 +89,11 @@ export default function Denver2Screen() {
   };
 
   if (currentStep === 'results') {
-    const { delays, cautions, interpretation, recommendation, ageForEval } = calculateResults();
+    const results = calculateResults();
+    const { overallInterpretation: interpretation, recommendation, ageInfo, counts } = results || {};
+    const ageForEval = ageInfo?.adjustedAgeMonths || hookAgeForEval || 0;
+    const delays = counts?.delays || 0;
+    const cautions = counts?.cautions || 0;
     const answerLabelMap: Record<string, string> = { P: 'Pasó', F: 'Falló', R: 'Rehusó', NO: 'Sin oportunidad' } as any;
     const answersArray = Object.entries(answers).map(([id, value]) => {
       const q = denverItems.find(item => item.id === id);
@@ -101,27 +106,12 @@ export default function Denver2Screen() {
     });
     const responseCounts = { P: 0, F: 0, R: 0, NO: 0 } as Record<string, number>;
     Object.values(answers).forEach(v => { if (responseCounts[v as string] !== undefined) responseCounts[v as string]++; });
-    const flagged = denverItems.reduce(
-      (acc, q) => {
-        const a = (answers as any)[q.id];
-        if (!a || (a !== 'F' && a !== 'R')) return acc;
-        const [ , , p75, p90 ] = q.percentiles;
-        if (ageForEval > p90) acc.delays.push(q);
-        else if (ageForEval > p75) acc.cautions.push(q);
-        return acc;
-      },
-      { delays: [] as typeof denverItems, cautions: [] as typeof denverItems }
-    );
-    const birth = patientData.birthDate ? new Date(patientData.birthDate + 'T00:00:00') : null;
-    const now = new Date();
-    let chronologicalMonths = 0;
-    if (birth && !isNaN(birth.getTime())) {
-      const years = now.getFullYear() - birth.getFullYear();
-      const months = now.getMonth() - birth.getMonth();
-      const days = now.getDate() - birth.getDate();
-      chronologicalMonths = years * 12 + months + (days / 30.44);
-    }
-    const correctedApplied = chronologicalMonths > 0 && Math.abs(chronologicalMonths - ageForEval) > 0.2;
+    const flagged = {
+      delays: results.areaResults ? Object.values(results.areaResults).flatMap(area => area.delays) : [],
+      cautions: results.areaResults ? Object.values(results.areaResults).flatMap(area => area.cautions) : []
+    };
+    const chronologicalMonths = ageInfo?.chronologicalAgeMonths || 0;
+    const correctedApplied = ageInfo?.wasPremature || false;
     return (
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ title: 'Resultados Denver II' }} />
@@ -129,7 +119,7 @@ export default function Denver2Screen() {
           <Text style={styles.title}>Resultados de la Evaluación</Text>
           <View style={styles.resultsCard}>
             <Text style={styles.resultsTitle}>Interpretación: {interpretation}</Text>
-            <Text style={styles.resultsText}>Edad de Evaluación: {ageForEval.toFixed(1)} meses</Text>
+            <Text style={styles.resultsText}>Edad de Evaluación: {ageForEval ? ageForEval.toFixed(1) : '0.0'} meses</Text>
             <Text style={styles.resultsText}>Retrasos: {delays}</Text>
             <Text style={styles.resultsText}>Precauciones: {cautions}</Text>
             <Text style={styles.recommendation}>{recommendation}</Text>
@@ -142,7 +132,7 @@ export default function Denver2Screen() {
             {!!patientData.gestationalWeeks && (<Text style={styles.resultsText}>Semanas de gestación: {patientData.gestationalWeeks}</Text>)}
             {chronologicalMonths > 0 && (
               <Text style={styles.resultsText}>
-                Edad cronológica: {chronologicalMonths.toFixed(1)} meses {correctedApplied ? '(se aplicó corrección por prematuridad)' : ''}
+                Edad cronológica: {chronologicalMonths ? chronologicalMonths.toFixed(1) : '0.0'} meses {correctedApplied ? '(se aplicó corrección por prematuridad)' : ''}
               </Text>
             )}
           </View>
@@ -173,7 +163,7 @@ export default function Denver2Screen() {
               patientData: {
                 name: patientData.name,
                 doctorName: patientData.examiner,
-                age: `${ageForEval.toFixed(1)} meses (${correctedApplied ? 'ajustada' : 'cronológica'})`,
+                age: `${ageForEval ? ageForEval.toFixed(1) : '0.0'} meses (${correctedApplied ? 'ajustada' : 'cronológica'})`,
               },
               score: `Retrasos: ${delays} | Precauciones: ${cautions}`,
               interpretation,

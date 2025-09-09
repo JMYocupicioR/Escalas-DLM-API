@@ -268,7 +268,7 @@ export default function SearchScreen() {
         </ResponsiveContainer>
         
         {/* Results */}
-        <ResponsiveContainer>
+        <View style={styles.listContainer}>
           <FlatList
             data={filteredScales}
             renderItem={renderScaleItem}
@@ -278,8 +278,9 @@ export default function SearchScreen() {
             initialNumToRender={5}
             maxToRenderPerBatch={3}
             windowSize={5}
+            showsVerticalScrollIndicator={true}
           />
-        </ResponsiveContainer>
+        </View>
       </SafeAreaView>
     );
   }
@@ -401,7 +402,7 @@ export default function SearchScreen() {
         </ResponsiveContainer>
       )}
 
-      <ResponsiveContainer>
+      <View style={styles.listContainer}>
         <FlatList
           data={filteredScales}
           renderItem={renderScaleItem}
@@ -411,8 +412,9 @@ export default function SearchScreen() {
           initialNumToRender={5}
           maxToRenderPerBatch={3}
           windowSize={5}
+          showsVerticalScrollIndicator={true}
         />
-      </ResponsiveContainer>
+      </View>
     </SafeAreaView>
   );
 }
@@ -541,6 +543,9 @@ const styles = StyleSheet.create({
   },
   sortChipTextSelected: {
     color: '#ffffff',
+  },
+  listContainer: {
+    flex: 1,
   },
   resultsGrid: {
     padding: 16,

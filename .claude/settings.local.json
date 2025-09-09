@@ -33,7 +33,8 @@
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\store/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\types/**)",
-      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)"
+      "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
+      "Bash(copy:*)"
     ],
     "deny": [],
     "ask": []

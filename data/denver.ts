@@ -1,5 +1,14 @@
 import { Scale } from '@/types/scale';
 
+// Shared type for Denver items used across hooks and data
+export interface DenverItem {
+  id: string;
+  text: string;
+  domain: string;
+  reportable: boolean;
+  percentiles: [number, number, number, number]; // [p25, p50, p75, p90]
+}
+
 export const denver2: Scale = {
   id: 'denver2',
   name: 'Prueba de Tamizaje del Desarrollo Denver II',
@@ -31,7 +40,7 @@ export const denver2: Scale = {
 };
 
 
-export const denverItems = [
+export const denverItems: DenverItem[] = [
     // =======================================================
     // Área Personal-Social (25 items)
     // =======================================================
@@ -41,9 +50,9 @@ export const denverItems = [
     { id: "ps4", text: "Mirarse la mano", domain: "Personal-Social", reportable: true, percentiles: [1.5, 2.5, 3.5, 4.5] },
     { id: "ps5", text: "Alcanzar un juguete", domain: "Personal-Social", reportable: false, percentiles: [3, 4, 4.8, 5.5] },
     { id: "ps6", text: "Darse de comer", domain: "Personal-Social", reportable: true, percentiles: [5, 6, 7, 8.5] },
-    { id: "ps7", text: "Jugar a las \"tortitas\"", domain: "Personal-Social", reportable: true, percentiles: [6.5, 8.5, 10.5, 12.5] },
+    { id: "ps7", text: "Jugar a las \"palmaditas\"", domain: "Personal-Social", reportable: true, percentiles: [6.5, 8.5, 10.5, 12.5] },
     { id: "ps8", text: "Indicar sus deseos", domain: "Personal-Social", reportable: true, percentiles: [8, 10, 12, 14] },
-    { id: "ps9", text: "Saludar \"Adiós\"", domain: "Personal-Social", reportable: true, percentiles: [7, 9.5, 12, 14] },
+    { id: "ps9", text: "Hacer \"bye bye\" con la mano", domain: "Personal-Social", reportable: true, percentiles: [7, 9.5, 12, 14] },
     { id: "ps10", text: "Jugar pelota con examinador", domain: "Personal-Social", reportable: false, percentiles: [11, 14, 18, 22] },
     { id: "ps11", text: "Imitar actividades", domain: "Personal-Social", reportable: true, percentiles: [12, 14, 16, 18.5] },
     { id: "ps12", text: "Beber de una taza", domain: "Personal-Social", reportable: true, percentiles: [12, 15, 18, 21] },
@@ -52,13 +61,13 @@ export const denverItems = [
     { id: "ps15", text: "Quitarse la ropa", domain: "Personal-Social", reportable: true, percentiles: [13, 15, 18, 22] },
     { id: "ps16", text: "Darle de comer a una muñeca", domain: "Personal-Social", reportable: false, percentiles: [18, 21, 25, 30] },
     { id: "ps17", text: "Ponerse la ropa", domain: "Personal-Social", reportable: true, percentiles: [24, 28, 33, 38] },
-    { id: "ps18", text: "Cepillarse dientes con ayuda", domain: "Personal-Social", reportable: true, percentiles: [26, 30, 36, 42] },
+    { id: "ps18", text: "Lavarse los dientes con ayuda", domain: "Personal-Social", reportable: true, percentiles: [26, 30, 36, 42] },
     { id: "ps19", text: "Lavarse y secarse las manos", domain: "Personal-Social", reportable: true, percentiles: [30, 36, 42, 48] },
     { id: "ps20", text: "Nombrar un amigo", domain: "Personal-Social", reportable: true, percentiles: [32, 38, 45, 52] },
     { id: "ps21", text: "Ponerse una camiseta", domain: "Personal-Social", reportable: true, percentiles: [36, 42, 48, 56] },
     { id: "ps22", text: "Vestirse sin ayuda", domain: "Personal-Social", reportable: true, percentiles: [42, 50, 58, 66] },
     { id: "ps23", text: "Jugar juegos de mesa/cartas", domain: "Personal-Social", reportable: true, percentiles: [40, 48, 56, 66] },
-    { id: "ps24", text: "Cepillarse los dientes sin ayuda", domain: "Personal-Social", reportable: true, percentiles: [48, 54, 62, 70] },
+    { id: "ps24", text: "Lavarse los dientes sin ayuda", domain: "Personal-Social", reportable: true, percentiles: [48, 54, 62, 70] },
     { id: "ps25", text: "Preparar cereal", domain: "Personal-Social", reportable: true, percentiles: [54, 60, 68, 72] },
 
     // =======================================================
@@ -79,7 +88,7 @@ export const denverItems = [
     { id: "mfa13", text: "Golpear 2 cubos", domain: "Motor Fino-Adaptativo", reportable: true, percentiles: [7.5, 9, 10.5, 12] },
     { id: "mfa14", text: "Meter un cubo en una taza", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [9, 10.5, 12, 14] },
     { id: "mfa15", text: "Garabatear", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [12, 14, 16, 20] },
-    { id: "mfa16", text: "Botar una pasa (demostrado)", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [12, 14.5, 17, 21] },
+    { id: "mfa16", text: "Soltar una pasa (demostrado)", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [12, 14.5, 17, 21] },
     { id: "mfa17", text: "Torre de 2 cubos", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [12, 13, 15, 18] },
     { id: "mfa18", text: "Torre de 4 cubos", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [15, 17, 20, 24] },
     { id: "mfa19", text: "Torre de 6 cubos", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [18, 21, 24, 28] },
@@ -101,14 +110,14 @@ export const denverItems = [
     { id: "len2", text: "Vocalizar", domain: "Lenguaje", reportable: true, percentiles: [1, 1.5, 2.5, 3.5] },
     { id: "len3", text: "\"Ooo\"/\"Aah\"", domain: "Lenguaje", reportable: true, percentiles: [1.5, 2.2, 3, 4] },
     { id: "len4", text: "Reírse", domain: "Lenguaje", reportable: true, percentiles: [2, 3, 4, 5] },
-    { id: "len5", text: "Chillar", domain: "Lenguaje", reportable: true, percentiles: [2.5, 3.5, 4.5, 5.5] },
+    { id: "len5", text: "Gritar con alegría", domain: "Lenguaje", reportable: true, percentiles: [2.5, 3.5, 4.5, 5.5] },
     { id: "len6", text: "Volver hacia el sonajero", domain: "Lenguaje", reportable: false, percentiles: [3, 4, 5, 6] },
     { id: "len7", text: "Volver hacia la voz", domain: "Lenguaje", reportable: false, percentiles: [3.5, 4.5, 5.5, 6.5] },
     { id: "len8", text: "Sílabas sencillas", domain: "Lenguaje", reportable: true, percentiles: [5, 6.5, 7.5, 9] },
     { id: "len9", text: "Imitar sonidos del lenguaje", domain: "Lenguaje", reportable: true, percentiles: [6, 7.5, 9, 11] },
     { id: "len10", text: "Papá/Mamá, no específicos", domain: "Lenguaje", reportable: true, percentiles: [6.5, 8, 10, 12] },
     { id: "len11", text: "Sílabas combinadas", domain: "Lenguaje", reportable: true, percentiles: [7, 8.5, 10, 12.5] },
-    { id: "len12", text: "Chapurrear", domain: "Lenguaje", reportable: true, percentiles: [7.5, 9, 11, 13] },
+    { id: "len12", text: "Balbucear", domain: "Lenguaje", reportable: true, percentiles: [7.5, 9, 11, 13] },
     { id: "len13", text: "Papá/Mamá, específicos", domain: "Lenguaje", reportable: true, percentiles: [9, 10.5, 12, 14] },
     { id: "len14", text: "1 palabra", domain: "Lenguaje", reportable: true, percentiles: [10, 12, 14, 16] },
     { id: "len15", text: "2 palabras", domain: "Lenguaje", reportable: true, percentiles: [11.5, 13.5, 16, 19] },
@@ -156,7 +165,7 @@ export const denverItems = [
     { id: "mg14", text: "Pararse solo", domain: "Motor Grueso", reportable: false, percentiles: [10, 11.5, 13, 14.5] },
     { id: "mg15", text: "Agacharse y recoger", domain: "Motor Grueso", reportable: false, percentiles: [10.5, 12, 13.5, 15] },
     { id: "mg16", text: "Caminar bien", domain: "Motor Grueso", reportable: false, percentiles: [11, 12.2, 13.5, 15] },
-    { id: "mg17", text: "Caminar para atrás", domain: "Motor Grueso", reportable: true, percentiles: [12, 14, 16, 18] },
+    { id: "mg17", text: "Caminar hacia atrás", domain: "Motor Grueso", reportable: true, percentiles: [12, 14, 16, 18] },
     { id: "mg18", text: "Correr", domain: "Motor Grueso", reportable: false, percentiles: [14, 16, 18, 22] },
     { id: "mg19", text: "Subir escaleras", domain: "Motor Grueso", reportable: true, percentiles: [15, 18, 22, 26] },
     { id: "mg20", text: "Patear pelota hacia delante", domain: "Motor Grueso", reportable: false, percentiles: [16, 20, 24, 28] },
@@ -171,5 +180,5 @@ export const denverItems = [
     { id: "mg29", text: "Equilibrio en 1 pie - 6 segundos", domain: "Motor Grueso", reportable: false, percentiles: [40, 48, 56, 64] },
     { id: "mg30", text: "Saltar en 1 pie", domain: "Motor Grueso", reportable: false, percentiles: [42, 49, 57, 66] },
     { id: "mg31", text: "Caminar talón-punta", domain: "Motor Grueso", reportable: false, percentiles: [48, 56, 64, 72] },
-    { id: "mg32", text: "Coger pelota al rebote", domain: "Motor Grueso", reportable: false, percentiles: [52, 60, 68, 76] },
+    { id: "mg32", text: "Atrapar pelota al rebote", domain: "Motor Grueso", reportable: false, percentiles: [52, 60, 68, 76] },
 ];
