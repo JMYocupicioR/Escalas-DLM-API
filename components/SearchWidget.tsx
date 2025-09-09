@@ -500,10 +500,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 2,
+    borderRadius: Platform.select({ default: 10, web: 12 }),
+    paddingHorizontal: Platform.select({ default: 12, web: 16 }),
+    paddingVertical: Platform.select({ default: 10, web: 12 }),
+    borderWidth: Platform.select({ default: 1, web: 2 }),
     borderColor: '#e2e8f0',
     ...Platform.select({
       web: {
@@ -513,20 +513,20 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOffset: {
           width: 0,
-          height: 2,
+          height: 1,
         },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOpacity: 0.04,
+        shadowRadius: 3,
+        elevation: 1,
       },
     }),
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: Platform.select({ default: 15, web: 16 }),
     color: '#0f172a',
-    marginLeft: 12,
-    marginRight: 8,
+    marginLeft: Platform.select({ default: 8, web: 12 }),
+    marginRight: Platform.select({ default: 6, web: 8 }),
     paddingVertical: 0, // Remove default padding on Android
     ...Platform.select({
       web: {
@@ -556,12 +556,12 @@ const styles = StyleSheet.create({
   quickFilterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: Platform.select({ default: 10, web: 12 }),
+    paddingVertical: Platform.select({ default: 5, web: 6 }),
+    borderRadius: Platform.select({ default: 16, web: 20 }),
     borderWidth: 1,
     backgroundColor: '#ffffff',
-    marginRight: 8,
+    marginRight: Platform.select({ default: 6, web: 8 }),
     ...Platform.select({
       web: {
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -569,9 +569,9 @@ const styles = StyleSheet.create({
       default: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.08,
         shadowRadius: 2,
-        elevation: 2,
+        elevation: 1,
       },
     }),
   },
@@ -580,9 +580,9 @@ const styles = StyleSheet.create({
     borderColor: '#0891b2',
   },
   quickFilterText: {
-    fontSize: 12,
+    fontSize: Platform.select({ default: 11, web: 12 }),
     fontWeight: '600',
-    marginLeft: 6,
+    marginLeft: Platform.select({ default: 4, web: 6 }),
     color: '#374151',
   },
   quickFilterTextSelected: {
