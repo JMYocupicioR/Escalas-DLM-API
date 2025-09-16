@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Calculadora Diagnóstica Topográfica del Plexo Braquial (v2)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', 'Arial', sans-serif;
+            background-color: #f7fafc; /* Tailwind gray-100 */
+            color: #2d3748; /* Tailwind gray-800 */
+            margin: 0;
+            padding: 0;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 1000px; /* Aumentado para más contenido */
+            margin: 2rem auto; /* Tailwind my-8 */
+            background-color: #fff;
+            padding: 1.5rem 2rem; /* Tailwind p-6 md:p-8 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind shadow-md */
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+        }
+
+        h1, h3 {
+            color: #2c7a7b; /* Tailwind teal-700 */
+            margin-bottom: 1rem; /* Tailwind mb-4 */
+            font-weight: 600; /* Tailwind font-semibold */
+        }
+        h1 { font-size: 1.5rem; } /* Tailwind text-2xl */
+        h3 { font-size: 1.25rem; } /* Tailwind text-xl */
+
+        .custom-button {
+            display: inline-block;
+            margin-top: 1.25rem; /* Tailwind mt-5 */
+            background-color: #2c7a7b; /* Tailwind teal-700 */
+            color: #fff;
+            text-align: center;
+            padding: 0.625rem 1.25rem; /* Tailwind py-2.5 px-5 */
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            font-weight: 500; /* Tailwind font-medium */
+        }
+
+        .custom-button:hover {
+            background-color: #285e61; /* Tailwind teal-800 */
+        }
+        .custom-button:disabled {
+            background-color: #a0aec0; /* Tailwind gray-400 */
+            cursor: not-allowed;
+        }
+        .custom-button.secondary {
+             background-color: #718096; /* Tailwind gray-600 */
+        }
+        .custom-button.secondary:hover {
+             background-color: #4a5568; /* Tailwind gray-700 */
+        }
+         .custom-button.reset {
+             background-color: #c53030; /* Tailwind red-700 */
+        }
+        .custom-button.reset:hover {
+             background-color: #9b2c2c; /* Tailwind red-800 */
+        }
+
+
+        .result {
+            margin-top: 1.25rem; /* Tailwind mt-5 */
+            padding: 0.75rem; /* Tailwind p-3 */
+            background-color: #e6fffa; /* Tailwind teal-100 */
+            border: 1px solid #38b2ac; /* Tailwind teal-500 */
+            color: #234e52; /* Tailwind teal-900 */
+            font-weight: 600; /* Tailwind font-semibold */
+            text-align: center;
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+            white-space: pre-wrap; /* Para mostrar saltos de línea */
+        }
+
+        .question {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .nav-buttons {
+            margin-top: 1.25rem; /* Tailwind mt-5 */
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Para mejor manejo en pantallas pequeñas */
+            gap: 0.5rem; /* Tailwind gap-2 */
+        }
+
+        .progress {
+            margin-top: 0.75rem; /* Tailwind mt-3 */
+            text-align: right;
+            font-style: italic;
+            color: #718096; /* Tailwind gray-600 */
+            font-size: 0.875rem; /* Tailwind text-sm */
+        }
+
+        .final-results {
+            margin-top: 1.25rem; /* Tailwind mt-5 */
+            padding: 1rem; /* Tailwind p-4 */
+            background-color: #fffff0; /* Ivory */
+            border: 1px solid #cbd5e0; /* Tailwind gray-300 */
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+        }
+
+        .final-results h4 {
+            margin-bottom: 0.75rem; /* Tailwind mb-3 */
+            color: #2c7a7b; /* Tailwind teal-700 */
+            font-weight: 600; /* Tailwind font-semibold */
+            font-size: 1.125rem; /* Tailwind text-lg */
+        }
+
+        .final-results ul {
+            list-style: inside disc;
+            margin-left: 1rem; /* Tailwind ml-4 */
+            margin-bottom: 1rem; /* Tailwind mb-4 */
+            color: #4a5568; /* Tailwind gray-700 */
+        }
+         .final-results p {
+            margin-bottom: 0.5rem; /* Tailwind mb-2 */
+            color: #4a5568; /* Tailwind gray-700 */
+         }
+         .final-results strong {
+             color: #2d3748; /* Tailwind gray-800 */
+         }
+
+        .error-message {
+            color: #c53030; /* Tailwind red-700 */
+            font-weight: 600; /* Tailwind font-semibold */
+            margin-top: 0.75rem; /* Tailwind mt-3 */
+            font-size: 0.875rem; /* Tailwind text-sm */
+        }
+
+        @media print {
+            body { background-color: #fff; }
+            .form-container {
+                box-shadow: none;
+                margin: 0;
+                max-width: 100%;
+                padding: 0;
+            }
+            #resetBtn, #printButton, .nav-buttons, .progress, #printButtonInner {
+                display: none !important;
+            }
+            .final-results { border: none; }
+            @page {
+                margin-top: 10mm;
+                margin-bottom: 15mm;
+            }
+        }
+
+        .footer-text {
+            margin-top: 2rem; /* Tailwind mt-8 */
+            text-align: center;
+            font-size: 0.875rem; /* Tailwind text-sm */
+            color: #718096; /* Tailwind gray-600 */
+        }
+
+        /* Diseño responsivo para grupos de músculos y opciones */
+        .input-grid {
+            display: grid;
+            gap: 1.5rem; /* Tailwind gap-6 */
+            margin-top: 1rem; /* Tailwind mt-4 */
+        }
+        /* Columnas responsivas */
+        @media (min-width: 640px) { /* sm */
+            .input-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) { /* lg */
+            .input-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+         @media (min-width: 1280px) { /* xl */
+            .input-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .input-group {
+            background-color: #f7fafc; /* Tailwind gray-100 */
+            border: 1px solid #e2e8f0; /* Tailwind gray-300 */
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+            padding: 1rem; /* Tailwind p-4 */
+        }
+        .input-group h4 {
+            margin-top: 0;
+            color: #4a5568; /* Tailwind gray-700 */
+            font-size: 1rem; /* Tailwind text-base */
+            font-weight: 600; /* Tailwind font-semibold */
+            border-bottom: 1px solid #e2e8f0; /* Tailwind gray-300 */
+            padding-bottom: 0.5rem; /* Tailwind pb-2 */
+            margin-bottom: 0.75rem; /* Tailwind mb-3 */
+        }
+        .input-group label, .input-group .mrc-label {
+            display: block; /* Cambiado a block para mejor alineación con select */
+            margin: 0.5rem 0; /* Tailwind my-2 */
+            font-size: 0.95rem;
+            color: #4a5568; /* Tailwind gray-700 */
+        }
+        .input-group select, .input-group input[type="checkbox"] {
+            margin-top: 0.25rem; /* Tailwind mt-1 */
+            margin-right: 0.5rem; /* Tailwind mr-2 */
+            padding: 0.375rem 0.5rem; /* Tailwind py-1.5 px-2 */
+            border-radius: 0.25rem; /* Tailwind rounded */
+            border: 1px solid #cbd5e0; /* Tailwind gray-300 */
+            width: calc(100% - 1rem); /* Ajustar ancho */
+        }
+        .input-group input[type="checkbox"] {
+             width: auto; /* Restaurar ancho para checkbox */
+             margin-right: 0.5rem;
+        }
+        .input-group .mrc-label span { /* Para alinear el texto del músculo */
+            display: inline-block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+             color: #2d3748; /* Tailwind gray-800 */
+        }
+
+        .options label {
+             display: flex;
+             align-items: center;
+             margin-bottom: 0.5rem;
+             color: #4a5568; /* Tailwind gray-700 */
+        }
+         .options label input {
+             margin-right: 0.5rem;
+         }
+         .options-grid { /* Para dermatomas y reflejos */
+            display: grid;
+            gap: 1rem 1.5rem;
+            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Columnas flexibles */
+         }
+         .options-grid .input-group {
+             padding: 0.75rem;
+         }
+         .options-grid h4 {
+             font-size: 1rem;
+             margin-bottom: 0.5rem;
+         }
+          .options-grid label {
+             font-size: 0.9rem;
+             margin-bottom: 0.25rem;
+         }
+          .options-grid select {
+             width: 100%;
+             padding: 0.375rem;
+         }
+
+        /* Ajustes menores para móviles */
+        @media (max-width: 640px) {
+            .form-container {
+                margin: 1rem;
+                padding: 1rem 1.5rem;
+            }
+            .input-group {
+                padding: 0.75rem;
+            }
+            .input-group h4 {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+            .input-group label, .input-group .mrc-label {
+                font-size: 0.9rem;
+                margin: 0.3rem 0;
+            }
+            .nav-buttons {
+                flex-direction: column;
+            }
+            .nav-buttons button {
+                width: 100%;
+            }
+            .nav-buttons button:first-child { /* Botón Anterior */
+                order: 2; /* Mover al final en columna */
+                margin-top: 0.5rem;
+            }
+             .nav-buttons button:last-child { /* Botón Siguiente/Evaluar */
+                order: 1;
+            }
+        }
+
+        /* ========== NUEVOS ESTILOS PARA VISUALIZACIÓN ANATÓMICA ========== */
+        .anatomia-visual-container {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #0ea5e9;
+            margin: 20px 0;
+        }
+
+        .estructura-lesionada {
+            stroke-width: 8 !important;
+            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8));
+            animation: pulso-lesion 2s infinite;
+        }
+
+        .estructura-secundaria {
+            stroke-width: 6 !important;
+            filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.6));
+            animation: pulso-secundario 3s infinite;
+        }
+
+        .estructura-normal {
+            opacity: 0.4;
+            stroke-width: 3 !important;
+        }
+
+        @keyframes pulso-lesion {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes pulso-secundario {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .recorrido-animado {
+            stroke-dasharray: 15, 5;
+            animation: recorrido-neural 4s ease-in-out infinite;
+        }
+
+        @keyframes recorrido-neural {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -40; }
+        }
+
+        .paso-recorrido {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            margin: 6px 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .paso-recorrido:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        .paso-recorrido.activo {
+            background: rgba(59, 130, 246, 0.2);
+            border-left-color: #1d4ed8;
+            transform: translateX(4px);
+        }
+
+        .numero-paso {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .musculo-explicado {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .musculo-explicado:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .mrc-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .mrc-0 { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .mrc-1 { background: #fed7aa; color: #9a3412; border: 1px solid #fdba74; }
+        .mrc-2 { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .mrc-3 { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .mrc-4 { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .mrc-5 { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+
+        .svg-diagnostico-container {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .boton-animar {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .boton-animar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .explicacion-anatomica {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-explicativo {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-explicativo h5 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-explicativo h5 i {
+            margin-right: 8px;
+            color: #3b82f6;
+        }
+
+        /* Responsive para visualización */
+        @media (max-width: 1024px) {
+            .anatomia-visual-container .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .anatomia-visual-container .lg\:col-span-2 {
+                order: 2;
+            }
+            
+            .explicacion-anatomica {
+                order: 1;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            
+            .panel-explicativo {
+                min-width: 280px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .explicacion-anatomica {
+                flex-direction: column;
+            }
+            
+            .panel-explicativo {
+                min-width: auto;
+            }
+            
+            .numero-paso {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+            
+            .paso-recorrido {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="form-container">
+        <h1 id="mostrarTitulo" class="text-2xl font-semibold text-teal-700 mb-4"></h1>
+
+        <div id="wizard">
+            <div class="question active" data-step="1">
+                <h3 class="text-xl font-semibold text-teal-700 mb-4">1. Fuerza Muscular (Escala MRC 0-5)</h3>
+                <p class="text-sm text-gray-600 mb-4">Selecciona la fuerza para cada músculo (0=Parálisis, 5=Normal).</p>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <h4>Hombro y Cintura Escapular</h4>
+                        <div class="mrc-label"><span>Deltoides</span><select name="musculos" data-muscle="Deltoides"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Supraespinoso</span><select name="musculos" data-muscle="Supraespinoso"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Infraespinoso</span><select name="musculos" data-muscle="Infraespinoso"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Redondo Menor</span><select name="musculos" data-muscle="Redondo Menor"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Redondo Mayor</span><select name="musculos" data-muscle="Redondo Mayor"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Subescapular</span><select name="musculos" data-muscle="Subescapular"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Serrato Anterior</span><select name="musculos" data-muscle="Serrato Anterior"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Dorsal Ancho</span><select name="musculos" data-muscle="Dorsal Ancho"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Pectoral Mayor (Clavicular)</span><select name="musculos" data-muscle="Pectoral Mayor (Porción Clavicular)"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Pectoral Mayor (Esternocostal)</span><select name="musculos" data-muscle="Pectoral Mayor (Porción Esternocostal)"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Pectoral Menor</span><select name="musculos" data-muscle="Pectoral Menor"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Subclavio</span><select name="musculos" data-muscle="Subclavio"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                    </div>
+                    <div class="input-group">
+                        <h4>Brazo</h4>
+                        <div class="mrc-label"><span>Bíceps Braquial</span><select name="musculos" data-muscle="Bíceps Braquial"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Braquial</span><select name="musculos" data-muscle="Braquial"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Coracobraquial</span><select name="musculos" data-muscle="Coracobraquial"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Tríceps Braquial</span><select name="musculos" data-muscle="Tríceps Braquial"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Ancóneo</span><select name="musculos" data-muscle="Ancóneo"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                    </div>
+                    <div class="input-group">
+                        <h4>Antebrazo</h4>
+                        <div class="mrc-label"><span>Braquiorradial</span><select name="musculos" data-muscle="Braquiorradial"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Supinador</span><select name="musculos" data-muscle="Supinador"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Pronador Redondo</span><select name="musculos" data-muscle="Pronador Redondo"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Pronador Cuadrado</span><select name="musculos" data-muscle="Pronador Cuadrado"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Carpi Radialis</span><select name="musculos" data-muscle="Flexor Carpi Radialis"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Carpi Ulnaris</span><select name="musculos" data-muscle="Flexor Carpi Ulnaris"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Superficial Dedos</span><select name="musculos" data-muscle="Flexor Superficial de los Dedos"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Profundo Dedos</span><select name="musculos" data-muscle="Flexor Profundo de los Dedos"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Largo del Pulgar</span><select name="musculos" data-muscle="Flexor Largo del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Carpi Radialis (L+B)</span><select name="musculos" data-muscle="Extensor Carpi Radialis"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Carpi Ulnaris</span><select name="musculos" data-muscle="Extensor Carpi Ulnaris"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor de los Dedos</span><select name="musculos" data-muscle="Extensor de los Dedos"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Abductor Largo del Pulgar</span><select name="musculos" data-muscle="Abductor Largo del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Corto del Pulgar</span><select name="musculos" data-muscle="Extensor Corto del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Largo del Pulgar</span><select name="musculos" data-muscle="Extensor Largo del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Indicis</span><select name="musculos" data-muscle="Extensor Indicis"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Extensor Digiti Minimi</span><select name="musculos" data-muscle="Extensor Digiti Minimi"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                    </div>
+                    <div class="input-group">
+                        <h4>Muñeca y Mano (Intrínsecos)</h4>
+                        <div class="mrc-label"><span>Abductor Corto Pulgar</span><select name="musculos" data-muscle="Abductor Corto del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Oponente del Pulgar</span><select name="musculos" data-muscle="Oponente del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Corto Pulgar</span><select name="musculos" data-muscle="Flexor Corto del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Aductor del Pulgar</span><select name="musculos" data-muscle="Aductor del Pulgar"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Abductor del Meñique</span><select name="musculos" data-muscle="Abductor del Meñique"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Flexor Corto Meñique</span><select name="musculos" data-muscle="Flexor Corto del Meñique"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Oponente del Meñique</span><select name="musculos" data-muscle="Oponente del Meñique"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Interóseos Palmares</span><select name="musculos" data-muscle="Interóseos Palmares"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Interóseos Dorsales</span><select name="musculos" data-muscle="Interóseos Dorsales"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Lumbricales 1 y 2</span><select name="musculos" data-muscle="Lumbricales 1 y 2"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                        <div class="mrc-label"><span>Lumbricales 3 y 4</span><select name="musculos" data-muscle="Lumbricales 3 y 4"><option value="5">5 - Normal</option><option value="4">4 - Mov. vs Resistencia</option><option value="3">3 - Mov. vs Gravedad</option><option value="2">2 - Mov. sin Gravedad</option><option value="1">1 - Contracción</option><option value="0">0 - Parálisis</option></select></div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <span></span> <button class="custom-button" id="nextBtn1">Siguiente</button>
+                </div>
+                <div class="progress" id="progressStep1">Paso 1 de 5</div>
+                <div class="error-message" id="errorStep1" style="display:none;"></div>
+            </div>
+
+            <div class="question" data-step="2">
+                <h3 class="text-xl font-semibold text-teal-700 mb-4">2. Síntomas Principales y Reflejos</h3>
+                 <div class="options-grid">
+                     <div class="input-group">
+                         <h4>Síntomas Generales</h4>
+                         <div class="options">
+                            <label><input type="checkbox" name="sintomas" value="Dolor Neurítico"> Dolor Neurítico</label>
+                            <label><input type="checkbox" name="sintomas" value="Parestesias"> Parestesias (hormigueos, adormecimientos)</label>
+                            <label><input type="checkbox" name="sintomas" value="Signo de Horner"> Signo de Horner (Ptosis, Miosis, Anhidrosis)</label>
+                            </div>
+                     </div>
+                     <div class="input-group">
+                         <h4>Reflejos Osteotendinosos</h4>
+                         <label for="reflejoBicipital">Bicipital (C5-C6):</label>
+                         <select id="reflejoBicipital" name="reflejos">
+                             <option value="normal">Normal</option>
+                             <option value="disminuido">Disminuido</option>
+                             <option value="ausente">Ausente</option>
+                         </select>
+                         <label for="reflejoBraquiorradial">Braquiorradial (C6):</label>
+                         <select id="reflejoBraquiorradial" name="reflejos">
+                             <option value="normal">Normal</option>
+                             <option value="disminuido">Disminuido</option>
+                             <option value="ausente">Ausente</option>
+                         </select>
+                         <label for="reflejoTricipital">Tricipital (C7):</label>
+                         <select id="reflejoTricipital" name="reflejos">
+                             <option value="normal">Normal</option>
+                             <option value="disminuido">Disminuido</option>
+                             <option value="ausente">Ausente</option>
+                         </select>
+                     </div>
+                 </div>
+                <div class="nav-buttons">
+                    <button class="custom-button secondary" id="prevBtn2">Anterior</button>
+                    <button class="custom-button" id="nextBtn2">Siguiente</button>
+                </div>
+                <div class="progress" id="progressStep2">Paso 2 de 5</div>
+                <div class="error-message" id="errorStep2" style="display:none;"></div>
+            </div>
+
+            <div class="question" data-step="3">
+                <h3 class="text-xl font-semibold text-teal-700 mb-4">3. Alteración de la Sensibilidad</h3>
+                <p class="text-sm text-gray-600 mb-4">Selecciona las áreas con hipoestesia o anestesia.</p>
+                 <div class="options-grid">
+                     <div class="input-group">
+                        <h4>Territorios Nerviosos Cutáneos</h4>
+                        <div class="options">
+                            <label><input type="checkbox" name="sensibilidad" value="Zona Lateral Hombro (Axilar)"> Zona Lateral del Hombro (N. Axilar) - "Parche deltoideo"</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Zona Lateral Antebrazo (Musculocutáneo)"> Zona Lateral del Antebrazo (N. Musculocutáneo) - Cara lateral</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Zona Posterior Brazo/Antebrazo (Radial)"> Zona Posterior Brazo/Antebrazo/Mano (N. Radial) - Dorso mano</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Zona Medial Brazo (Cut. Med. Brazo)"> Zona Medial del Brazo (N. Cut. Med. Brazo) - Cara interna</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Zona Medial Antebrazo (Cut. Med. Antebrazo)"> Zona Medial del Antebrazo (N. Cut. Med. Antebrazo) - Cara interna</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Mano Medial (Cubital)"> Meñique y Mitad Anular (N. Cubital) - Cara palmar y dorsal</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Mano Lateral (Mediano)"> Pulgar, Índice, Medio y Mitad Radial Anular (N. Mediano) - Cara palmar</label>
+                        </div>
+                     </div>
+                     <div class="input-group">
+                        <h4>Dermatomas</h4>
+                         <div class="options">
+                            <label><input type="checkbox" name="sensibilidad" value="Dermatoma C5"> Dermatoma C5 (Hombro lateral)</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Dermatoma C6"> Dermatoma C6 (Antebrazo lateral, pulgar, índice)</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Dermatoma C7"> Dermatoma C7 (Dedo medio, dorso mano)</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Dermatoma C8"> Dermatoma C8 (Antebrazo medial, anular, meñique)</label>
+                            <label><input type="checkbox" name="sensibilidad" value="Dermatoma T1"> Dermatoma T1 (Axila, brazo medial)</label>
+                         </div>
+                     </div>
+                 </div>
+                <div class="nav-buttons">
+                    <button class="custom-button secondary" id="prevBtn3">Anterior</button>
+                    <button class="custom-button" id="nextBtn3">Siguiente</button>
+                </div>
+                <div class="progress" id="progressStep3">Paso 3 de 5</div>
+            </div>
+
+             <div class="question" data-step="4">
+                <h3 class="text-xl font-semibold text-teal-700 mb-4">4. Información Adicional (Opcional)</h3>
+                 <div class="options-grid">
+                     <div class="input-group">
+                         <h4>Mecanismo de Lesión</h4>
+                         <select id="mecanismoLesion" name="infoAdicional">
+                             <option value="no_especificado">No especificado</option>
+                             <option value="traccion">Tracción / Estiramiento</option>
+                             <option value="compresion">Compresión (Tumor, Salida Torácica, etc.)</option>
+                             <option value="trauma_penetrante">Trauma Penetrante</option>
+                             <option value="obstetrico">Obstétrico</option>
+                             <option value="inflamatorio">Inflamatorio / Idiopático (ej. Parsonage-Turner)</option>
+                             <option value="iatrogenico">Iatrogénico (Post-quirúrgico, Radioterapia)</option>
+                             <option value="otro">Otro</option>
+                         </select>
+                     </div>
+                     <div class="input-group">
+                         <h4>Tiempo de Evolución</h4>
+                         <select id="tiempoEvolucion" name="infoAdicional">
+                             <option value="no_especificado">No especificado</option>
+                             <option value="agudo">Agudo (&lt; 3 semanas)</option>
+                             <option value="subagudo">Subagudo (3 semanas - 3 meses)</option>
+                             <option value="cronico">Crónico (&gt; 3 meses)</option>
+                         </select>
+                     </div>
+                     <div class="input-group">
+                         <h4>Variación Anatómica del Plexo</h4>
+                         <select id="tipoPlexo" name="infoAdicional">
+                             <option value="normal">Plexo Normal (C5-T1)</option>
+                             <option value="prefijado">Plexo Prefijado (C4-C8)</option>
+                             <option value="postfijado">Plexo Postfijado (C6-T2)</option>
+                         </select>
+                         <p class="text-xs text-gray-500 mt-2">
+                             <strong>Prefijado:</strong> Incluye contribución de C4, puede afectar músculos del hombro.<br>
+                             <strong>Postfijado:</strong> Incluye contribución de T2, puede afectar músculos intrínsecos de la mano.
+                         </p>
+                     </div>
+                 </div>
+                 <div class="nav-buttons">
+                    <button class="custom-button secondary" id="prevBtn4">Anterior</button>
+                    <button class="custom-button" id="nextBtn4">Siguiente</button>
+                </div>
+                <div class="progress" id="progressStep4">Paso 4 de 5</div>
+            </div>
+
+
+            <div class="question" data-step="5">
+                <h3 class="text-xl font-semibold text-teal-700 mb-4">5. Resultado</h3>
+                <p class="text-sm text-gray-600 mb-4">Haz clic en "Evaluar Diagnóstico" para ver los resultados basados en la información proporcionada.</p>
+                <div class="nav-buttons">
+                    <button class="custom-button secondary" id="prevBtn5">Anterior</button>
+                    <button class="custom-button" id="evaluateBtn">Evaluar Diagnóstico</button>
+                </div>
+                <div class="progress" id="progressStep5">Paso 5 de 5</div>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="result" style="display:none;">
+            <span id="diagnosticoResultado"></span>
+        </div>
+
+        <div id="finalSheet" class="final-results" style="display:none;">
+            <div id="contentToPrint">
+                <h4>Diagnóstico con Visualización Anatómica Integrada</h4>
+                <div><strong id="diagName"></strong></div>
+                <div id="scoreInfo" class="text-sm text-gray-600 mb-3"></div>
+                
+                <!-- ========== NUEVA SECCIÓN: VISUALIZACIÓN ANATÓMICA INTEGRADA ========== -->
+                <div id="anatomia-visual-diagnostico" class="anatomia-visual-container">
+                    <h4 class="text-xl font-semibold text-blue-800 mb-6 flex items-center">
+                        <i class="fas fa-brain mr-3"></i>
+                        Visualización Anatómica de la Lesión
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- SVG del diagnóstico -->
+                        <div class="lg:col-span-2">
+                            <div class="svg-diagnostico-container">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h5 class="font-semibold text-gray-700 flex items-center">
+                                        <i class="fas fa-sitemap mr-2 text-blue-600"></i>
+                                        Mapa de Afectación Neural
+                                    </h5>
+                                    <button id="animar-recorrido" class="boton-animar">
+                                        <i class="fas fa-play mr-1"></i>
+                                        Animar Recorrido
+                                    </button>
+                                </div>
+                                <div id="svg-plexo-diagnostico">
+                                    <!-- SVG se insertará aquí dinámicamente -->
+                                </div>
+                                
+                                <!-- Leyenda de colores -->
+                                <div class="mt-4 flex flex-wrap gap-4 justify-center text-xs">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                                        <span>Lesión Primaria</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-orange-500 rounded mr-2"></div>
+                                        <span>Afectación Secundaria</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-gray-400 rounded mr-2"></div>
+                                        <span>Estructuras Normales</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel explicativo -->
+                        <div class="explicacion-anatomica">
+                            <div class="panel-explicativo">
+                                <h5>
+                                    <i class="fas fa-route"></i>
+                                    Recorrido de la Lesión
+                                </h5>
+                                <div id="pasos-recorrido">
+                                    <!-- Pasos se generarán dinámicamente -->
+                                </div>
+                            </div>
+                            
+                            <div class="panel-explicativo">
+                                <h5>
+                                    <i class="fas fa-dumbbell"></i>
+                                    ¿Por qué están afectados estos músculos?
+                                </h5>
+                                <div id="lista-musculos-explicados">
+                                    <!-- Explicaciones musculares dinámicas -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Panel de correlación clínica -->
+                    <div class="mt-6 p-4 bg-white rounded-lg border border-gray-200">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-stethoscope mr-2 text-green-600"></i>
+                            Correlación Clínica
+                        </h5>
+                        <div id="correlacion-clinica" class="text-sm text-gray-600">
+                            <!-- Correlación clínica se generará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="nerviosAfectados"></div>
+                <div id="musculosDetalle"></div>
+                <div id="sensibilidadDetalle"></div>
+                <div id="reflejosDetalle"></div>
+                <div id="infoAdicionalDetalle" class="mt-4"></div>
+                <div id="inervacionDualInfo" class="mt-4"></div>
+
+                <div class="footer-text">
+                    Nota: Esta herramienta es de apoyo y no sustituye la evaluación clínica completa, estudios electrodiagnósticos o de imagen. La precisión depende de la exactitud de los datos introducidos y la configuración del algoritmo. Consulte siempre a un profesional médico cualificado. Creada por el Dr. Marcos Yocupicio para www.DeepLuxMed.Mx Escalas Medicas. (v2 - Con Visualización Anatómica)
+                </div>
+            </div>
+            <button class="custom-button mt-4" id="printButtonInner" onclick="window.print()">
+                <i class="fas fa-print mr-2"></i>
+                Imprimir Resultados
+            </button>
+        </div>
+
+        <div class="mt-6 text-center space-x-4">
+            <button class="custom-button reset" id="resetBtn">Reiniciar</button>
+            <button class="custom-button" id="printButton" disabled>Imprimir Hoja Final</button>
+        </div>
+        
+        <!-- ========== CASOS CLÍNICOS DEMO ========== -->
+        <div class="mt-6 p-4 bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg border border-teal-200">
+            <h4 class="text-lg font-semibold text-teal-700 mb-4 flex items-center">
+                <i class="fas fa-vials mr-2"></i>
+                Casos Clínicos de Demostración
+            </h4>
+            <p class="text-sm text-gray-600 mb-4">Carga casos clínicos predefinidos para probar el sistema:</p>
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="custom-button secondary" onclick="cargarCasoClinico('Erb-Duchenne Clásico')">
+                    <i class="fas fa-motorcycle mr-1"></i>
+                    Erb-Duchenne
+                </button>
+                <button class="custom-button secondary" onclick="cargarCasoClinico('Klumpke Clásico')">
+                    <i class="fas fa-hand-paper mr-1"></i>
+                    Klumpke
+                </button>
+                <button class="custom-button secondary" onclick="cargarCasoClinico('Lesión Axilar Aislada')">
+                    <i class="fas fa-shoulder mr-1"></i>
+                    Axilar
+                </button>
+                <button class="custom-button secondary" onclick="cargarCasoClinico('Muñeca Caída')">
+                    <i class="fas fa-hand-holding mr-1"></i>
+                    Radial
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**************************************************************************
+         * Configuración global y definición de lesiones (datos de diagnóstico) v2
+         **************************************************************************/
+        const CONFIG = {
+            // --- Pesos Relativos ---
+            PESO_MUSCULOS: 4,       // Mayor peso a la fuerza muscular
+            PESO_SENSIBILIDAD: 1.5, // Peso moderado para sensibilidad (territorios + dermatomas)
+            PESO_SINTOMAS: 0.5,     // Peso bajo para síntomas generales (dolor, parestesias)
+            PESO_REFLEJOS: 1.5,     // Peso moderado para reflejos
+            PESO_HORNER: 2,         // Peso alto si Horner está presente y la lesión lo incluye (T1)
+
+            // --- Umbrales y Modificadores ---
+            UMBRAL_COINCIDENCIA_GENERAL: 0.3, // Umbral mínimo de score normalizado para considerar una lesión
+            UMBRAL_MINIMO_EXCLUSIVO: 0.7,   // Umbral alto para mononeuropatías (ya no requiere 100%)
+            PENALIZACION_MUSCULO_NORMAL: 0.8 // Factor multiplicador si un músculo clave está normal (MRC 5) - Penalización leve
+        };
+
+        // Estructura LESIONES actualizada (v2)
+        // - musculosClave: Array de { nombre: string, peso: number }
+        // - areasSensibilidad: Array de strings (Territorios y/o Dermatomas)
+        // - sintomasClave: Array de strings (Dolor Neurítico, Parestesias, Signo de Horner)
+        // - reflejosClave: Objeto { bicipital: 'normal'|'disminuido'|'ausente', ... }
+        // - exclusivos: boolean (para mononeuropatías)
+        // - umbralMinimo: number (opcional, sobreescribe UMBRAL_MINIMO_EXCLUSIVO si se define)
+        const LESIONES = [
+            // --- Lesiones Radiculares ---
+            {
+                nombre: "Lesión de Raíz C5",
+                musculosClave: [
+                    { nombre: "Deltoides", peso: 1.5 }, { nombre: "Supraespinoso", peso: 1.2 },
+                    { nombre: "Infraespinoso", peso: 1.2 }, { nombre: "Bíceps Braquial", peso: 1.0 },
+                    { nombre: "Braquial", peso: 0.8 }, { nombre: "Subclavio", peso: 0.5 },
+                    { nombre: "Romboides", peso: 1.0 }, // Asumiendo N. Dorsal Escápula afectado
+                    { nombre: "Elevador Escápula", peso: 0.8 } // Asumiendo N. Dorsal Escápula afectado
+                ],
+                nerviosPerifericos: ["N. Axilar", "N. Musculocutáneo (parcial)", "N. Supraescapular", "N. Dorsal Escápula"],
+                areasSensibilidad: ["Zona Lateral Hombro (Axilar)", "Dermatoma C5"],
+                sintomasClave: ["Dolor Neurítico"], // Debilidad implícita
+                reflejosClave: { bicipital: "disminuido", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Raíz C6",
+                musculosClave: [
+                    { nombre: "Bíceps Braquial", peso: 1.2 }, { nombre: "Braquiorradial", peso: 1.2 },
+                    { nombre: "Extensor Carpi Radialis", peso: 1.0 }, { nombre: "Supinador", peso: 0.8 },
+                    { nombre: "Pronador Redondo", peso: 0.8 }, { nombre: "Pectoral Mayor (Porción Clavicular)", peso: 0.5 }
+                ],
+                nerviosPerifericos: ["N. Musculocutáneo", "N. Radial (parcial)", "Raíz Lat. N. Mediano"],
+                areasSensibilidad: ["Zona Lateral Antebrazo (Musculocutáneo)", "Mano Lateral (Mediano)", "Dermatoma C6"],
+                sintomasClave: ["Parestesias"],
+                reflejosClave: { bicipital: "disminuido", braquiorradial: "disminuido", tricipital: "normal" },
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Raíz C7",
+                musculosClave: [
+                    { nombre: "Tríceps Braquial", peso: 1.5 }, { nombre: "Extensor de los Dedos", peso: 1.2 },
+                    { nombre: "Extensor Carpi Radialis", peso: 1.0 }, { nombre: "Extensor Carpi Ulnaris", peso: 1.0 },
+                    { nombre: "Flexor Carpi Radialis", peso: 0.8 }, { nombre: "Pronador Redondo", peso: 0.5 },
+                    { nombre: "Dorsal Ancho", peso: 0.5 }
+                ],
+                nerviosPerifericos: ["N. Radial", "N. Mediano (parcial)"],
+                areasSensibilidad: ["Zona Posterior Brazo/Antebrazo (Radial)", "Dermatoma C7"],
+                sintomasClave: ["Dolor Neurítico"],
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "disminuido" },
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Raíz C8",
+                musculosClave: [
+                    { nombre: "Flexor Profundo de los Dedos", peso: 1.2 }, { nombre: "Flexor Largo del Pulgar", peso: 1.0 },
+                    { nombre: "Flexor Carpi Ulnaris", peso: 1.0 }, { nombre: "Interóseos Dorsales", peso: 0.8 },
+                    { nombre: "Interóseos Palmares", peso: 0.8 }, { nombre: "Lumbricales 3 y 4", peso: 0.8 },
+                    { nombre: "Abductor del Meñique", peso: 0.5 }, { nombre: "Oponente del Meñique", peso: 0.5 }
+                ],
+                nerviosPerifericos: ["N. Ulnar", "N. Mediano (parcial)"],
+                areasSensibilidad: ["Mano Medial (Cubital)", "Zona Medial Antebrazo (Cut. Med. Antebrazo)", "Dermatoma C8"],
+                sintomasClave: ["Parestesias"],
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" }, // Reflejos usualmente normales
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Raíz T1",
+                musculosClave: [
+                    { nombre: "Interóseos Dorsales", peso: 1.5 }, { nombre: "Interóseos Palmares", peso: 1.5 },
+                    { nombre: "Lumbricales 3 y 4", peso: 1.0 }, { nombre: "Aductor del Pulgar", peso: 1.0 },
+                    { nombre: "Abductor del Meñique", peso: 1.2 }, { nombre: "Oponente del Meñique", peso: 1.2 },
+                    { nombre: "Flexor Corto del Meñique", peso: 1.2 }
+                ],
+                nerviosPerifericos: ["N. Ulnar", "Raíz Med. N. Mediano"],
+                areasSensibilidad: ["Zona Medial Brazo (Cut. Med. Brazo)", "Dermatoma T1"],
+                sintomasClave: ["Dolor Neurítico", "Signo de Horner"], // Horner es clave si es preganglionar
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: false
+            },
+            // --- Lesiones de Troncos ---
+             {
+                nombre: "Lesión de Tronco Superior (C5-C6) - Erb-Duchenne",
+                musculosClave: [ // Combinación de C5 y C6, más N. Supraescapular
+                    { nombre: "Deltoides", peso: 1.5 }, { nombre: "Supraespinoso", peso: 1.5 },
+                    { nombre: "Infraespinoso", peso: 1.5 }, { nombre: "Bíceps Braquial", peso: 1.2 },
+                    { nombre: "Braquial", peso: 1.0 }, { nombre: "Braquiorradial", peso: 1.0 },
+                    { nombre: "Subclavio", peso: 0.5 }
+                 ],
+                nerviosPerifericos: ["N. Axilar", "N. Musculocutáneo", "N. Supraescapular", "N. Subclavio", "N. Radial (parcial C5-C6)"],
+                areasSensibilidad: ["Zona Lateral Hombro (Axilar)", "Zona Lateral Antebrazo (Musculocutáneo)", "Dermatoma C5", "Dermatoma C6"],
+                sintomasClave: [], // Debilidad y pérdida de reflejos son clave
+                reflejosClave: { bicipital: "ausente", braquiorradial: "disminuido", tricipital: "normal" },
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Tronco Medio (C7)",
+                musculosClave: [ // Similar a raíz C7 pero más distal
+                    { nombre: "Tríceps Braquial", peso: 1.5 }, { nombre: "Extensor de los Dedos", peso: 1.2 },
+                    { nombre: "Extensor Carpi Radialis", peso: 1.0 }, { nombre: "Extensor Carpi Ulnaris", peso: 1.0 },
+                    { nombre: "Flexor Carpi Radialis", peso: 0.8 }, { nombre: "Ancóneo", peso: 0.5 }
+                ],
+                nerviosPerifericos: ["N. Radial"],
+                areasSensibilidad: ["Zona Posterior Brazo/Antebrazo (Radial)", "Dermatoma C7"],
+                sintomasClave: ["Dolor Neurítico"],
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "ausente" },
+                exclusivos: false
+            },
+             {
+                nombre: "Lesión de Tronco Inferior (C8-T1) - Dejerine-Klumpke",
+                musculosClave: [ // Combinación C8 y T1
+                    { nombre: "Flexor Profundo de los Dedos", peso: 1.2 }, { nombre: "Flexor Largo del Pulgar", peso: 0.8 }, // Menos afectado que intrínsecos
+                    { nombre: "Flexor Carpi Ulnaris", peso: 1.0 }, { nombre: "Interóseos Dorsales", peso: 1.5 },
+                    { nombre: "Interóseos Palmares", peso: 1.5 }, { nombre: "Lumbricales 3 y 4", peso: 1.2 },
+                    { nombre: "Abductor del Meñique", peso: 1.2 }, { nombre: "Oponente del Meñique", peso: 1.2 },
+                    { nombre: "Aductor del Pulgar", peso: 1.0 }
+                ],
+                nerviosPerifericos: ["N. Ulnar", "Raíz Med. N. Mediano", "N. Cut. Med. Brazo/Antebrazo"],
+                areasSensibilidad: ["Mano Medial (Cubital)", "Zona Medial Antebrazo (Cut. Med. Antebrazo)", "Zona Medial Brazo (Cut. Med. Brazo)", "Dermatoma C8", "Dermatoma T1"],
+                sintomasClave: ["Parestesias", "Signo de Horner"], // Horner si T1 preganglionar
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: false
+            },
+            // --- Lesiones de Fascículos ---
+             {
+                nombre: "Lesión de Fascículo Lateral (C5-C7)",
+                musculosClave: [
+                    { nombre: "Bíceps Braquial", peso: 1.5 }, { nombre: "Braquial", peso: 1.2 },
+                    { nombre: "Coracobraquial", peso: 1.0 }, { nombre: "Pectoral Mayor (Porción Clavicular)", peso: 1.0 },
+                    // Músculos Mediano dependientes de C5-C7:
+                    { nombre: "Pronador Redondo", peso: 0.8 }, { nombre: "Flexor Carpi Radialis", peso: 0.8 },
+                    { nombre: "Flexor Largo del Pulgar", peso: 0.5 }, { nombre: "Abductor Corto del Pulgar", peso: 0.5 },
+                    { nombre: "Oponente del Pulgar", peso: 0.5 }, { nombre: "Lumbricales 1 y 2", peso: 0.5 }
+                ],
+                nerviosPerifericos: ["N. Musculocutáneo", "N. Pectoral Lateral", "Raíz Lat. N. Mediano"],
+                areasSensibilidad: ["Zona Lateral Antebrazo (Musculocutáneo)", "Mano Lateral (Mediano)"],
+                sintomasClave: ["Dolor Neurítico"],
+                reflejosClave: { bicipital: "disminuido", braquiorradial: "disminuido", tricipital: "normal" },
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Fascículo Posterior (C5-T1)",
+                musculosClave: [
+                    { nombre: "Deltoides", peso: 1.2 }, { nombre: "Redondo Menor", peso: 0.8 }, // N. Axilar
+                    { nombre: "Tríceps Braquial", peso: 1.5 }, { nombre: "Braquiorradial", peso: 1.0 },
+                    { nombre: "Extensores de Muñeca", peso: 1.2 }, { nombre: "Extensor de los Dedos", peso: 1.2 }, // N. Radial
+                    { nombre: "Supinador", peso: 0.8 }, { nombre: "Ancóneo", peso: 0.5 },
+                    { nombre: "Subescapular", peso: 1.0 }, { nombre: "Redondo Mayor", peso: 1.0 }, // N. Subescapulares
+                    { nombre: "Dorsal Ancho", peso: 1.0 } // N. Toracodorsal
+                ],
+                nerviosPerifericos: ["N. Axilar", "N. Radial", "N. Subescapular Sup/Inf", "N. Toracodorsal"],
+                areasSensibilidad: ["Zona Lateral Hombro (Axilar)", "Zona Posterior Brazo/Antebrazo (Radial)"],
+                sintomasClave: [],
+                reflejosClave: { bicipital: "normal", braquiorradial: "disminuido", tricipital: "disminuido" }, // Variable
+                exclusivos: false
+            },
+            {
+                nombre: "Lesión de Fascículo Medial (C8-T1)",
+                musculosClave: [
+                    { nombre: "Flexor Carpi Ulnaris", peso: 1.2 }, { nombre: "Flexor Profundo de los Dedos", peso: 1.0 }, // Mitad Medial (N. Ulnar)
+                    { nombre: "Interóseos Dorsales", peso: 1.5 }, { nombre: "Interóseos Palmares", peso: 1.5 },
+                    { nombre: "Lumbricales 3 y 4", peso: 1.2 }, { nombre: "Abductor del Meñique", peso: 1.2 },
+                    { nombre: "Oponente del Meñique", peso: 1.2 }, { nombre: "Aductor del Pulgar", peso: 1.0 }, // N. Ulnar (Mano)
+                    { nombre: "Pectoral Menor", peso: 0.8 }, { nombre: "Pectoral Mayor (Porción Esternocostal)", peso: 0.8 }, // N. Pectoral Medial
+                     // Músculos Mediano dependientes de C8-T1:
+                    { nombre: "Flexor Corto del Pulgar", peso: 0.5 }, // Cabeza profunda (Ulnar), superficial (Mediano)
+                ],
+                nerviosPerifericos: ["N. Ulnar", "Raíz Med. N. Mediano", "N. Pectoral Medial", "N. Cut. Med. Brazo/Antebrazo"],
+                areasSensibilidad: ["Mano Medial (Cubital)", "Zona Medial Antebrazo (Cut. Med. Antebrazo)", "Zona Medial Brazo (Cut. Med. Brazo)"],
+                sintomasClave: ["Parestesias", "Signo de Horner"], // Horner si T1 afectado proximalmente
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: false
+            },
+            // --- Mononeuropatías ---
+            {
+                nombre: "Mononeuropatía del Nervio Axilar",
+                musculosClave: [{ nombre: "Deltoides", peso: 2.0 }, { nombre: "Redondo Menor", peso: 1.0 }],
+                nerviosPerifericos: ["N. Axilar"],
+                areasSensibilidad: ["Zona Lateral Hombro (Axilar)"],
+                sintomasClave: [],
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: true, umbralMinimo: CONFIG.UMBRAL_MINIMO_EXCLUSIVO
+            },
+            {
+                nombre: "Mononeuropatía del Nervio Musculocutáneo",
+                musculosClave: [{ nombre: "Bíceps Braquial", peso: 1.5 }, { nombre: "Braquial", peso: 1.2 }, { nombre: "Coracobraquial", peso: 1.0 }],
+                nerviosPerifericos: ["N. Musculocutáneo"],
+                areasSensibilidad: ["Zona Lateral Antebrazo (Musculocutáneo)"],
+                sintomasClave: [],
+                reflejosClave: { bicipital: "disminuido", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: true, umbralMinimo: CONFIG.UMBRAL_MINIMO_EXCLUSIVO
+            },
+            {
+                nombre: "Mononeuropatía del Nervio Radial (Alta - Surco Radial)",
+                musculosClave: [
+                    { nombre: "Tríceps Braquial", peso: 1.5 }, // Puede estar respetado si la lesión es en el surco
+                    { nombre: "Braquiorradial", peso: 1.2 }, { nombre: "Supinador", peso: 1.0 },
+                    { nombre: "Extensor Carpi Radialis", peso: 1.2 }, { nombre: "Extensor Carpi Ulnaris", peso: 1.0 },
+                    { nombre: "Extensor de los Dedos", peso: 1.2 }, { nombre: "Extensor Largo del Pulgar", peso: 1.0 },
+                    { nombre: "Ancóneo", peso: 0.8 }
+                ],
+                nerviosPerifericos: ["N. Radial"],
+                areasSensibilidad: ["Zona Posterior Brazo/Antebrazo (Radial)"],
+                sintomasClave: [],
+                reflejosClave: { bicipital: "normal", braquiorradial: "disminuido", tricipital: "disminuido" },
+                exclusivos: true, umbralMinimo: CONFIG.UMBRAL_MINIMO_EXCLUSIVO
+            },
+             {
+                nombre: "Mononeuropatía del Nervio Mediano (Túnel Carpiano)", // Ejemplo específico
+                musculosClave: [
+                    { nombre: "Abductor Corto del Pulgar", peso: 1.5 }, { nombre: "Oponente del Pulgar", peso: 1.5 },
+                    { nombre: "Flexor Corto del Pulgar", peso: 1.0 }, // Cabeza superficial
+                    { nombre: "Lumbricales 1 y 2", peso: 1.0 }
+                    // Músculos del antebrazo respetados en Túnel Carpiano
+                ],
+                nerviosPerifericos: ["N. Mediano (distal)"],
+                areasSensibilidad: ["Mano Lateral (Mediano)"], // Típicamente palmar
+                sintomasClave: ["Parestesias"], // Nocturnas características
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: true, umbralMinimo: CONFIG.UMBRAL_MINIMO_EXCLUSIVO
+            },
+            {
+                nombre: "Mononeuropatía del Nervio Ulnar (Codo - Túnel Cubital)", // Ejemplo específico
+                musculosClave: [
+                    { nombre: "Flexor Carpi Ulnaris", peso: 1.0 }, { nombre: "Flexor Profundo de los Dedos", peso: 1.0 }, // Mitad Medial
+                    { nombre: "Interóseos Dorsales", peso: 1.5 }, { nombre: "Interóseos Palmares", peso: 1.5 },
+                    { nombre: "Lumbricales 3 y 4", peso: 1.2 }, { nombre: "Abductor del Meñique", peso: 1.2 },
+                    { nombre: "Oponente del Meñique", peso: 1.2 }, { nombre: "Aductor del Pulgar", peso: 1.2 }
+                ],
+                nerviosPerifericos: ["N. Ulnar"],
+                areasSensibilidad: ["Mano Medial (Cubital)"],
+                sintomasClave: ["Parestesias"],
+                reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
+                exclusivos: true, umbralMinimo: CONFIG.UMBRAL_MINIMO_EXCLUSIVO
+            },
+            // --- Lesiones Combinadas / Globales ---
+             {
+                nombre: "Lesión Global (C5-T1)",
+                musculosClave: [ // Incluir la mayoría con peso 1.0 o ajustado
+                    { nombre: "Deltoides", peso: 1 }, { nombre: "Bíceps Braquial", peso: 1 }, { nombre: "Tríceps Braquial", peso: 1 },
+                    { nombre: "Supraespinoso", peso: 1 }, { nombre: "Infraespinoso", peso: 1 }, { nombre: "Subescapular", peso: 1 },
+                    { nombre: "Dorsal Ancho", peso: 1 }, { nombre: "Flexor Carpi Radialis", peso: 1 }, { nombre: "Flexor Carpi Ulnaris", peso: 1 },
+                    { nombre: "Extensor Carpi Radialis", peso: 1 }, { nombre: "Extensor Carpi Ulnaris", peso: 1 }, { nombre: "Braquiorradial", peso: 1 },
+                    { nombre: "Supinador", peso: 1 }, { nombre: "Pronador Redondo", peso: 1 }, { nombre: "Pectoral Mayor (Porción Clavicular)", peso: 1 },
+                    { nombre: "Pectoral Mayor (Porción Esternocostal)", peso: 1 }, { nombre: "Serrato Anterior", peso: 1 },
+                    { nombre: "Interóseos Dorsales", peso: 1 }, { nombre: "Interóseos Palmares", peso: 1 }, { nombre: "Lumbricales 1 y 2", peso: 1 },
+                    { nombre: "Lumbricales 3 y 4", peso: 1 }, { nombre: "Abductor Corto del Pulgar", peso: 1 }, { nombre: "Oponente del Pulgar", peso: 1 },
+                    { nombre: "Aductor del Pulgar", peso: 1 }, { nombre: "Abductor del Meñique", peso: 1 }, { nombre: "Oponente del Meñique", peso: 1 },
+                    { nombre: "Flexor Profundo de los Dedos", peso: 1 }, { nombre: "Flexor Largo del Pulgar", peso: 1 }
+                 ],
+                nerviosPerifericos: ["Todos: N. Axilar", "N. Musculocutáneo", "N. Radial", "N. Mediano", "N. Ulnar", "N. Supraescapular", "N. Torácico Largo", "..."],
+                areasSensibilidad: ["Zona Lateral Hombro (Axilar)", "Zona Lateral Antebrazo (Musculocutáneo)", "Zona Posterior Brazo/Antebrazo (Radial)", "Mano Lateral (Mediano)", "Mano Medial (Cubital)", "Dermatoma C5", "Dermatoma C6", "Dermatoma C7", "Dermatoma C8", "Dermatoma T1"],
+                sintomasClave: ["Dolor Neurítico", "Parestesias", "Signo de Horner"], // Horner si T1 afectado
+                reflejosClave: { bicipital: "ausente", braquiorradial: "ausente", tricipital: "ausente" },
+                exclusivos: false
+            }
+        ];
+
+        /**************************************************************************
+         * Funciones auxiliares para obtener datos del formulario
+         **************************************************************************/
+
+        // Obtiene la fuerza muscular seleccionada para cada músculo
+        function getMuscleStrengths() {
+            const selects = document.querySelectorAll('select[name="musculos"]');
+            const strengths = {};
+            selects.forEach(select => {
+                const muscleName = select.getAttribute('data-muscle');
+                // Convertir a número entero la fuerza seleccionada
+                strengths[muscleName] = parseInt(select.value, 10);
+            });
+            return strengths;
+        }
+
+        // Obtiene los checkboxes seleccionados para un grupo (síntomas, sensibilidad)
+        function getCheckedValues(groupName) {
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // Obtiene el estado seleccionado para cada reflejo
+        function getReflexStatuses() {
+            return {
+                bicipital: document.getElementById('reflejoBicipital').value,
+                braquiorradial: document.getElementById('reflejoBraquiorradial').value,
+                tricipital: document.getElementById('reflejoTricipital').value
+            };
+        }
+
+        // Obtiene información adicional (opcional)
+        function getAdditionalInfo() {
+             return {
+                 mecanismo: document.getElementById('mecanismoLesion').value,
+                 evolucion: document.getElementById('tiempoEvolucion').value,
+                 tipoPlexo: document.getElementById('tipoPlexo').value
+             };
+        }
+
+        // Función para analizar inervación dual en músculos clave
+        function analizarInervacionDual(muscleStrengths) {
+            const inervacionDual = {
+                "Braquial": {
+                    principal: "N. Musculocutáneo",
+                    secundario: "N. Radial (porción lateral)",
+                    implicacion: "Lesión aislada del musculocutáneo puede no paralizar completamente el músculo"
+                },
+                "Pectoral Mayor": {
+                    principal: "N. Pectoral Lateral (C5-C7)",
+                    secundario: "N. Pectoral Medial (C8-T1)",
+                    implicacion: "Lesión de un solo nervio pectoral puede preservar función parcial"
+                },
+                "Flexor Corto del Pulgar": {
+                    principal: "N. Mediano (cabeza superficial)",
+                    secundario: "N. Ulnar (cabeza profunda)",
+                    implicacion: "Doble inervación crucial para función del pulgar"
+                }
+            };
+
+            const hallazgos = [];
+            
+            for (const [musculo, info] of Object.entries(inervacionDual)) {
+                const mrc = muscleStrengths[musculo];
+                if (mrc !== undefined && mrc < 5) {
+                    hallazgos.push({
+                        musculo: musculo,
+                        mrc: mrc,
+                        info: info,
+                        relevancia: mrc < 3 ? "Alta" : "Moderada"
+                    });
+                }
+            }
+            
+            return hallazgos;
+        }
+
+        // Función para ajustar lesiones según el tipo de plexo
+        function ajustarLesionPorTipoPlexo(lesion, tipoPlexo) {
+            const lesionAjustada = { ...lesion };
+            
+            if (tipoPlexo === 'prefijado') {
+                // En plexo prefijado, C4 contribuye significativamente
+                if (lesion.nombre.includes('C5') || lesion.nombre.includes('Tronco Superior')) {
+                    // Añadir músculos que pueden recibir contribución de C4
+                    lesionAjustada.musculosClave = [
+                        ...lesionAjustada.musculosClave,
+                        { nombre: "Trapecio Superior", peso: 0.8 }, // C4 contribuye
+                        { nombre: "Elevador Escápula", peso: 1.0 }  // C4 contribuye
+                    ];
+                    lesionAjustada.areasSensibilidad = [
+                        ...lesionAjustada.areasSensibilidad,
+                        "Dermatoma C4" // Añadir dermatoma C4
+                    ];
+                }
+            } else if (tipoPlexo === 'postfijado') {
+                // En plexo postfijado, T2 contribuye significativamente
+                if (lesion.nombre.includes('T1') || lesion.nombre.includes('Tronco Inferior')) {
+                    // Añadir músculos que pueden recibir contribución de T2
+                    lesionAjustada.musculosClave = [
+                        ...lesionAjustada.musculosClave,
+                        { nombre: "Interóseos Dorsales", peso: 1.2 }, // T2 puede contribuir
+                        { nombre: "Interóseos Palmares", peso: 1.2 }  // T2 puede contribuir
+                    ];
+                    lesionAjustada.areasSensibilidad = [
+                        ...lesionAjustada.areasSensibilidad,
+                        "Dermatoma T2" // Añadir dermatoma T2
+                    ];
+                }
+            }
+            
+            return lesionAjustada;
+        }
+
+        // ========== MAPEO ANATÓMICO-DIAGNÓSTICO COMPLETO ==========
+        const MAPEO_ANATOMICO_DIAGNOSTICO = {
+            "Lesión de Raíz C5": {
+                estructurasPrimarias: ["c5-path"],
+                estructurasSecundarias: ["superior-trunk", "lateral-cord", "posterior-cord"],
+                nerviosAfectados: ["axillary", "musculocutaneous", "suprascapular"],
+                colorPrimario: "#ef4444",
+                colorSecundario: "#f97316",
+                recorrido: [
+                    { estructura: "Raíz C5", explicacion: "Lesión en la raíz nerviosa C5 a nivel cervical", icono: "🧠" },
+                    { estructura: "Tronco Superior", explicacion: "C5 contribuye al tronco superior junto con C6", icono: "🔗" },
+                    { estructura: "Fascículos", explicacion: "El tronco superior se divide en fascículos lateral y posterior", icono: "🌿" },
+                    { estructura: "Nervios Terminales", explicacion: "Compromete nervios axilar, musculocutáneo y supraescapular", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Deltoides": "Inervado por nervio axilar (C5-C6) que surge del fascículo posterior",
+                    "Supraespinoso": "Inervado por nervio supraescapular que se origina directamente del tronco superior",
+                    "Infraespinoso": "También inervado por nervio supraescapular (C5-C6)",
+                    "Bíceps Braquial": "Inervado por nervio musculocutáneo del fascículo lateral (C5-C7)"
+                },
+                correlacionClinica: "La lesión de C5 produce el patrón clásico de debilidad en abducción y rotación externa del hombro, con preservación de la función de la mano."
+            },
+            
+            "Lesión de Tronco Superior (C5-C6) - Erb-Duchenne": {
+                estructurasPrimarias: ["c5-path", "c6-path", "superior-trunk"],
+                estructurasSecundarias: ["lateral-cord", "posterior-cord"],
+                nerviosAfectados: ["axillary", "musculocutaneous", "suprascapular"],
+                colorPrimario: "#dc2626",
+                colorSecundario: "#f97316",
+                recorrido: [
+                    { estructura: "Raíces C5-C6", explicacion: "Lesión completa del tronco superior (parálisis Erb-Duchenne)", icono: "🧠" },
+                    { estructura: "Tronco Superior", explicacion: "Interrupción total del tronco formado por C5-C6", icono: "❌" },
+                    { estructura: "Fascículos", explicacion: "Ambos fascículos pierden contribución C5-C6", icono: "🌿" },
+                    { estructura: "Múltiples Nervios", explicacion: "Afectación simultánea de nervios axilar, musculocutáneo y supraescapular", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Deltoides": "Parálisis completa por lesión del nervio axilar (C5-C6)",
+                    "Supraespinoso": "Pérdida de abducción inicial por lesión del nervio supraescapular",
+                    "Infraespinoso": "Pérdida de rotación externa por lesión del nervio supraescapular",
+                    "Bíceps Braquial": "Debilidad en flexión del codo por lesión del nervio musculocutáneo",
+                    "Braquiorradial": "Debilidad por pérdida de contribución C5-C6 al nervio radial"
+                },
+                correlacionClinica: "Patrón clásico Erb-Duchenne: brazo en adducción y rotación interna, codo extendido, postura 'propina de mesero'. Común en accidentes de motocicleta (86%)."
+            },
+            
+            "Mononeuropatía del Nervio Axilar": {
+                estructurasPrimarias: ["axillary"],
+                estructurasSecundarias: ["posterior-cord"],
+                nerviosAfectados: ["axillary"],
+                colorPrimario: "#f97316",
+                colorSecundario: "#fbbf24",
+                recorrido: [
+                    { estructura: "Fascículo Posterior", explicacion: "Origen normal del nervio axilar", icono: "🌿" },
+                    { estructura: "Nervio Axilar", explicacion: "Lesión selectiva del nervio axilar", icono: "⚡" },
+                    { estructura: "Músculos Específicos", explicacion: "Afectación selectiva de deltoides y redondo menor", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Deltoides": "Lesión directa del nervio axilar causa parálisis selectiva del deltoides",
+                    "Redondo Menor": "También inervado por el nervio axilar, función de rotación externa comprometida"
+                },
+                correlacionClinica: "Lesión aislada del nervio axilar: pérdida de abducción del hombro >15°, atrofia deltoides, pérdida sensorial en 'insignia del sargento'."
+            },
+            
+            "Mononeuropatía del Nervio Radial (Alta - Surco Radial)": {
+                estructurasPrimarias: ["radial"],
+                estructurasSecundarias: ["posterior-cord"],
+                nerviosAfectados: ["radial"],
+                colorPrimario: "#8b5cf6",
+                colorSecundario: "#a78bfa",
+                recorrido: [
+                    { estructura: "Fascículo Posterior", explicacion: "Origen del nervio radial", icono: "🌿" },
+                    { estructura: "Nervio Radial", explicacion: "Lesión en surco espiral del húmero", icono: "⚡" },
+                    { estructura: "Extensores", explicacion: "Pérdida de función extensora de brazo y antebrazo", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Tríceps Braquial": "Extensión del codo comprometida por lesión radial proximal",
+                    "Braquiorradial": "Flexión del codo debilitada (inervación radial C5-C6)",
+                    "Extensor Carpi Radialis": "Pérdida de extensión de muñeca - 'muñeca caída'",
+                    "Extensor de los Dedos": "Pérdida de extensión de dedos en MCF"
+                },
+                correlacionClinica: "Síndrome de 'muñeca caída': pérdida de extensión de muñeca y dedos, debilidad en puño, preservación de flexión."
+            },
+            
+            "Mononeuropatía del Nervio Mediano (Túnel Carpiano)": {
+                estructurasPrimarias: ["median"],
+                estructurasSecundarias: ["lateral-cord", "medial-cord"],
+                nerviosAfectados: ["median"],
+                colorPrimario: "#10b981",
+                colorSecundario: "#34d399",
+                recorrido: [
+                    { estructura: "Fascículos Lateral y Medial", explicacion: "Doble origen del nervio mediano", icono: "🌿" },
+                    { estructura: "Nervio Mediano", explicacion: "Compresión en túnel carpiano", icono: "⚡" },
+                    { estructura: "Músculos Tenares", explicacion: "Afectación de músculos de la eminencia tenar", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Abductor Corto del Pulgar": "Inervado por rama recurrente del mediano",
+                    "Oponente del Pulgar": "Músculo clave para oposición del pulgar",
+                    "Flexor Corto del Pulgar": "Cabeza superficial inervada por mediano",
+                    "Lumbricales 1 y 2": "Lumbricales laterales inervados por mediano"
+                },
+                correlacionClinica: "Síndrome túnel carpiano: parestesias nocturnas, debilidad oposición pulgar, 'mano de simio', signo de Tinel y Phalen positivos."
+            },
+            
+            "Mononeuropatía del Nervio Ulnar (Codo - Túnel Cubital)": {
+                estructurasPrimarias: ["ulnar"],
+                estructurasSecundarias: ["medial-cord"],
+                nerviosAfectados: ["ulnar"],
+                colorPrimario: "#6366f1",
+                colorSecundario: "#8b5cf6",
+                recorrido: [
+                    { estructura: "Fascículo Medial", explicacion: "Origen del nervio cubital", icono: "🌿" },
+                    { estructura: "Nervio Cubital", explicacion: "Compresión en túnel cubital del codo", icono: "⚡" },
+                    { estructura: "Músculos Intrínsecos", explicacion: "Afectación de músculos intrínsecos de la mano", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Flexor Carpi Ulnaris": "Flexión y adducción de muñeca comprometida",
+                    "Flexor Profundo de los Dedos": "Flexión de IFD del meñique y anular afectada",
+                    "Interóseos Dorsales": "Abducción de dedos comprometida",
+                    "Interóseos Palmares": "Adducción de dedos comprometida",
+                    "Lumbricales 3 y 4": "Lumbricales mediales afectados",
+                    "Aductor del Pulgar": "Pérdida de adducción del pulgar (signo de Froment)"
+                },
+                correlacionClinica: "Síndrome túnel cubital: 'mano en garra', signo de Froment positivo, atrofia de espacios interóseos, debilidad pinza lateral."
+            },
+            
+            "Lesión de Raíz C6": {
+                estructurasPrimarias: ["c6-path"],
+                estructurasSecundarias: ["superior-trunk", "lateral-cord"],
+                nerviosAfectados: ["musculocutaneous", "median"],
+                colorPrimario: "#f97316",
+                colorSecundario: "#fbbf24",
+                recorrido: [
+                    { estructura: "Raíz C6", explicacion: "Lesión en la raíz nerviosa C6", icono: "🧠" },
+                    { estructura: "Tronco Superior", explicacion: "C6 contribuye al tronco superior junto con C5", icono: "🔗" },
+                    { estructura: "Fascículo Lateral", explicacion: "Afecta principalmente el fascículo lateral", icono: "🌿" },
+                    { estructura: "Nervios Flexores", explicacion: "Compromete nervios musculocutáneo y mediano", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Bíceps Braquial": "Inervado por nervio musculocutáneo (C5-C7), debilidad por pérdida C6",
+                    "Braquiorradial": "Inervado por nervio radial (C5-C6), flexión del codo comprometida",
+                    "Extensor Carpi Radialis": "Extensión de muñeca afectada por compromiso C6",
+                    "Pronador Redondo": "Inervado por nervio mediano, pronación debilitada"
+                },
+                correlacionClinica: "Lesión C6: debilidad flexión codo y extensión muñeca, reflejo braquiorradial disminuido, preservación abducción hombro."
+            },
+            
+            "Lesión de Raíz C7": {
+                estructurasPrimarias: ["c7-path"],
+                estructurasSecundarias: ["middle-trunk", "lateral-cord", "posterior-cord", "medial-cord"],
+                nerviosAfectados: ["radial", "median"],
+                colorPrimario: "#8b5cf6",
+                colorSecundario: "#a78bfa",
+                recorrido: [
+                    { estructura: "Raíz C7", explicacion: "Lesión aislada de la raíz C7", icono: "🧠" },
+                    { estructura: "Tronco Medio", explicacion: "C7 forma el tronco medio de manera aislada", icono: "🔗" },
+                    { estructura: "Todos los Fascículos", explicacion: "C7 contribuye a los tres fascículos", icono: "🌿" },
+                    { estructura: "Múltiples Nervios", explicacion: "Afecta principalmente nervio radial y porciones del mediano", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Tríceps Braquial": "Extensión del codo severamente comprometida por lesión C7",
+                    "Extensor de los Dedos": "Extensión de dedos afectada por compromiso del nervio radial",
+                    "Extensor Carpi Radialis": "Extensión de muñeca comprometida",
+                    "Flexor Carpi Radialis": "Flexión de muñeca afectada por compromiso del mediano"
+                },
+                correlacionClinica: "Lesión C7: pérdida extensión codo y dedos, reflejo tricipital ausente, 'muñeca caída' parcial."
+            },
+            
+            "Lesión de Raíz C8": {
+                estructurasPrimarias: ["c8-path"],
+                estructurasSecundarias: ["inferior-trunk", "medial-cord"],
+                nerviosAfectados: ["ulnar", "median"],
+                colorPrimario: "#06b6d4",
+                colorSecundario: "#22d3ee",
+                recorrido: [
+                    { estructura: "Raíz C8", explicacion: "Lesión en la raíz nerviosa C8", icono: "🧠" },
+                    { estructura: "Tronco Inferior", explicacion: "C8 contribuye al tronco inferior junto con T1", icono: "🔗" },
+                    { estructura: "Fascículo Medial", explicacion: "Afecta principalmente el fascículo medial", icono: "🌿" },
+                    { estructura: "Nervios de la Mano", explicacion: "Compromete nervios cubital y mediano para función de mano", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Flexor Profundo de los Dedos": "Flexión distal de dedos comprometida",
+                    "Flexor Carpi Ulnaris": "Flexión y adducción de muñeca afectada",
+                    "Interóseos Dorsales": "Abducción de dedos comprometida",
+                    "Interóseos Palmares": "Adducción de dedos comprometida",
+                    "Flexor Largo del Pulgar": "Flexión del pulgar afectada"
+                },
+                correlacionClinica: "Lesión C8: debilidad flexión dedos y función intrínsecos, inicio de patrón Klumpke."
+            },
+            
+            "Lesión de Raíz T1": {
+                estructurasPrimarias: ["t1-path"],
+                estructurasSecundarias: ["inferior-trunk", "medial-cord"],
+                nerviosAfectados: ["ulnar", "median"],
+                colorPrimario: "#ec4899",
+                colorSecundario: "#f472b6",
+                recorrido: [
+                    { estructura: "Raíz T1", explicacion: "Lesión en la raíz nerviosa T1", icono: "🧠" },
+                    { estructura: "Tronco Inferior", explicacion: "T1 contribuye al tronco inferior junto con C8", icono: "🔗" },
+                    { estructura: "Fascículo Medial", explicacion: "Principal contribución al fascículo medial", icono: "🌿" },
+                    { estructura: "Músculos Intrínsecos", explicacion: "Afectación severa de músculos intrínsecos de la mano", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Interóseos Dorsales": "Músculos clave para abducción de dedos, severamente afectados",
+                    "Interóseos Palmares": "Músculos clave para adducción de dedos, severamente afectados",
+                    "Lumbricales 3 y 4": "Lumbricales mediales inervados por cubital",
+                    "Aductor del Pulgar": "Pérdida de adducción del pulgar",
+                    "Abductor del Meñique": "Función del meñique comprometida"
+                },
+                correlacionClinica: "Lesión T1: mano en garra, Síndrome de Horner si avulsión, atrofia severa de espacios interóseos."
+            },
+            
+            "Lesión de Tronco Medio (C7)": {
+                estructurasPrimarias: ["c7-path", "middle-trunk"],
+                estructurasSecundarias: ["lateral-cord", "posterior-cord", "medial-cord"],
+                nerviosAfectados: ["radial", "median"],
+                colorPrimario: "#7c3aed",
+                colorSecundario: "#8b5cf6",
+                recorrido: [
+                    { estructura: "Raíz C7", explicacion: "Origen de la lesión en C7", icono: "🧠" },
+                    { estructura: "Tronco Medio", explicacion: "C7 forma exclusivamente el tronco medio", icono: "🔗" },
+                    { estructura: "Todos los Fascículos", explicacion: "C7 contribuye a los tres fascículos", icono: "🌿" },
+                    { estructura: "Nervio Radial", explicacion: "Principal afectación del nervio radial", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Tríceps Braquial": "Extensión del codo severamente comprometida",
+                    "Extensor de los Dedos": "Pérdida de extensión de dedos",
+                    "Extensor Carpi Radialis": "Extensión de muñeca afectada",
+                    "Extensor Carpi Ulnaris": "Extensión y adducción de muñeca comprometida",
+                    "Flexor Carpi Radialis": "Flexión de muñeca afectada por compromiso mediano"
+                },
+                correlacionClinica: "Lesión C7: predomina pérdida de extensión, reflejo tricipital ausente, preservación de función de mano fina."
+            },
+            
+            "Lesión de Tronco Inferior (C8-T1) - Dejerine-Klumpke": {
+                estructurasPrimarias: ["c8-path", "t1-path", "inferior-trunk"],
+                estructurasSecundarias: ["medial-cord"],
+                nerviosAfectados: ["ulnar", "median"],
+                colorPrimario: "#dc2626",
+                colorSecundario: "#ef4444",
+                recorrido: [
+                    { estructura: "Raíces C8-T1", explicacion: "Lesión del tronco inferior (parálisis Klumpke)", icono: "🧠" },
+                    { estructura: "Tronco Inferior", explicacion: "Interrupción completa del tronco C8-T1", icono: "❌" },
+                    { estructura: "Fascículo Medial", explicacion: "Principal afectación del fascículo medial", icono: "🌿" },
+                    { estructura: "Nervios de la Mano", explicacion: "Compromiso severo de cubital y mediano para mano", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Flexor Profundo de los Dedos": "Flexión distal severamente comprometida",
+                    "Flexor Carpi Ulnaris": "Pérdida de flexión y adducción de muñeca",
+                    "Interóseos Dorsales": "Parálisis completa de abducción de dedos",
+                    "Interóseos Palmares": "Parálisis completa de adducción de dedos",
+                    "Lumbricales 3 y 4": "Lumbricales mediales completamente afectados",
+                    "Aductor del Pulgar": "Pérdida total de adducción del pulgar"
+                },
+                correlacionClinica: "Parálisis Klumpke clásica: mano en garra, Síndrome de Horner (si T1 preganglionar), atrofia severa de la mano."
+            },
+            
+            "Lesión de Fascículo Lateral (C5-C7)": {
+                estructurasPrimarias: ["lateral-cord"],
+                estructurasSecundarias: ["superior-trunk", "middle-trunk"],
+                nerviosAfectados: ["musculocutaneous", "median"],
+                colorPrimario: "#22c55e",
+                colorSecundario: "#34d399",
+                recorrido: [
+                    { estructura: "Troncos Superior y Medio", explicacion: "Origen del fascículo lateral", icono: "🔗" },
+                    { estructura: "Fascículo Lateral", explicacion: "Lesión del fascículo lateral completo", icono: "❌" },
+                    { estructura: "Nervios Flexores", explicacion: "Afecta nervios musculocutáneo y raíz lateral del mediano", icono: "⚡" },
+                    { estructura: "Músculos Flexores", explicacion: "Compromiso de flexores de codo y antebrazo", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Bíceps Braquial": "Parálisis por lesión completa del musculocutáneo",
+                    "Braquial": "Debilidad severa en flexión pura del codo",
+                    "Coracobraquial": "Flexión y adducción del brazo comprometida",
+                    "Pronador Redondo": "Pronación afectada por compromiso de raíz lateral del mediano",
+                    "Flexor Carpi Radialis": "Flexión de muñeca comprometida"
+                },
+                correlacionClinica: "Lesión fascículo lateral: debilidad severa flexión codo, preservación extensión y función intrínsecos mano."
+            },
+            
+            "Lesión de Fascículo Posterior (C5-T1)": {
+                estructurasPrimarias: ["posterior-cord"],
+                estructurasSecundarias: ["superior-trunk", "middle-trunk", "inferior-trunk"],
+                nerviosAfectados: ["axillary", "radial"],
+                colorPrimario: "#059669",
+                colorSecundario: "#10b981",
+                recorrido: [
+                    { estructura: "Todos los Troncos", explicacion: "Fascículo posterior recibe de C5-T1", icono: "🔗" },
+                    { estructura: "Fascículo Posterior", explicacion: "Lesión completa del fascículo posterior", icono: "❌" },
+                    { estructura: "Nervios Extensores", explicacion: "Afecta nervios axilar y radial", icono: "⚡" },
+                    { estructura: "Músculos Extensores", explicacion: "Pérdida de función extensora completa", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Deltoides": "Parálisis completa por lesión del nervio axilar",
+                    "Tríceps Braquial": "Pérdida total de extensión del codo",
+                    "Extensor Carpi Radialis": "Extensión de muñeca severamente comprometida",
+                    "Extensor de los Dedos": "Pérdida completa de extensión de dedos",
+                    "Subescapular": "Rotación interna del hombro afectada",
+                    "Dorsal Ancho": "Adducción y extensión del hombro comprometida"
+                },
+                correlacionClinica: "Lesión fascículo posterior: pérdida extensión completa, muñeca caída, preservación flexión."
+            },
+            
+            "Lesión de Fascículo Medial (C8-T1)": {
+                estructurasPrimarias: ["medial-cord"],
+                estructurasSecundarias: ["inferior-trunk"],
+                nerviosAfectados: ["ulnar", "median"],
+                colorPrimario: "#7c3aed",
+                colorSecundario: "#8b5cf6",
+                recorrido: [
+                    { estructura: "Tronco Inferior", explicacion: "Origen del fascículo medial", icono: "🔗" },
+                    { estructura: "Fascículo Medial", explicacion: "Lesión del fascículo medial completo", icono: "❌" },
+                    { estructura: "Nervios Mediales", explicacion: "Afecta cubital y raíz medial del mediano", icono: "⚡" },
+                    { estructura: "Mano Intrínseca", explicacion: "Pérdida de función intrínseca de la mano", icono: "💪" }
+                ],
+                explicacionMuscular: {
+                    "Flexor Carpi Ulnaris": "Flexión y adducción de muñeca comprometida",
+                    "Interóseos Dorsales": "Abducción de dedos severamente afectada",
+                    "Interóseos Palmares": "Adducción de dedos severamente afectada",
+                    "Aductor del Pulgar": "Pérdida de adducción del pulgar (Froment +)",
+                    "Lumbricales 3 y 4": "Flexión MCF de dedos anular y meñique afectada"
+                },
+                correlacionClinica: "Lesión fascículo medial: mano en garra, signo de Froment, atrofia interóseos, Síndrome Horner posible."
+            },
+            
+            "Lesión Global (C5-T1)": {
+                estructurasPrimarias: ["c5-path", "c6-path", "c7-path", "c8-path", "t1-path"],
+                estructurasSecundarias: ["superior-trunk", "middle-trunk", "inferior-trunk", "lateral-cord", "posterior-cord", "medial-cord"],
+                nerviosAfectados: ["musculocutaneous", "axillary", "radial", "median", "ulnar", "suprascapular"],
+                colorPrimario: "#991b1b",
+                colorSecundario: "#dc2626",
+                recorrido: [
+                    { estructura: "Todas las Raíces", explicacion: "Lesión completa del plexo braquial C5-T1", icono: "🧠" },
+                    { estructura: "Todos los Troncos", explicacion: "Interrupción de todos los troncos", icono: "❌" },
+                    { estructura: "Todos los Fascículos", explicacion: "Pérdida completa de todos los fascículos", icono: "❌" },
+                    { estructura: "Todos los Nervios", explicacion: "Parálisis completa del miembro superior", icono: "⚡" }
+                ],
+                explicacionMuscular: {
+                    "Deltoides": "Parálisis completa - no abducción del hombro",
+                    "Bíceps Braquial": "Parálisis completa - no flexión del codo",
+                    "Tríceps Braquial": "Parálisis completa - no extensión del codo",
+                    "Extensor Carpi Radialis": "Parálisis completa - muñeca caída",
+                    "Flexor Carpi Radialis": "Parálisis completa - no flexión muñeca",
+                    "Interóseos Dorsales": "Parálisis completa - mano en garra severa"
+                },
+                correlacionClinica: "Lesión global: miembro superior completamente flácido, pérdida sensorial total, Síndrome Horner, pronóstico reservado."
+            }
+        };
+
+        // ========== CASOS CLÍNICOS PREDEFINIDOS PARA DEMO ==========
+        const CASOS_CLINICOS_DEMO = {
+            "Erb-Duchenne Clásico": {
+                descripcion: "Accidente de motocicleta, caída sobre hombro derecho",
+                musculos: {
+                    "Deltoides": 0,
+                    "Supraespinoso": 1,
+                    "Infraespinoso": 1,
+                    "Bíceps Braquial": 2,
+                    "Braquiorradial": 3,
+                    "Tríceps Braquial": 5,
+                    "Flexor Carpi Radialis": 5,
+                    "Interóseos Dorsales": 5
+                },
+                sintomas: ["Dolor Neurítico"],
+                sensibilidad: ["Zona Lateral Hombro (Axilar)", "Zona Lateral Antebrazo (Musculocutáneo)"],
+                reflejos: { bicipital: "ausente", tricipital: "normal" },
+                diagnosticoEsperado: "Lesión de Tronco Superior (C5-C6) - Erb-Duchenne"
+            },
+            
+            "Klumpke Clásico": {
+                descripcion: "Tracción forzada del brazo hacia arriba",
+                musculos: {
+                    "Deltoides": 5,
+                    "Bíceps Braquial": 5,
+                    "Tríceps Braquial": 5,
+                    "Flexor Carpi Ulnaris": 2,
+                    "Interóseos Dorsales": 0,
+                    "Interóseos Palmares": 0,
+                    "Lumbricales 3 y 4": 1,
+                    "Aductor del Pulgar": 1
+                },
+                sintomas: ["Parestesias", "Signo de Horner"],
+                sensibilidad: ["Mano Medial (Cubital)", "Zona Medial Antebrazo (Cut. Med. Antebrazo)"],
+                reflejos: { bicipital: "normal", tricipital: "normal" },
+                diagnosticoEsperado: "Lesión de Tronco Inferior (C8-T1) - Dejerine-Klumpke"
+            },
+            
+            "Lesión Axilar Aislada": {
+                descripcion: "Luxación de hombro con lesión del nervio axilar",
+                musculos: {
+                    "Deltoides": 0,
+                    "Supraespinoso": 5,
+                    "Infraespinoso": 5,
+                    "Bíceps Braquial": 5,
+                    "Tríceps Braquial": 5,
+                    "Interóseos Dorsales": 5
+                },
+                sintomas: [],
+                sensibilidad: ["Zona Lateral Hombro (Axilar)"],
+                reflejos: { bicipital: "normal", tricipital: "normal" },
+                diagnosticoEsperado: "Mononeuropatía del Nervio Axilar"
+            },
+            
+            "Muñeca Caída": {
+                descripcion: "Fractura de húmero con lesión del nervio radial",
+                musculos: {
+                    "Deltoides": 5,
+                    "Bíceps Braquial": 5,
+                    "Tríceps Braquial": 2,
+                    "Braquiorradial": 3,
+                    "Extensor Carpi Radialis": 0,
+                    "Extensor de los Dedos": 1,
+                    "Interóseos Dorsales": 5
+                },
+                sintomas: [],
+                sensibilidad: ["Zona Posterior Brazo/Antebrazo (Radial)"],
+                reflejos: { bicipital: "normal", tricipital: "disminuido" },
+                diagnosticoEsperado: "Mononeuropatía del Nervio Radial (Alta - Surco Radial)"
+            }
+        };
+
+        // ========== FUNCIONES DE VISUALIZACIÓN ANATÓMICA ==========
+        
+        function generarSVGConDiagnostico(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) {
+                return '<div class="text-center text-gray-500 py-8"><i class="fas fa-exclamation-triangle mr-2"></i>No hay visualización disponible para este diagnóstico.</div>';
+            }
+
+            return `
+                <svg viewBox="0 0 1000 600" class="w-full" style="height: 350px;" id="svg-diagnostico">
+                    <defs>
+                        <linearGradient id="lesionPrimariaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:${mapeo.colorPrimario};stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+                        </linearGradient>
+                        
+                        <linearGradient id="lesionSecundariaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:${mapeo.colorSecundario};stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        </linearGradient>
+                        
+                        <linearGradient id="normalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#94a3b8;stop-opacity:0.4" />
+                            <stop offset="100%" style="stop-color:#64748b;stop-opacity:0.4" />
+                        </linearGradient>
+                        
+                        <filter id="glowLesion" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    
+                    <!-- Fondo -->
+                    <rect width="1000" height="600" fill="#f8fafc" opacity="0.5"/>
+                    
+                    <!-- Columna vertebral -->
+                    <rect x="50" y="80" width="15" height="400" fill="#6b7280" rx="7"/>
+                    <text x="30" y="70" class="text-sm font-bold fill-gray-700">RAÍCES</text>
+                    
+                    <!-- RAÍCES NERVIOSAS -->
+                    <g class="nerve-roots">
+                        <!-- C5 -->
+                        <path id="c5-path" d="M65 120 Q120 115 180 125" 
+                              stroke="${mapeo.estructurasPrimarias.includes('c5-path') ? 'url(#lesionPrimariaGrad)' : 'url(#normalGrad)'}" 
+                              stroke-width="${mapeo.estructurasPrimarias.includes('c5-path') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.estructurasPrimarias.includes('c5-path') ? 'estructura-lesionada' : 'estructura-normal'}"
+                              filter="${mapeo.estructurasPrimarias.includes('c5-path') ? 'url(#glowLesion)' : 'none'}"/>
+                        <circle cx="65" cy="120" r="6" fill="${mapeo.estructurasPrimarias.includes('c5-path') ? mapeo.colorPrimario : '#94a3b8'}"/>
+                        <text x="25" y="125" class="text-sm font-bold ${mapeo.estructurasPrimarias.includes('c5-path') ? 'fill-red-600' : 'fill-gray-400'}">C5</text>
+                        
+                        <!-- C6 -->
+                        <path id="c6-path" d="M65 180 Q120 175 180 185" 
+                              stroke="${mapeo.estructurasPrimarias.includes('c6-path') ? 'url(#lesionPrimariaGrad)' : 'url(#normalGrad)'}" 
+                              stroke-width="${mapeo.estructurasPrimarias.includes('c6-path') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.estructurasPrimarias.includes('c6-path') ? 'estructura-lesionada' : 'estructura-normal'}"
+                              filter="${mapeo.estructurasPrimarias.includes('c6-path') ? 'url(#glowLesion)' : 'none'}"/>
+                        <circle cx="65" cy="180" r="6" fill="${mapeo.estructurasPrimarias.includes('c6-path') ? mapeo.colorPrimario : '#94a3b8'}"/>
+                        <text x="25" y="185" class="text-sm font-bold ${mapeo.estructurasPrimarias.includes('c6-path') ? 'fill-red-600' : 'fill-gray-400'}">C6</text>
+                        
+                        <!-- C7 -->
+                        <path id="c7-path" d="M65 240 Q120 235 180 245" stroke="url(#normalGrad)" stroke-width="4" fill="none" class="estructura-normal"/>
+                        <circle cx="65" cy="240" r="6" fill="#94a3b8"/>
+                        <text x="25" y="245" class="text-sm font-bold fill-gray-400">C7</text>
+                        
+                        <!-- C8 -->
+                        <path id="c8-path" d="M65 300 Q120 295 180 305" stroke="url(#normalGrad)" stroke-width="4" fill="none" class="estructura-normal"/>
+                        <circle cx="65" cy="300" r="6" fill="#94a3b8"/>
+                        <text x="25" y="305" class="text-sm font-bold fill-gray-400">C8</text>
+                        
+                        <!-- T1 -->
+                        <path id="t1-path" d="M65 360 Q120 355 180 365" stroke="url(#normalGrad)" stroke-width="4" fill="none" class="estructura-normal"/>
+                        <circle cx="65" cy="360" r="6" fill="#94a3b8"/>
+                        <text x="25" y="365" class="text-sm font-bold fill-gray-400">T1</text>
+                    </g>
+                    
+                    <!-- TRONCOS -->
+                    <g class="trunks">
+                        <text x="220" y="70" class="text-sm font-bold fill-blue-600">TRONCOS</text>
+                        
+                        <!-- Tronco Superior -->
+                        <path id="superior-trunk" d="M180 155 Q250 150 320 165" 
+                              stroke="${mapeo.estructurasSecundarias.includes('superior-trunk') ? 'url(#lesionSecundariaGrad)' : 'url(#normalGrad)'}" 
+                              stroke-width="${mapeo.estructurasSecundarias.includes('superior-trunk') ? '10' : '6'}" 
+                              fill="none" 
+                              class="${mapeo.estructurasSecundarias.includes('superior-trunk') ? 'estructura-secundaria' : 'estructura-normal'}"
+                              filter="${mapeo.estructurasSecundarias.includes('superior-trunk') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="230" y="140" class="text-sm font-semibold ${mapeo.estructurasSecundarias.includes('superior-trunk') ? 'fill-orange-600' : 'fill-gray-400'}">SUPERIOR</text>
+                        
+                        <!-- Tronco Medio -->
+                        <path id="middle-trunk" d="M180 245 Q250 245 320 245" stroke="url(#normalGrad)" stroke-width="6" fill="none" class="estructura-normal"/>
+                        <text x="240" y="235" class="text-sm font-semibold fill-gray-400">MEDIO</text>
+                        
+                        <!-- Tronco Inferior -->
+                        <path id="inferior-trunk" d="M180 335 Q250 335 320 325" stroke="url(#normalGrad)" stroke-width="6" fill="none" class="estructura-normal"/>
+                        <text x="230" y="350" class="text-sm font-semibold fill-gray-400">INFERIOR</text>
+                    </g>
+                    
+                    <!-- FASCÍCULOS -->
+                    <g class="cords">
+                        <text x="380" y="70" class="text-sm font-bold fill-green-600">FASCÍCULOS</text>
+                        
+                        <!-- Fascículo Lateral -->
+                        <path id="lateral-cord" d="M320 165 Q420 160 520 180" 
+                              stroke="${mapeo.estructurasSecundarias.includes('lateral-cord') ? 'url(#lesionSecundariaGrad)' : 'url(#normalGrad)'}" 
+                              stroke-width="${mapeo.estructurasSecundarias.includes('lateral-cord') ? '10' : '6'}" 
+                              fill="none" 
+                              class="${mapeo.estructurasSecundarias.includes('lateral-cord') ? 'estructura-secundaria' : 'estructura-normal'}"/>
+                        <text x="400" y="150" class="text-sm font-semibold ${mapeo.estructurasSecundarias.includes('lateral-cord') ? 'fill-orange-600' : 'fill-gray-400'}">LATERAL</text>
+                        
+                        <!-- Fascículo Posterior -->
+                        <path id="posterior-cord" d="M320 200 Q420 200 520 220" 
+                              stroke="${mapeo.estructurasSecundarias.includes('posterior-cord') ? 'url(#lesionSecundariaGrad)' : 'url(#normalGrad)'}" 
+                              stroke-width="${mapeo.estructurasSecundarias.includes('posterior-cord') ? '10' : '6'}" 
+                              fill="none" 
+                              class="${mapeo.estructurasSecundarias.includes('posterior-cord') ? 'estructura-secundaria' : 'estructura-normal'}"/>
+                        <text x="400" y="190" class="text-sm font-semibold ${mapeo.estructurasSecundarias.includes('posterior-cord') ? 'fill-orange-600' : 'fill-gray-400'}">POSTERIOR</text>
+                        
+                        <!-- Fascículo Medial -->
+                        <path id="medial-cord" d="M320 280 Q420 280 520 300" stroke="url(#normalGrad)" stroke-width="6" fill="none" class="estructura-normal"/>
+                        <text x="400" y="270" class="text-sm font-semibold fill-gray-400">MEDIAL</text>
+                    </g>
+                    
+                    <!-- NERVIOS TERMINALES -->
+                    <g class="terminal-nerves">
+                        <text x="580" y="70" class="text-sm font-bold fill-cyan-600">NERVIOS TERMINALES</text>
+                        
+                        <!-- Nervio Musculocutáneo -->
+                        <path id="musculocutaneous" d="M520 180 L750 160" 
+                              stroke="${mapeo.nerviosAfectados.includes('musculocutaneous') ? mapeo.colorPrimario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('musculocutaneous') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('musculocutaneous') ? 'estructura-lesionada' : 'estructura-normal'}"
+                              filter="${mapeo.nerviosAfectados.includes('musculocutaneous') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="620" y="155" class="text-sm font-semibold ${mapeo.nerviosAfectados.includes('musculocutaneous') ? 'fill-red-600' : 'fill-gray-400'}">MUSCULOCUTÁNEO</text>
+                        
+                        <!-- Nervio Axilar -->
+                        <path id="axillary" d="M520 220 L750 200" 
+                              stroke="${mapeo.nerviosAfectados.includes('axillary') ? mapeo.colorPrimario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('axillary') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('axillary') ? 'estructura-lesionada' : 'estructura-normal'}"
+                              filter="${mapeo.nerviosAfectados.includes('axillary') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="620" y="195" class="text-sm font-semibold ${mapeo.nerviosAfectados.includes('axillary') ? 'fill-red-600' : 'fill-gray-400'}">AXILAR</text>
+                        
+                        <!-- Nervio Radial -->
+                        <path id="radial" d="M520 220 L750 260" 
+                              stroke="${mapeo.nerviosAfectados.includes('radial') ? mapeo.colorPrimario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('radial') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('radial') ? 'estructura-lesionada' : 'estructura-normal'}"
+                              filter="${mapeo.nerviosAfectados.includes('radial') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="620" y="255" class="text-sm font-semibold ${mapeo.nerviosAfectados.includes('radial') ? 'fill-red-600' : 'fill-gray-400'}">RADIAL</text>
+                        
+                        <!-- Nervio Mediano -->
+                        <path id="median" d="M520 200 Q600 240 750 280" 
+                              stroke="${mapeo.nerviosAfectados.includes('median') ? mapeo.colorPrimario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('median') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('median') ? 'estructura-lesionada' : 'estructura-normal'}" 
+                              filter="${mapeo.nerviosAfectados.includes('median') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="620" y="275" class="text-sm font-semibold ${mapeo.nerviosAfectados.includes('median') ? 'fill-red-600' : 'fill-gray-400'}">MEDIANO</text>
+                        
+                        <!-- Nervio Cubital -->
+                        <path id="ulnar" d="M520 300 L750 320" 
+                              stroke="${mapeo.nerviosAfectados.includes('ulnar') ? mapeo.colorPrimario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('ulnar') ? '8' : '4'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('ulnar') ? 'estructura-lesionada' : 'estructura-normal'}" 
+                              filter="${mapeo.nerviosAfectados.includes('ulnar') ? 'url(#glowLesion)' : 'none'}"/>
+                        <text x="620" y="315" class="text-sm font-semibold ${mapeo.nerviosAfectados.includes('ulnar') ? 'fill-red-600' : 'fill-gray-400'}">CUBITAL</text>
+                        
+                        <!-- Nervio Supraescapular -->
+                        <path id="suprascapular" d="M320 165 Q380 140 450 145" 
+                              stroke="${mapeo.nerviosAfectados.includes('suprascapular') ? mapeo.colorSecundario : '#94a3b8'}" 
+                              stroke-width="${mapeo.nerviosAfectados.includes('suprascapular') ? '6' : '3'}" 
+                              fill="none" 
+                              class="${mapeo.nerviosAfectados.includes('suprascapular') ? 'estructura-secundaria' : 'estructura-normal'}"/>
+                        <text x="360" y="135" class="text-xs ${mapeo.nerviosAfectados.includes('suprascapular') ? 'fill-orange-600' : 'fill-gray-400'}">SUPRAESCAPULAR</text>
+                    </g>
+                    
+                    <!-- Líneas divisorias -->
+                    <line x1="160" y1="60" x2="160" y2="480" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="5,5" opacity="0.6"/>
+                    <line x1="300" y1="60" x2="300" y2="480" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="5,5" opacity="0.6"/>
+                    <line x1="500" y1="60" x2="500" y2="480" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="5,5" opacity="0.6"/>
+                </svg>
+            `;
+        }
+
+        function generarExplicacionRecorrido(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) return '<p class="text-gray-500">No disponible</p>';
+
+            return mapeo.recorrido.map((paso, index) => `
+                <div class="paso-recorrido" data-paso="${index}" onclick="resaltarPasoRecorrido(${index}, '${diagnostico.nombreLesion}')">
+                    <div class="numero-paso">${index + 1}</div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm flex items-center">
+                            <span class="mr-2">${paso.icono}</span>
+                            ${paso.estructura}
+                        </div>
+                        <div class="text-xs text-gray-600 mt-1">${paso.explicacion}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generarExplicacionMuscular(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo || !diagnostico.detalles.musculos) return '<p class="text-gray-500">No hay músculos afectados</p>';
+
+            return diagnostico.detalles.musculos.map(musculo => {
+                const explicacion = mapeo.explicacionMuscular[musculo.nombre] || 'Afectación por compromiso neural en el recorrido anatómico';
+                return `
+                    <div class="musculo-explicado">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-sm">${musculo.nombre}</span>
+                            <span class="mrc-badge mrc-${musculo.mrc}">MRC ${musculo.mrc}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed">${explicacion}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generarCorrelacionClinica(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) return '<p class="text-gray-500">No disponible</p>';
+
+            return `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p class="text-sm text-green-800 leading-relaxed">
+                        <i class="fas fa-lightbulb mr-2 text-green-600"></i>
+                        ${mapeo.correlacionClinica}
+                    </p>
+                </div>
+            `;
+        }
+
+        function mostrarVisualizacionDiagnostica(mejorDiagnostico) {
+            // Generar y mostrar SVG con diagnóstico
+            document.getElementById('svg-plexo-diagnostico').innerHTML = generarSVGConDiagnostico(mejorDiagnostico);
+            
+            // Generar explicación del recorrido
+            document.getElementById('pasos-recorrido').innerHTML = generarExplicacionRecorrido(mejorDiagnostico);
+            
+            // Generar explicación muscular
+            document.getElementById('lista-musculos-explicados').innerHTML = generarExplicacionMuscular(mejorDiagnostico);
+            
+            // Generar correlación clínica
+            document.getElementById('correlacion-clinica').innerHTML = generarCorrelacionClinica(mejorDiagnostico);
+            
+            // Configurar botón de animación
+            document.getElementById('animar-recorrido').onclick = () => animarRecorridoLesion(mejorDiagnostico);
+            
+            // Agregar tooltips interactivos al SVG
+            agregarTooltipsSVG(mejorDiagnostico);
+        }
+        
+        function agregarTooltipsSVG(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) return;
+            
+            // Crear tooltip element si no existe
+            let tooltip = document.getElementById('svg-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'svg-tooltip';
+                tooltip.className = 'absolute bg-gray-800 text-white text-xs rounded px-2 py-1 pointer-events-none opacity-0 transition-opacity z-50';
+                document.getElementById('svg-diagnostico-container').appendChild(tooltip);
+            }
+            
+            // Agregar eventos a elementos del SVG
+            setTimeout(() => {
+                const svgElements = document.querySelectorAll('#svg-diagnostico path, #svg-diagnostico circle');
+                svgElements.forEach(element => {
+                    element.style.cursor = 'pointer';
+                    
+                    element.addEventListener('mouseenter', (e) => {
+                        const elementId = e.target.id;
+                        const tooltipText = obtenerTextoTooltip(elementId, diagnostico);
+                        if (tooltipText) {
+                            tooltip.textContent = tooltipText;
+                            tooltip.style.opacity = '1';
+                        }
+                    });
+                    
+                    element.addEventListener('mousemove', (e) => {
+                        const rect = document.getElementById('svg-diagnostico-container').getBoundingClientRect();
+                        tooltip.style.left = (e.clientX - rect.left + 10) + 'px';
+                        tooltip.style.top = (e.clientY - rect.top - 30) + 'px';
+                    });
+                    
+                    element.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                    
+                    element.addEventListener('click', (e) => {
+                        const elementId = e.target.id;
+                        mostrarInformacionDetallada(elementId, diagnostico);
+                    });
+                });
+            }, 100);
+        }
+        
+        function obtenerTextoTooltip(elementId, diagnostico) {
+            const tooltips = {
+                'c5-path': 'Raíz C5: Deltoides, Supraespinoso, Bíceps',
+                'c6-path': 'Raíz C6: Extensores muñeca, Braquiorradial',
+                'c7-path': 'Raíz C7: Tríceps, Extensores dedos',
+                'c8-path': 'Raíz C8: Flexores profundos, Interóseos',
+                't1-path': 'Raíz T1: Músculos intrínsecos mano',
+                'superior-trunk': 'Tronco Superior (C5-C6): Erb-Duchenne',
+                'middle-trunk': 'Tronco Medio (C7): Extensores',
+                'inferior-trunk': 'Tronco Inferior (C8-T1): Klumpke',
+                'lateral-cord': 'Fascículo Lateral: Musculocutáneo + Mediano',
+                'posterior-cord': 'Fascículo Posterior: Axilar + Radial',
+                'medial-cord': 'Fascículo Medial: Cubital + Mediano',
+                'musculocutaneous': 'N. Musculocutáneo: Flexión codo',
+                'axillary': 'N. Axilar: Abducción hombro',
+                'radial': 'N. Radial: Extensión codo/muñeca/dedos',
+                'median': 'N. Mediano: Pronación, flexión, oposición',
+                'ulnar': 'N. Cubital: Intrínsecos mano',
+                'suprascapular': 'N. Supraescapular: Supraespinoso + Infraespinoso'
+            };
+            
+            return tooltips[elementId] || 'Estructura anatómica del plexo braquial';
+        }
+        
+        function mostrarInformacionDetallada(elementId, diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) return;
+            
+            let mensaje = `Estructura: ${elementId.replace('-', ' ').toUpperCase()}\n\n`;
+            
+            if (mapeo.estructurasPrimarias.includes(elementId)) {
+                mensaje += "Estado: LESIÓN PRIMARIA ❗\n";
+                mensaje += "Esta estructura es el sitio principal de la lesión.\n\n";
+            } else if (mapeo.estructurasSecundarias.includes(elementId)) {
+                mensaje += "Estado: AFECTACIÓN SECUNDARIA 🟠\n";
+                mensaje += "Esta estructura está afectada como consecuencia de la lesión primaria.\n\n";
+            } else {
+                mensaje += "Estado: ESTRUCTURA NORMAL ✅\n";
+                mensaje += "Esta estructura no está afectada en este diagnóstico.\n\n";
+            }
+            
+            if (mapeo.nerviosAfectados.includes(elementId)) {
+                mensaje += "Este nervio está comprometido en esta lesión.\n";
+            }
+            
+            alert(mensaje);
+        }
+
+        function animarRecorridoLesion(diagnostico) {
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[diagnostico.nombreLesion];
+            if (!mapeo) return;
+
+            // Resetear animaciones
+            document.querySelectorAll('#svg-diagnostico path, #svg-diagnostico circle').forEach(elemento => {
+                elemento.classList.remove('recorrido-animado');
+            });
+
+            // Animar secuencialmente las estructuras
+            const todasEstructuras = [...mapeo.estructurasPrimarias, ...mapeo.estructurasSecundarias];
+            todasEstructuras.forEach((estructura, index) => {
+                setTimeout(() => {
+                    const elemento = document.getElementById(estructura);
+                    if (elemento) {
+                        elemento.classList.add('recorrido-animado');
+                        
+                        // Resaltar paso correspondiente
+                        document.querySelectorAll('.paso-recorrido').forEach(paso => {
+                            paso.classList.remove('activo');
+                        });
+                        const pasoActual = document.querySelector(`[data-paso="${index}"]`);
+                        if (pasoActual) {
+                            pasoActual.classList.add('activo');
+                        }
+                    }
+                }, index * 1000);
+            });
+
+            // Resetear después de la animación
+            setTimeout(() => {
+                document.querySelectorAll('.paso-recorrido').forEach(paso => {
+                    paso.classList.remove('activo');
+                });
+                document.querySelectorAll('#svg-diagnostico path, #svg-diagnostico circle').forEach(elemento => {
+                    elemento.classList.remove('recorrido-animado');
+                });
+            }, todasEstructuras.length * 1000 + 2000);
+        }
+
+        function resaltarPasoRecorrido(pasoIndex, nombreLesion) {
+            // Resaltar paso específico
+            document.querySelectorAll('.paso-recorrido').forEach((paso, index) => {
+                if (index === pasoIndex) {
+                    paso.classList.add('activo');
+                } else {
+                    paso.classList.remove('activo');
+                }
+            });
+
+            // Resaltar estructura correspondiente en SVG
+            const mapeo = MAPEO_ANATOMICO_DIAGNOSTICO[nombreLesion];
+            if (mapeo && mapeo.recorrido[pasoIndex]) {
+                const estructuras = [...mapeo.estructurasPrimarias, ...mapeo.estructurasSecundarias];
+                if (estructuras[pasoIndex]) {
+                    const elemento = document.getElementById(estructuras[pasoIndex]);
+                    if (elemento) {
+                        // Efecto temporal de resaltado
+                        elemento.style.animation = 'pulso-lesion 1s ease-in-out 3';
+                        setTimeout(() => {
+                            elemento.style.animation = '';
+                        }, 3000);
+                    }
+                }
+            }
+        }
+
+        // ========== FUNCIONES PARA CASOS CLÍNICOS DEMO ==========
+        
+        function cargarCasoClinico(nombreCaso) {
+            const caso = CASOS_CLINICOS_DEMO[nombreCaso];
+            if (!caso) {
+                alert('Caso clínico no encontrado');
+                return;
+            }
+            
+            // Resetear todo primero
+            document.getElementById('resetBtn').click();
+            
+            setTimeout(() => {
+                // Cargar valores musculares
+                Object.entries(caso.musculos).forEach(([musculo, mrc]) => {
+                    const select = document.querySelector(`select[data-muscle="${musculo}"]`);
+                    if (select) {
+                        select.value = mrc.toString();
+                    }
+                });
+                
+                // Cargar síntomas
+                caso.sintomas.forEach(sintoma => {
+                    const checkbox = document.querySelector(`input[name="sintomas"][value="${sintoma}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Cargar sensibilidad
+                caso.sensibilidad.forEach(area => {
+                    const checkbox = document.querySelector(`input[name="sensibilidad"][value="${area}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Cargar reflejos
+                Object.entries(caso.reflejos).forEach(([reflejo, estado]) => {
+                    const select = document.getElementById(`reflejo${reflejo.charAt(0).toUpperCase() + reflejo.slice(1)}`);
+                    if (select) {
+                        select.value = estado;
+                    }
+                });
+                
+                // Mostrar alerta informativa
+                alert(`Caso clínico cargado: ${nombreCaso}\n\nDescripción: ${caso.descripcion}\n\nDiagnóstico esperado: ${caso.diagnosticoEsperado}\n\nPuedes proceder con la evaluación para ver la visualización anatómica.`);
+                
+                // Navegar automáticamente al último paso para evaluación
+                currentStep = 5;
+                showStep(currentStep);
+                
+            }, 500);
+        }
+        
+        function mostrarInformacionCaso(nombreCaso) {
+            const caso = CASOS_CLINICOS_DEMO[nombreCaso];
+            if (!caso) return;
+            
+            return `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <h6 class="font-semibold text-blue-800 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Caso Clínico: ${nombreCaso}
+                    </h6>
+                    <p class="text-sm text-blue-700 mb-2">${caso.descripcion}</p>
+                    <p class="text-xs text-blue-600">
+                        <strong>Diagnóstico esperado:</strong> ${caso.diagnosticoEsperado}
+                    </p>
+                </div>
+            `;
+        }
+
+        /**************************************************************************
+         * Función principal para calcular el diagnóstico (v2)
+         **************************************************************************/
+        function calcularDiagnostico(muscleStrengths, sintomasSel, sensibilidadSel, reflexStatuses, tipoPlexo = 'normal') {
+            const resultadosDetallados = LESIONES.map(lesion => {
+                // Ajustar la lesión según el tipo de plexo
+                const lesionAjustada = ajustarLesionPorTipoPlexo(lesion, tipoPlexo);
+                let totalWeightedMuscleScorePossible = 0;
+                let currentWeightedMuscleScore = 0;
+                let muscleMatches = []; // Para mostrar detalle
+
+                // 1. Calcular Score Muscular Ponderado
+                lesionAjustada.musculosClave.forEach(muscleInfo => {
+                    const muscleName = muscleInfo.nombre;
+                    const weight = muscleInfo.peso || 1.0; // Peso por defecto 1.0
+                    const mrcScore = muscleStrengths[muscleName]; // Obtener MRC del input del usuario
+
+                    totalWeightedMuscleScorePossible += weight; // El score máximo posible es el peso total
+
+                    if (mrcScore !== undefined && mrcScore < 5) {
+                        // El músculo está afectado (MRC 0-4)
+                        // Calcular contribución basada en grado de debilidad (0 a 1) y peso
+                        const weaknessFactor = (5 - mrcScore) / 5; // 0 para MRC 5, 1 para MRC 0
+                        let muscleScoreContribution = weaknessFactor * weight;
+
+                        // Aplicar penalización leve si un músculo clave está normal (simplificado)
+                        // En lugar de penalizar, simplemente no suma puntos si MRC=5
+                        // if (mrcScore === 5) {
+                        //     muscleScoreContribution *= CONFIG.PENALIZACION_MUSCULO_NORMAL; // No aplica si no suma puntos
+                        // }
+
+                        currentWeightedMuscleScore += muscleScoreContribution;
+                        muscleMatches.push({ nombre: muscleName, mrc: mrcScore, contribucion: muscleScoreContribution.toFixed(2) });
+                    } else if (mrcScore === 5) {
+                         // Músculo clave está normal, registrar para posible penalización o info
+                         muscleMatches.push({ nombre: muscleName, mrc: mrcScore, contribucion: 0 });
+                    }
+                    // Si mrcScore es undefined (músculo no en la lista del HTML), se ignora
+                });
+
+                // Normalizar score muscular (0 a 1)
+                const normalizedMuscleScore = totalWeightedMuscleScorePossible > 0 ? currentWeightedMuscleScore / totalWeightedMuscleScorePossible : 0;
+
+                // 2. Calcular Score de Sensibilidad
+                let sensitivityScore = 0;
+                let sensitivityMatches = [];
+                const totalSensitivityAreas = lesionAjustada.areasSensibilidad.length;
+                if (totalSensitivityAreas > 0) {
+                    lesionAjustada.areasSensibilidad.forEach(area => {
+                        if (sensibilidadSel.includes(area)) {
+                            sensitivityScore += 1;
+                            sensitivityMatches.push(area);
+                        }
+                    });
+                    sensitivityScore /= totalSensitivityAreas; // Normalizar (0 a 1)
+                }
+
+                // 3. Calcular Score de Síntomas (Dolor, Parestesias, Horner)
+                let symptomScore = 0;
+                let symptomMatches = [];
+                const totalSymptoms = lesionAjustada.sintomasClave.length;
+                let hornerPresentAndExpected = false;
+                 if (totalSymptoms > 0) {
+                    lesionAjustada.sintomasClave.forEach(sintoma => {
+                        if (sintomasSel.includes(sintoma)) {
+                            symptomScore += 1;
+                            symptomMatches.push(sintoma);
+                            if (sintoma === "Signo de Horner") {
+                                hornerPresentAndExpected = true;
+                            }
+                        }
+                    });
+                     symptomScore /= totalSymptoms; // Normalizar (0 a 1)
+                 }
+
+
+                // 4. Calcular Score de Reflejos
+                let reflexScore = 0;
+                let reflexMatches = [];
+                const expectedReflexes = lesionAjustada.reflejosClave;
+                const numReflexesDefined = Object.keys(expectedReflexes).length;
+                let reflexMatchCount = 0;
+                if (numReflexesDefined > 0) {
+                    for (const reflex in expectedReflexes) {
+                        if (reflexStatuses[reflex] === expectedReflexes[reflex]) {
+                            reflexMatchCount++;
+                            reflexMatches.push({ nombre: reflex, esperado: expectedReflexes[reflex], encontrado: reflexStatuses[reflex], match: true });
+                        } else {
+                             reflexMatches.push({ nombre: reflex, esperado: expectedReflexes[reflex], encontrado: reflexStatuses[reflex], match: false });
+                        }
+                    }
+                    reflexScore = reflexMatchCount / numReflexesDefined; // Normalizar (0 a 1)
+                }
+
+                // 5. Combinar Scores Ponderados
+                let finalScore = (normalizedMuscleScore * CONFIG.PESO_MUSCULOS) +
+                                 (sensitivityScore * CONFIG.PESO_SENSIBILIDAD) +
+                                 (symptomScore * CONFIG.PESO_SINTOMAS) +
+                                 (reflexScore * CONFIG.PESO_REFLEJOS);
+
+                // Añadir bonus/peso extra si Horner está presente y esperado
+                if (hornerPresentAndExpected) {
+                    finalScore += CONFIG.PESO_HORNER; // Añadir peso extra, no normalizado aquí intencionalmente
+                }
+
+                // Normalizar el score final (opcional, pero útil para comparar)
+                const maxPossibleScore = CONFIG.PESO_MUSCULOS + CONFIG.PESO_SENSIBILIDAD + CONFIG.PESO_SINTOMAS + CONFIG.PESO_REFLEJOS + (lesion.sintomasClave.includes("Signo de Horner") ? CONFIG.PESO_HORNER : 0);
+                const normalizedFinalScore = maxPossibleScore > 0 ? finalScore / maxPossibleScore : 0;
+
+
+                 // 6. Aplicar Umbrales
+                 const umbralAplicable = lesionAjustada.exclusivos
+                    ? (lesionAjustada.umbralMinimo || CONFIG.UMBRAL_MINIMO_EXCLUSIVO)
+                    : CONFIG.UMBRAL_COINCIDENCIA_GENERAL;
+
+                 // Si el score normalizado no alcanza el umbral, descartar o penalizar fuertemente
+                 if (normalizedFinalScore < umbralAplicable) {
+                     // Podríamos retornar null o un score muy bajo
+                     // Por simplicidad, mantendremos el score pero se filtrará después si es necesario
+                     // Opcional: poner a 0 si no cumple umbral
+                     // finalScore = 0;
+                     // normalizedFinalScore = 0;
+                 }
+
+
+                return {
+                    nombreLesion: lesionAjustada.nombre,
+                    score: finalScore, // Score ponderado absoluto (puede ser > 1)
+                    normalizedScore: normalizedFinalScore, // Score normalizado (0-1)
+                    umbral: umbralAplicable,
+                    detalles: {
+                        musculos: muscleMatches,
+                        sensibilidad: sensitivityMatches,
+                        sintomas: symptomMatches,
+                        reflejos: reflexMatches,
+                        nerviosPerifericos: lesionAjustada.nerviosPerifericos || []
+                    }
+                };
+            });
+
+            // Filtrar resultados que no alcanzan su umbral mínimo
+            const resultadosFiltrados = resultadosDetallados.filter(r => r.normalizedScore >= r.umbral);
+
+
+            // Ordenar de mayor a menor puntaje normalizado
+            resultadosFiltrados.sort((a, b) => b.normalizedScore - a.normalizedScore);
+
+            return resultadosFiltrados;
+        }
+
+        /**************************************************************************
+         * Lógica del Wizard y manejo de eventos v2
+         **************************************************************************/
+        let currentStep = 1;
+        const totalSteps = 5; // Actualizado al número total de pasos
+        const questionElems = document.querySelectorAll(".question");
+        const resultsContainer = document.getElementById("resultsContainer");
+        const diagnosticoResultado = document.getElementById("diagnosticoResultado");
+        const finalSheet = document.getElementById("finalSheet");
+        const diagName = document.getElementById("diagName");
+        const scoreInfo = document.getElementById("scoreInfo");
+        const nerviosAfectadosDiv = document.getElementById("nerviosAfectados");
+        const musculosDetalleDiv = document.getElementById("musculosDetalle");
+        const sensibilidadDetalleDiv = document.getElementById("sensibilidadDetalle");
+        const reflejosDetalleDiv = document.getElementById("reflejosDetalle");
+        const infoAdicionalDetalleDiv = document.getElementById("infoAdicionalDetalle");
+        const inervacionDualInfoDiv = document.getElementById("inervacionDualInfo");
+        const printButton = document.getElementById("printButton");
+
+        function showStep(step) {
+            questionElems.forEach(q => {
+                q.classList.remove("active");
+                if (+q.getAttribute("data-step") === step) {
+                    q.classList.add("active");
+                    // Actualizar texto de progreso
+                    const progressElem = q.querySelector(".progress");
+                    if(progressElem) {
+                        progressElem.textContent = `Paso ${step} de ${totalSteps}`;
+                    }
+                }
+            });
+            // Ocultar resultados al navegar hacia atrás
+             if (step < totalSteps) {
+                 resultsContainer.style.display = "none";
+                 finalSheet.style.display = "none";
+                 printButton.disabled = true;
+             }
+        }
+
+        // ========== VALIDACIONES MEJORADAS ==========
+        function validateStep1() {
+            // Validar que al menos un músculo tenga MRC < 5
+            const muscleStrengths = getMuscleStrengths();
+            const musculosAfectados = Object.values(muscleStrengths).filter(mrc => mrc < 5);
+            
+            const errorElement = document.getElementById("errorStep1");
+            
+            if (musculosAfectados.length === 0) {
+                errorElement.textContent = "⚠️ Advertencia: No se detectaron músculos con debilidad. Verifica la evaluación muscular.";
+                errorElement.style.display = "block";
+                return false;
+            }
+            
+            if (musculosAfectados.length > 20) {
+                errorElement.textContent = "⚠️ Advertencia: Demasiados músculos afectados. Considera lesión global o revisa la evaluación.";
+                errorElement.style.display = "block";
+                // Permitir continuar pero con advertencia
+            } else {
+                errorElement.style.display = "none";
+            }
+            
+            return true;
+        }
+        
+        function validateStep2() {
+            const sintomas = getCheckedValues("sintomas");
+            const sensibilidad = getCheckedValues("sensibilidad");
+            const errorElement = document.getElementById("errorStep2");
+            
+            // Validación de coherencia: Horner solo con lesiones C8-T1
+            if (sintomas.includes("Signo de Horner")) {
+                if (!sensibilidad.some(s => s.includes("Medial") || s.includes("T1"))) {
+                    errorElement.textContent = "⚠️ Coherencia: Signo de Horner sugiere lesión T1. Considera alteración sensorial medial.";
+                    errorElement.style.display = "block";
+                }
+            }
+            
+            // Sugerencia si no hay alteraciones sensoriales
+            if (sensibilidad.length === 0 && sintomas.length === 0) {
+                errorElement.textContent = "📝 Sugerencia: Sin alteraciones sensoriales o síntomas. Considera mononeuropatías motoras puras.";
+                errorElement.style.display = "block";
+            } else {
+                errorElement.style.display = "none";
+            }
+            
+            return true;
+        }
+        
+        function validateStep3() {
+            // Validación final antes de evaluar
+            const muscleStrengths = getMuscleStrengths();
+            const musculosAfectados = Object.entries(muscleStrengths).filter(([_, mrc]) => mrc < 5);
+            
+            if (musculosAfectados.length === 0) {
+                alert("⚠️ No se puede realizar el diagnóstico sin músculos afectados. Revisa la evaluación muscular.");
+                return false;
+            }
+            
+            return true;
+        }
+
+        // --- Eventos de Navegación ---
+        document.getElementById("nextBtn1").addEventListener("click", () => {
+            if (!validateStep1()) return;
+            currentStep = 2;
+            showStep(currentStep);
+        });
+        document.getElementById("prevBtn2").addEventListener("click", () => { currentStep = 1; showStep(currentStep); });
+
+        document.getElementById("nextBtn2").addEventListener("click", () => {
+            if (!validateStep2()) return;
+            currentStep = 3;
+            showStep(currentStep);
+        });
+        document.getElementById("prevBtn3").addEventListener("click", () => { currentStep = 2; showStep(currentStep); });
+
+        document.getElementById("nextBtn3").addEventListener("click", () => {
+            currentStep = 4;
+            showStep(currentStep);
+        });
+         document.getElementById("prevBtn4").addEventListener("click", () => { currentStep = 3; showStep(currentStep); });
+
+         document.getElementById("nextBtn4").addEventListener("click", () => {
+            currentStep = 5;
+            showStep(currentStep);
+        });
+        document.getElementById("prevBtn5").addEventListener("click", () => { currentStep = 4; showStep(currentStep); });
+
+
+        // --- Evaluación del Diagnóstico ---
+        document.getElementById("evaluateBtn").addEventListener("click", () => {
+            // Validación final antes de evaluar
+            if (!validateStep3()) return;
+            // Recolectar todos los datos
+            const muscleStrengths = getMuscleStrengths();
+            const sintomasSeleccionados = getCheckedValues("sintomas");
+            const sensibilidadSeleccionada = getCheckedValues("sensibilidad");
+            const reflexStatuses = getReflexStatuses();
+            const additionalInfo = getAdditionalInfo(); // Recoger info adicional
+
+            // Calcular diagnóstico
+            const resultados = calcularDiagnostico(muscleStrengths, sintomasSeleccionados, sensibilidadSeleccionada, reflexStatuses, additionalInfo.tipoPlexo);
+
+            // Analizar inervación dual
+            const hallazgosInervacionDual = analizarInervacionDual(muscleStrengths);
+
+            // Limpiar resultados anteriores
+            diagnosticoResultado.innerText = "";
+            finalSheet.style.display = "none";
+            printButton.disabled = true;
+
+
+            if (!resultados || resultados.length === 0) {
+                diagnosticoResultado.innerText = "No se encontró ninguna lesión compatible con los criterios y umbrales definidos.";
+                resultsContainer.style.display = "block";
+                return;
+            }
+
+            // Mostrar top 3 resultados en el resumen
+            let msg = "Diagnósticos más probables:";
+            resultados.slice(0, 3).forEach((r, idx) => {
+                // Usar score normalizado para mostrar probabilidad relativa
+                msg += `\n${idx + 1}) ${r.nombreLesion} (Score Norm: ${r.normalizedScore.toFixed(2)}, Umbral: ${r.umbral.toFixed(2)})`;
+            });
+            diagnosticoResultado.innerText = msg;
+            resultsContainer.style.display = "block";
+
+            // Mostrar detalles del mejor resultado en la hoja final
+            const mejorCoincidencia = resultados[0];
+            finalSheet.style.display = "block";
+            diagName.innerText = `Diagnóstico Principal Sugerido: ${mejorCoincidencia.nombreLesion}`;
+            scoreInfo.innerText = `(Score Normalizado: ${mejorCoincidencia.normalizedScore.toFixed(2)}, Score Ponderado: ${mejorCoincidencia.score.toFixed(2)}, Umbral Aplicado: ${mejorCoincidencia.umbral.toFixed(2)})`;
+
+            // Detalles: Nervios
+            let nerviosHtml = `<p><strong>Nervios periféricos potencialmente afectados:</strong></p><ul>`;
+            mejorCoincidencia.detalles.nerviosPerifericos.forEach(nv => { nerviosHtml += `<li>${nv}</li>`; });
+            nerviosHtml += `</ul>`;
+            nerviosAfectadosDiv.innerHTML = nerviosHtml;
+
+            // Detalles: Músculos
+            let musculosHtml = `<p><strong>Detalle muscular clave para "${mejorCoincidencia.nombreLesion}":</strong></p><ul>`;
+            mejorCoincidencia.detalles.musculos.forEach(musc => {
+                musculosHtml += `<li>${musc.nombre}: MRC ${musc.mrc} ${musc.mrc < 5 ? '(Contribuyó al score)' : '(Normal)'}</li>`;
+            });
+            musculosHtml += `</ul>`;
+            musculosDetalleDiv.innerHTML = musculosHtml;
+
+             // Detalles: Sensibilidad
+            let sensibilidadHtml = `<p><strong>Coincidencias Sensoriales:</strong></p><ul>`;
+            if (mejorCoincidencia.detalles.sensibilidad.length > 0) {
+                mejorCoincidencia.detalles.sensibilidad.forEach(sens => { sensibilidadHtml += `<li>${sens}</li>`; });
+            } else {
+                sensibilidadHtml += `<li>Ninguna coincidencia específica encontrada.</li>`;
+            }
+            sensibilidadHtml += `</ul>`;
+            sensibilidadDetalleDiv.innerHTML = sensibilidadHtml;
+
+             // Detalles: Reflejos
+            let reflejosHtml = `<p><strong>Estado de Reflejos vs. Esperado:</strong></p><ul>`;
+             if (mejorCoincidencia.detalles.reflejos.length > 0) {
+                mejorCoincidencia.detalles.reflejos.forEach(refl => {
+                    reflejosHtml += `<li>${refl.nombre.charAt(0).toUpperCase() + refl.nombre.slice(1)}: Encontrado=${refl.encontrado}, Esperado=${refl.esperado} ${refl.match ? '(Coincide)' : '(No coincide)'}</li>`;
+                });
+             } else {
+                 reflejosHtml += `<li>No se definieron reflejos clave para esta lesión.</li>`;
+             }
+            reflejosHtml += `</ul>`;
+            reflejosDetalleDiv.innerHTML = reflejosHtml;
+
+             // Detalles: Información Adicional
+            let infoAdicionalHtml = `<p><strong>Información Adicional Registrada:</strong></p><ul>`;
+            infoAdicionalHtml += `<li>Mecanismo: ${additionalInfo.mecanismo.replace(/_/g, ' ') || 'No especificado'}</li>`;
+            infoAdicionalHtml += `<li>Evolución: ${additionalInfo.evolucion.replace(/_/g, ' ') || 'No especificado'}</li>`;
+            infoAdicionalHtml += `<li>Tipo de Plexo: ${additionalInfo.tipoPlexo.replace(/_/g, ' ') || 'No especificado'}</li>`;
+            infoAdicionalHtml += `</ul>`;
+            infoAdicionalDetalleDiv.innerHTML = infoAdicionalHtml;
+
+            // Detalles: Inervación Dual
+            let inervacionDualHtml = `<p><strong>Análisis de Inervación Dual:</strong></p>`;
+            if (hallazgosInervacionDual.length > 0) {
+                inervacionDualHtml += `<ul>`;
+                hallazgosInervacionDual.forEach(hallazgo => {
+                    inervacionDualHtml += `<li><strong>${hallazgo.musculo}</strong> (MRC ${hallazgo.mrc}):<br>`;
+                    inervacionDualHtml += `• Principal: ${hallazgo.info.principal}<br>`;
+                    inervacionDualHtml += `• Secundario: ${hallazgo.info.secundario}<br>`;
+                    inervacionDualHtml += `• Implicación: ${hallazgo.info.implicacion}<br>`;
+                    inervacionDualHtml += `• Relevancia: ${hallazgo.relevancia}</li>`;
+                });
+                inervacionDualHtml += `</ul>`;
+            } else {
+                inervacionDualHtml += `<p>No se detectaron músculos con inervación dual afectados significativamente.</p>`;
+            }
+            inervacionDualInfoDiv.innerHTML = inervacionDualHtml;
+
+
+            // Habilitar botón de imprimir
+            printButton.disabled = false;
+            
+            // ========== NUEVA FUNCIONALIDAD: INTEGRAR VISUALIZACIÓN ANATÓMICA ==========
+            mostrarVisualizacionDiagnostica(mejorCoincidencia);
+            
+            // Mostrar estadísticas del diagnóstico
+            mostrarEstadisticasDiagnostico(resultados, mejorCoincidencia);
+        });
+        
+        function mostrarEstadisticasDiagnostico(todosResultados, mejorDiagnostico) {
+            const estadisticas = `
+                <div class="mt-4 p-3 bg-gray-50 rounded-lg border">
+                    <h6 class="font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
+                        Estadísticas del Diagnóstico
+                    </h6>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-600">Diagnósticos evaluados:</span>
+                            <span class="font-semibold ml-2">${todosResultados.length}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Confianza del diagnóstico:</span>
+                            <span class="font-semibold ml-2 ${mejorDiagnostico.normalizedScore > 0.7 ? 'text-green-600' : mejorDiagnostico.normalizedScore > 0.5 ? 'text-yellow-600' : 'text-red-600'}">
+                                ${(mejorDiagnostico.normalizedScore * 100).toFixed(1)}%
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Músculos evaluados:</span>
+                            <span class="font-semibold ml-2">${mejorDiagnostico.detalles.musculos.length}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Áreas sensoriales:</span>
+                            <span class="font-semibold ml-2">${mejorDiagnostico.detalles.sensibilidad.length}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insertar después de la correlación clínica
+            const correlacionDiv = document.getElementById('correlacion-clinica');
+            if (correlacionDiv && correlacionDiv.parentNode) {
+                correlacionDiv.parentNode.insertAdjacentHTML('afterend', estadisticas);
+            }
+        }
+
+        // --- Reiniciar ---
+        document.getElementById("resetBtn").addEventListener("click", () => {
+            // Resetear selects de músculos a 5 (Normal)
+            document.querySelectorAll('select[name="musculos"]').forEach(select => select.value = "5");
+            // Resetear checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+            // Resetear selects de reflejos a normal
+            document.getElementById('reflejoBicipital').value = "normal";
+            document.getElementById('reflejoBraquiorradial').value = "normal";
+            document.getElementById('reflejoTricipital').value = "normal";
+             // Resetear selects de info adicional
+            document.getElementById('mecanismoLesion').value = "no_especificado";
+            document.getElementById('tiempoEvolucion').value = "no_especificado";
+            document.getElementById('tipoPlexo').value = "normal";
+
+            // Ocultar resultados y volver al paso 1
+            resultsContainer.style.display = "none";
+            diagnosticoResultado.innerText = "";
+            finalSheet.style.display = "none";
+            currentStep = 1;
+            showStep(currentStep);
+            printButton.disabled = true;
+             // Limpiar mensajes de error
+             document.querySelectorAll('.error-message').forEach(el => { el.style.display = 'none'; el.innerText = ''; });
+        });
+
+        // --- Botón extra de imprimir ---
+        document.getElementById("printButton").addEventListener("click", () => {
+            if (!finalSheet.style.display || finalSheet.style.display === 'none') {
+                alert("Primero debes evaluar un diagnóstico para poder imprimir.");
+                return;
+            }
+            window.print();
+        });
+
+        // --- Inicialización ---
+        document.getElementById("mostrarTitulo").textContent = document.title;
+        showStep(currentStep); // Mostrar el primer paso por defecto
+
+    </script>
+</body>
+</html>

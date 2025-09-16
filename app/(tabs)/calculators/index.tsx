@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
@@ -9,6 +9,11 @@ const calculators = [
     id: 'botulinum',
     title: 'Toxina Botulínica',
     description: 'Cálculo de unidades por músculo, volumen y dilución',
+  },
+  {
+    id: 'plexo-braquial',
+    title: 'Diagnóstico Plexo Braquial',
+    description: 'Calculadora diagnóstica topográfica del plexo braquial',
   },
 ];
 

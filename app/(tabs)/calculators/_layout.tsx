@@ -15,6 +15,18 @@ export default function CalculatorsLayout() {
           title: 'Toxina Botulínica',
         }}
       />
+      <Stack.Screen
+        name="plexo-braquial"
+        options={{
+          title: 'Diagnóstico Plexo Braquial',
+        }}
+      />
+      <Stack.Screen
+        name="plexus-educativo"
+        options={{
+          title: 'Plexo Braquial Interactivo',
+        }}
+      />
     </Stack>
   );
 }
