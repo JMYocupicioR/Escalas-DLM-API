@@ -45,6 +45,12 @@ export default function ScalesLayout() {
           title: 'Escalas por Segmento Corporal',
         }}
       />
+      <Stack.Screen
+        name="ogs"
+        options={{
+          title: 'Escala OGS',
+        }}
+      />
     </Stack>
   );
 }

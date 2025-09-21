@@ -39,6 +39,14 @@ const SCALES = [
     popular: true,
     timeToComplete: '10 min',
   },
+  {
+    id: 'ogs',
+    name: 'Observational Gait Scale',
+    acronym: 'OGS',
+    description: 'Evaluación cualitativa de parámetros de la marcha',
+    popular: false,
+    timeToComplete: '15 min',
+  },
   // Add more scales...
 ].sort((a, b) => a.name.localeCompare(b.name));
 

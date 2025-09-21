@@ -20,6 +20,7 @@ export { generateHtml as renderBotulinumHtml } from './botulinum';
 export { generateHtml as renderFimHtml } from './fim';
 export { generateHtml as renderBarthelHtml } from './barthel';
 export { generateHtml as renderLequesneHtml } from './lequesne';
+export { generateHtml as renderOgsHtml } from './ogs';
 
 export const renderHtmlForScale = (payload: PdfTemplatePayload): string => {
   const id = payload?.scale?.id || '';
@@ -36,6 +37,9 @@ export const renderHtmlForScale = (payload: PdfTemplatePayload): string => {
   if (id === 'lequesne' || id === 'lequesne-rodilla-es-v1') {
     return (require('./lequesne') as typeof import('./lequesne')).generateHtml(payload as any);
   }
+  if (id === 'ogs') {
+    return (require('./ogs') as typeof import('./ogs')).generateHtml(payload as any);
+  }
   return (require('./generic') as typeof import('./generic')).generateHtml(payload as any);
 };
 
@@ -46,6 +50,7 @@ export const TEMPLATE_MAP = {
   barthel: (payload: PdfTemplatePayload) => (require('./barthel') as typeof import('./barthel')).generateHtml(payload as any),
   lequesne: (payload: PdfTemplatePayload) => (require('./lequesne') as typeof import('./lequesne')).generateHtml(payload as any),
   'lequesne-rodilla-es-v1': (payload: PdfTemplatePayload) => (require('./lequesne') as typeof import('./lequesne')).generateHtml(payload as any),
+  ogs: (payload: PdfTemplatePayload) => (require('./ogs') as typeof import('./ogs')).generateHtml(payload as any),
   generic: (payload: PdfTemplatePayload) => (require('./generic') as typeof import('./generic')).generateHtml(payload as any),
 } as const;
 

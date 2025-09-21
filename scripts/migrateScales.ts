@@ -11,6 +11,7 @@ import {
   functionalStatusQuestions, 
   scoreInterpretation 
 } from '../data/boston';
+import { ogsScale } from '../data/ogs';
 import { CreateScaleRequest } from '../api/scales/types';
 
 // Define scale definitions to migrate
@@ -128,7 +129,8 @@ const scalesToMigrate = [
       }
     ],
     questions: [...symptomSeverityQuestions, ...functionalStatusQuestions]
-  }
+  },
+  ogsScale
 ];
 
 /**
