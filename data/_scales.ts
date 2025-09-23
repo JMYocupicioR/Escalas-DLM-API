@@ -175,6 +175,24 @@ export const scales: Scale[] = [
     specialty: 'Neurología',
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
   },
+  {
+    id: 'ogs',
+    name: 'Observational Gait Scale',
+    description: 'Herramienta clínica cualitativa para valorar parámetros de la marcha, especialmente útil en población pediátrica con parálisis cerebral.',
+    timeToComplete: '15 min',
+    category: 'Funcional',
+    specialty: 'Medicina Física y Rehabilitación',
+    imageUrl: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'hine',
+    name: 'Hammersmith Infant Neurological Examination',
+    description: 'Evaluación neurológica estandarizada para lactantes de 2 a 24 meses',
+    timeToComplete: '30-45 min',
+    category: 'Neurology',
+    specialty: 'Neurología Pediátrica',
+    imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
+  },
 ];
 
 export const scalesById = scales.reduce((acc, scale) => {

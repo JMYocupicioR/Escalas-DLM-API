@@ -39,6 +39,12 @@ const SPECIALTIES = {
         description: 'Evaluación de déficit neurológico en ictus',
         timeToComplete: '10 min',
       },
+      {
+        id: 'hine',
+        name: 'HINE - Hammersmith Infant Neurological Examination',
+        description: 'Evaluación neurológica estandarizada para lactantes de 2 a 24 meses',
+        timeToComplete: '30-45 min',
+      },
     ],
   },
   traumatologia: {

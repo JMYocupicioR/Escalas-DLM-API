@@ -12,14 +12,14 @@ const OgsAssessmentSchema = z.object({
   leftTotalScore: z.number(),
   rightTotalScore: z.number(),
   leftInterpretation: z.object({
-    level: z.string(),
-    text: z.string(),
-    color: z.string(),
+    interpretation_level: z.string(),
+    interpretation_text: z.string(),
+    color_code: z.string(),
   }),
   rightInterpretation: z.object({
-    level: z.string(),
-    text: z.string(),
-    color: z.string(),
+    interpretation_level: z.string(),
+    interpretation_text: z.string(),
+    color_code: z.string(),
   }),
   responses: z.array(z.object({
     questionId: z.string(),
@@ -168,15 +168,15 @@ export const generateHtml = (payload: OgsPayload): string => {
         <div class="score-title">Pierna Derecha</div>
         <div class="score-value" style="color: #3b82f6;">${rightTotalScore}</div>
         <div class="score-range">de 22 puntos</div>
-        <div class="score-badge" style="background-color: ${rightInterpretation.color};">${rightInterpretation.level}</div>
-        <div class="score-description">${rightInterpretation.text}</div>
+        <div class="score-badge" style="background-color: ${rightInterpretation.color_code};">${rightInterpretation.interpretation_level}</div>
+        <div class="score-description">${rightInterpretation.interpretation_text}</div>
       </div>
       <div class="score-card left">
         <div class="score-title">Pierna Izquierda</div>
         <div class="score-value" style="color: #10b981;">${leftTotalScore}</div>
         <div class="score-range">de 22 puntos</div>
-        <div class="score-badge" style="background-color: ${leftInterpretation.color};">${leftInterpretation.level}</div>
-        <div class="score-description">${leftInterpretation.text}</div>
+        <div class="score-badge" style="background-color: ${leftInterpretation.color_code};">${leftInterpretation.interpretation_level}</div>
+        <div class="score-description">${leftInterpretation.interpretation_text}</div>
       </div>
     </div>
   </div>
@@ -204,13 +204,13 @@ export const generateHtml = (payload: OgsPayload): string => {
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
       <div>
         <h4 style="color: #3b82f6; margin-bottom: 10px;">Pierna Derecha</h4>
-        <p><strong>Nivel:</strong> ${rightInterpretation.level}</p>
-        <p><strong>Interpretación:</strong> ${rightInterpretation.text}</p>
+        <p><strong>Nivel:</strong> ${rightInterpretation.interpretation_level}</p>
+        <p><strong>Interpretación:</strong> ${rightInterpretation.interpretation_text}</p>
       </div>
       <div>
         <h4 style="color: #10b981; margin-bottom: 10px;">Pierna Izquierda</h4>
-        <p><strong>Nivel:</strong> ${leftInterpretation.level}</p>
-        <p><strong>Interpretación:</strong> ${leftInterpretation.text}</p>
+        <p><strong>Nivel:</strong> ${leftInterpretation.interpretation_level}</p>
+        <p><strong>Interpretación:</strong> ${leftInterpretation.interpretation_text}</p>
       </div>
     </div>
   </div>

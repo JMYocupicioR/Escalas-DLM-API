@@ -17,7 +17,7 @@ const calculators = [
   { id: 'botulinum', title: 'Toxina Botulínica', description: 'Unidades, volumen y dilución' },
 ];
 
-const POPULAR_IDS = ['barthel', 'glasgow', 'mmse', 'fim', 'lequesne-rodilla-es-v1', 'vas'];
+const POPULAR_IDS = ['barthel', 'glasgow', 'mmse', 'fim', 'lequesne-rodilla-es-v1', 'vas', 'hine'];
 
 // Simulated usage stats for popular scales
 const SCALE_STATS = {
@@ -27,6 +27,7 @@ const SCALE_STATS = {
   'fim': { uses: 654, rating: 4.6, category: 'Funcional', icon: TrendingUp, color: '#0891b2' },
   'lequesne-rodilla-es-v1': { uses: 432, rating: 4.5, category: 'Dolor', icon: Heart, color: '#ef4444' },
   'vas': { uses: 1156, rating: 4.8, category: 'Dolor', icon: Activity, color: '#f97316' },
+  'hine': { uses: 523, rating: 4.7, category: 'Neurológica', icon: Brain, color: '#3b82f6' },
 };
 
 export default function HomeScreen() {

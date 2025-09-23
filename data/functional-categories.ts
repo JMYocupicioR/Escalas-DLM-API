@@ -9,7 +9,7 @@ export const functionalCategories = {
     title: 'Diagnóstico',
     description: 'Escalas para apoyo diagnóstico y clasificación',
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=60',
-    scales: ['mmse', 'lequesne-rodilla-es-v1'],
+    scales: ['mmse', 'lequesne-rodilla-es-v1', 'hine'],
   },
   pronostico: {
     title: 'Pronóstico',

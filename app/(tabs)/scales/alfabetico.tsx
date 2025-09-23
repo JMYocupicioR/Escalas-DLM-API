@@ -32,6 +32,14 @@ const SCALES = [
     timeToComplete: '2 min',
   },
   {
+    id: 'hine',
+    name: 'Hammersmith Infant Neurological Examination',
+    acronym: 'HINE',
+    description: 'Evaluación neurológica estandarizada para lactantes de 2 a 24 meses',
+    popular: true,
+    timeToComplete: '30-45 min',
+  },
+  {
     id: 'mmse',
     name: 'Mini-Mental State Examination',
     acronym: 'MMSE',

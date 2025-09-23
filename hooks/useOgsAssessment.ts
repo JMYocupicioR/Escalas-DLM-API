@@ -13,14 +13,14 @@ export interface OgsAssessmentData {
   leftTotalScore: number;
   rightTotalScore: number;
   leftInterpretation: {
-    level: string;
-    text: string;
-    color: string;
+    interpretation_level: string;
+    interpretation_text: string;
+    color_code: string;
   };
   rightInterpretation: {
-    level: string;
-    text: string;
-    color: string;
+    interpretation_level: string;
+    interpretation_text: string;
+    color_code: string;
   };
   patientData: {
     name: string;

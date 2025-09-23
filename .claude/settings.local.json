@@ -34,7 +34,14 @@
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\types/**)",
       "Read(/C:\\Users\\JmYoc\\OneDrive\\Documentos\\DeepLuxMed\\Escalas\\Escalas-DLM-API-1\\data/**)",
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(npm run dev:silent:*)",
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(npx expo start:*)",
+      "Bash(findstr:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
