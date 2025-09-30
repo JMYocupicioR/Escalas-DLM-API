@@ -11,6 +11,8 @@ import { ScaleAssessmentRequest } from '@/api/scales/types';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useScaleDetails } from '@/hooks/useScaleDetails';
 import Denver2Screen from '@/app/(tabs)/scales/denver2';
+import BergScaleScreen from '@/app/(tabs)/scales/berg';
+import KatzScaleScreen from '@/app/(tabs)/scales/katz';
 
 export default function ScaleDetailsScreen() {
   const { colors } = useScaleStyles();
@@ -119,7 +121,7 @@ export default function ScaleDetailsScreen() {
         summary: `Escala de la categoría ${scale.category}${scale.specialty ? ` - ${scale.specialty}` : ''}. Versión ${scale.version || '1.0'}.`,
         references: scale.references?.map(ref => ({
           title: ref.title,
-          authors: ref.authors.join(', '),
+          authors: Array.isArray(ref.authors) ? ref.authors.join(', ') : ref.authors,
           journal: 'N/A',
           year: ref.year,
           pages: 'N/A',
@@ -163,6 +165,38 @@ export default function ScaleDetailsScreen() {
     // Render the custom Denver II component here
     // This will be implemented in the next step.
     return <Denver2Screen />;
+  }
+
+  // Berg Balance Scale requires custom component due to complex structure
+  if (id === 'berg') {
+    return <BergScaleScreen />;
+  }
+
+  // Katz Index requires custom component with auto-advance feature
+  if (id === 'katz') {
+    return <KatzScaleScreen />;
+  }
+
+  // 6MWT requires custom component due to non-standard structure
+  if (id === '6mwt') {
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            title: 'Test de Marcha de 6 Minutos',
+            headerShown: true,
+          }}
+        />
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+          <EmptyState
+            title="Test de Marcha de 6 Minutos"
+            message="Esta escala requiere un componente especializado que está en desarrollo. Por favor, utilice la versión impresa mientras tanto."
+            actionText="Volver"
+            onAction={() => router.back()}
+          />
+        </SafeAreaView>
+      </>
+    );
   }
 
   if (isDesktop) {

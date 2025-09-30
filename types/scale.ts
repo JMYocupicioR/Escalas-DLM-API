@@ -5,6 +5,7 @@ export interface Scale {
   description: string;
   category: string;
   tags?: string[];
+  searchTerms?: string[]; // Términos adicionales para búsqueda (abreviaturas, sinónimos, nombres alternativos)
   timeToComplete?: string;
   popularity?: number;
   popular?: boolean;

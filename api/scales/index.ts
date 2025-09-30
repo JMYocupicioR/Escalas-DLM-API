@@ -8,45 +8,30 @@
  * @license CC BY-NC 4.0
  */
 
-import { 
-  getScales, 
-  getScaleById, 
-  getScaleCategories, 
-  getScaleSpecialties, 
-  getPopularScales,
-  createScaleAssessment,
-  getScaleStatistics,
-  addToFavorites,
-  removeFromFavorites,
-  getUserFavorites
-} from './scales';
+// TODO: Implement these functions when scales module is created
+// import {
+//   getScales,
+//   getScaleById,
+//   getScaleCategories,
+//   getScaleSpecialties,
+//   getPopularScales,
+//   createScaleAssessment,
+//   getScaleStatistics,
+//   addToFavorites,
+//   removeFromFavorites,
+//   getUserFavorites
+// } from './scales';
 
-import { 
-  GetScalesParams, 
-  ScalesResponse, 
-  ScaleResponse, 
+import {
+  GetScalesParams,
+  ScalesResponse,
+  ScaleResponse,
   ScaleAssessmentRequest,
-  ScaleAssessmentResponse 
-} from './scales/types';
+  ScaleAssessmentResponse
+} from './types';
 
-// Export all scale-related functions and types
+// Export all scale-related types
 export {
-  // Scale Management Functions
-  getScales,
-  getScaleById,
-  getScaleCategories,
-  getScaleSpecialties,
-  getPopularScales,
-  
-  // Assessment Functions
-  createScaleAssessment,
-  getScaleStatistics,
-  
-  // User Interaction Functions
-  addToFavorites,
-  removeFromFavorites,
-  getUserFavorites,
-  
   // Type Definitions
   GetScalesParams,
   ScalesResponse,
@@ -54,6 +39,25 @@ export {
   ScaleAssessmentRequest,
   ScaleAssessmentResponse
 };
+
+// TODO: Export functions when implemented
+// export {
+//   // Scale Management Functions
+//   getScales,
+//   getScaleById,
+//   getScaleCategories,
+//   getScaleSpecialties,
+//   getPopularScales,
+//
+//   // Assessment Functions
+//   createScaleAssessment,
+//   getScaleStatistics,
+//
+//   // User Interaction Functions
+//   addToFavorites,
+//   removeFromFavorites,
+//   getUserFavorites
+// };
 
 /**
  * Medical Scales Repository API

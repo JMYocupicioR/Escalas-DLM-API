@@ -10,7 +10,7 @@
  * @security HIPAA-compliant
  */
 
-import { createClient, SupabaseClient, Session, User, UserAttributes } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
@@ -274,7 +274,7 @@ function createSecureStorage() {
       try {
         if (Platform.OS === 'web') {
           const item = localStorage.getItem(key);
-          return item ? decrypt(item, 'LOCAL_STORAGE_KEY') : null;
+          return item ? decrypt(item) : null;
         }
         return await SecureStore.getItemAsync(key);
       } catch (error) {
@@ -285,7 +285,7 @@ function createSecureStorage() {
     setItem: async (key: string, value: string): Promise<void> => {
       try {
         if (Platform.OS === 'web') {
-          const encrypted = encrypt(value, 'LOCAL_STORAGE_KEY');
+          const encrypted = encrypt(value);
           localStorage.setItem(key, encrypted);
           return;
         }
@@ -376,9 +376,9 @@ export const ERROR_CODES = {
  * @param shouldThrow Whether to throw the error or return an error object
  * @returns An error object with message, code, and status
  */
-export function handleApiError<T = any>(
-  error: any, 
-  customMessage = 'Error in operation', 
+export function handleApiError(
+  error: any,
+  customMessage = 'Error in operation',
   shouldThrow = false
 ): { error: true; message: string; code?: string; status?: number; details?: any } {
   // Extract error information
@@ -386,13 +386,18 @@ export function handleApiError<T = any>(
   const code = error?.code || 'general/unknown';
   const status = error?.status || 500;
   const details = error?.details || null;
-  
+
+  // Resolve message first
+  const resolvedMessage = error?.code && (ERROR_CODES as Record<string, string>)[error.code]
+    ? (ERROR_CODES as Record<string, string>)[error.code]
+    : rawMessage;
+
   // Log the error for debugging and audit
   console.error(`${customMessage}:`, error);
-  
+
   // Log security-relevant errors
   if (
-    code.startsWith('auth/') || 
+    code.startsWith('auth/') ||
     code === 'db/row-level-security' ||
     code === 'storage/unauthorized'
   ) {
@@ -402,23 +407,19 @@ export function handleApiError<T = any>(
       user: supabase.auth.getUser() || 'unauthenticated',
     });
   }
-  
-  const resolvedMessage = error?.code && ERROR_CODES[error.code]
-    ? ERROR_CODES[error.code]
-    : rawMessage;
 
   const processedError = {
-    error: true,
+    error: true as const,
     message: resolvedMessage,
     code,
     status,
     details,
   };
-  
+
   if (shouldThrow) {
     throw processedError;
   }
-  
+
   return processedError;
 }
 

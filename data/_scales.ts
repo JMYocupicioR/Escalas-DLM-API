@@ -1,8 +1,42 @@
+/**
+ * @file data/_scales.ts
+ * @description REGISTRO CENTRAL DE TODAS LAS ESCALAS MÉDICAS
+ *
+ * ⚠️ IMPORTANTE: Este archivo es el punto de entrada único para todas las escalas.
+ * Toda nueva escala DEBE registrarse aquí.
+ *
+ * FLUJO DE TRABAJO:
+ * 1. Importar la escala desde su archivo individual (ej: './katz')
+ * 2. Agregar entrada básica en el array 'scales' con searchTerms
+ * 3. Crear función build[Nombre]Detailed() que adapta al formato ScaleWithDetails
+ * 4. Ejecutar la función y registrar en 'scalesById'
+ *
+ * Ver docs/ADDING_SCALES.md para guía completa.
+ */
+
 import type { Scale } from '@/types/scale';
 import { denver2 } from './denver';
 import { boston, scoreInterpretation as bostonScoreInterp } from './boston';
+import { bergScale, questions as bergQuestions, scoreInterpretation as bergScoreInterp } from './berg';
+import { katzScale, questions as katzQuestions, scoreInterpretation as katzScoreInterp } from './katz';
+import { sixMWT } from './6mwt';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
+/**
+ * Array principal de escalas médicas.
+ *
+ * ESTRUCTURA BÁSICA:
+ * - id: Identificador único (minúsculas, sin espacios)
+ * - name: Nombre completo de la escala
+ * - description: Descripción breve
+ * - category: Categoría principal (ADL, Balance, Neurology, etc.)
+ * - searchTerms: Array de términos para búsqueda (abreviaturas, sinónimos)
+ * - specialty: Especialidad médica (opcional)
+ * - timeToComplete: Tiempo estimado de aplicación
+ *
+ * ⚠️ El array básico será enriquecido con datos detallados por las funciones
+ * build[Nombre]Detailed() que se ejecutan al final de este archivo.
+ */
 export const scales: Scale[] = [
   denver2,
   // From functional.tsx
@@ -12,7 +46,18 @@ export const scales: Scale[] = [
     description: 'Evaluación de actividades básicas de la vida diaria',
     timeToComplete: '5-10 min',
     category: 'ADL',
+    searchTerms: ['barthel', 'IB', 'actividades vida diaria', 'AVD', 'ABVD', 'independencia funcional', 'autocuidado'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'katz',
+    name: 'Índice de Katz de Independencia en AVD',
+    description: 'Evaluación de la independencia funcional en actividades básicas de la vida diaria en adultos mayores',
+    timeToComplete: '5-10 min',
+    category: 'ADL',
+    specialty: 'Geriatría',
+    searchTerms: ['katz', 'AVD', 'ABVD', 'actividades vida diaria', 'independencia funcional', 'geriatría', 'adulto mayor', 'autocuidado'],
+    imageUrl: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?w=400&h=300&fit=crop&crop=center',
   },
   {
     id: 'gas',
@@ -20,6 +65,7 @@ export const scales: Scale[] = [
     description: 'Consecución de objetivos personalizados en rehabilitación',
     timeToComplete: '10-20 min',
     category: 'Rehab',
+    searchTerms: ['GAS', 'goal attainment scaling', 'consecución objetivos', 'objetivos rehabilitación', 'metas terapéuticas'],
     imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -28,6 +74,7 @@ export const scales: Scale[] = [
     description: 'Evaluación del equilibrio y la marcha',
     timeToComplete: '10-15 min',
     category: 'Balance',
+    searchTerms: ['tinetti', 'POMA', 'performance oriented mobility assessment', 'equilibrio', 'marcha', 'balance', 'caídas', 'riesgo caída'],
     imageUrl: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -36,6 +83,7 @@ export const scales: Scale[] = [
     description: 'Evaluación del estado cognitivo',
     timeToComplete: '10 min',
     category: 'Cognitive',
+    searchTerms: ['MMSE', 'mini mental', 'folstein', 'cognitivo', 'cognición', 'demencia', 'memoria', 'orientación'],
     crossReferences: ['geriatria'],
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
   },
@@ -45,6 +93,7 @@ export const scales: Scale[] = [
     description: 'Valoración del riesgo de úlceras por presión',
     timeToComplete: '5 min',
     category: 'Risk',
+    searchTerms: ['norton', 'úlceras presión', 'UPP', 'escaras', 'decúbito', 'lesiones piel', 'riesgo úlceras'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -53,6 +102,7 @@ export const scales: Scale[] = [
     description: 'Evaluación del dolor',
     timeToComplete: '1 min',
     category: 'Pain',
+    searchTerms: ['VAS', 'EVA', 'visual analógica', 'dolor', 'intensidad dolor', 'escala dolor'],
     imageUrl: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=300&fit=crop&crop=center',
   },
   // From segmento.tsx
@@ -62,6 +112,7 @@ export const scales: Scale[] = [
     description: 'Evaluación del nivel de consciencia',
     timeToComplete: '2 min',
     category: 'Neurology',
+    searchTerms: ['glasgow', 'GCS', 'coma scale', 'consciencia', 'nivel consciencia', 'trauma craneal', 'TCE'],
     crossReferences: ['trauma'],
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
   },
@@ -71,6 +122,7 @@ export const scales: Scale[] = [
     description: 'Evaluación de parálisis facial',
     timeToComplete: '5 min',
     category: 'Neurology',
+    searchTerms: ['house-brackmann', 'HB', 'parálisis facial', 'nervio facial', 'VII par craneal', 'bell'],
     crossReferences: ['neurologia'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center',
   },
@@ -80,6 +132,7 @@ export const scales: Scale[] = [
     description: 'Evaluación funcional de columna lumbar',
     timeToComplete: '10 min',
     category: 'Orthopedics',
+    searchTerms: ['oswestry', 'ODI', 'lumbar', 'columna lumbar', 'dolor lumbar', 'discapacidad lumbar', 'espalda baja'],
     crossReferences: ['traumatologia'],
     imageUrl: 'https://images.unsplash.com/photo-1571019614113-b8dcf0bf7e56?w=400&h=300&fit=crop&crop=center',
   },
@@ -89,6 +142,7 @@ export const scales: Scale[] = [
     description: 'Evaluación de disnea',
     timeToComplete: '2 min',
     category: 'Cardiopulmonary',
+    searchTerms: ['borg', 'RPE', 'disnea', 'fatiga', 'esfuerzo percibido', 'ejercicio'],
     crossReferences: ['neumologia'],
     imageUrl: 'https://images.unsplash.com/photo-1559757175-7a07110cb5d8?w=400&h=300&fit=crop&crop=center',
   },
@@ -98,6 +152,7 @@ export const scales: Scale[] = [
     description: 'Evaluación funcional del hombro',
     timeToComplete: '10 min',
     category: 'Orthopedics',
+    searchTerms: ['constant', 'constant-murley', 'hombro', 'shoulder', 'dolor hombro', 'manguito rotador'],
     crossReferences: ['traumatologia'],
     imageUrl: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=400&h=300&fit=crop&crop=center',
   },
@@ -107,6 +162,7 @@ export const scales: Scale[] = [
     description: 'Evaluación funcional de cadera',
     timeToComplete: '10 min',
     category: 'Orthopedics',
+    searchTerms: ['harris', 'HHS', 'cadera', 'hip', 'artroplastia cadera', 'prótesis cadera'],
     crossReferences: ['traumatologia'],
     imageUrl: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=400&h=300&fit=crop&crop=center',
   },
@@ -116,6 +172,7 @@ export const scales: Scale[] = [
     description: 'Evaluación de resultados en lesiones de rodilla',
     timeToComplete: '15 min',
     category: 'Orthopedics',
+    searchTerms: ['KOOS', 'knee injury', 'rodilla', 'osteoartritis rodilla', 'menisco', 'ligamento cruzado', 'LCA'],
     crossReferences: ['traumatologia'],
     imageUrl: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=400&h=300&fit=crop&crop=center',
   },
@@ -126,6 +183,7 @@ export const scales: Scale[] = [
     timeToComplete: '20-30 min',
     category: 'Rehab',
     specialty: 'Medicina Física y Rehabilitación',
+    searchTerms: ['FIM', 'functional independence measure', 'independencia funcional', 'discapacidad', 'rehabilitación'],
     imageUrl: 'https://images.unsplash.com/photo-1571019614113-b8dcf0bf7e56?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -135,6 +193,7 @@ export const scales: Scale[] = [
     timeToComplete: '3-5 min',
     category: 'Osteoartritis de rodilla',
     specialty: 'Traumatología',
+    searchTerms: ['lequesne', 'osteoartritis', 'OA', 'artrosis rodilla', 'gonartrosis', 'dolor rodilla'],
     imageUrl: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=400&h=300&fit=crop&crop=center',
     scoring: {
       method: 'sum',
@@ -164,6 +223,7 @@ export const scales: Scale[] = [
     timeToComplete: '5-10 min',
     category: 'Neurology',
     specialty: 'Neurología',
+    searchTerms: ['boston', 'BCTQ', 'túnel carpiano', 'STC', 'carpal tunnel', 'nervio mediano', 'muñeca'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -173,6 +233,7 @@ export const scales: Scale[] = [
     timeToComplete: '10-15 min',
     category: 'Neurology',
     specialty: 'Neurología',
+    searchTerms: ['botulinum', 'toxina botulinica', 'botox', 'dysport', 'espasticidad', 'distonía', 'infiltración'],
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -182,6 +243,7 @@ export const scales: Scale[] = [
     timeToComplete: '15 min',
     category: 'Funcional',
     specialty: 'Medicina Física y Rehabilitación',
+    searchTerms: ['OGS', 'marcha', 'gait', 'parálisis cerebral', 'PC', 'marcha observacional', 'análisis marcha'],
     imageUrl: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop&crop=center',
   },
   {
@@ -191,7 +253,28 @@ export const scales: Scale[] = [
     timeToComplete: '30-45 min',
     category: 'Neurology',
     specialty: 'Neurología Pediátrica',
+    searchTerms: ['HINE', 'hammersmith', 'lactante', 'neurológico infantil', 'desarrollo motor', 'hipotonía'],
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'berg',
+    name: 'Escala de Equilibrio de Berg',
+    description: 'Evaluación funcional del equilibrio estático y dinámico a través de 14 tareas',
+    timeToComplete: '15-20 min',
+    category: 'Balance',
+    specialty: 'Medicina Física y Rehabilitación',
+    searchTerms: ['berg', 'BBS', 'berg balance scale', 'equilibrio', 'balance', 'caídas', 'marcha', 'estabilidad'],
+    imageUrl: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: '6mwt',
+    name: 'Test de Marcha de 6 Minutos',
+    description: 'Evaluación de la capacidad funcional y tolerancia al ejercicio mediante distancia recorrida',
+    timeToComplete: '15-20 min',
+    category: 'Cardiopulmonary',
+    specialty: 'Medicina Física y Rehabilitación',
+    searchTerms: ['6MWT', '6 minutos', 'six minute walk', 'caminata', 'capacidad funcional', 'cardiopulmonar', 'ejercicio'],
+    imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center',
   },
 ];
 
@@ -200,7 +283,36 @@ export const scalesById = scales.reduce((acc, scale) => {
   return acc;
 }, {} as Record<string, Scale>);
 
-// Adapt Boston to generic evaluation shape expected by ScaleEvaluation
+/**
+ * ============================================================================
+ * SECCIÓN DE ADAPTADORES
+ * ============================================================================
+ *
+ * Las funciones build[Nombre]Detailed() convierten definiciones simples de
+ * escalas al formato ScaleWithDetails requerido por ScaleEvaluation.
+ *
+ * PATRÓN ESTÁNDAR:
+ * 1. Mapear questions[] → ScaleQuestion[] con IDs únicos y metadatos
+ * 2. Mapear opciones → QuestionOption[] con valores numéricos
+ * 3. Crear ScoringRange[] desde scoreInterpretation
+ * 4. Construir objeto ScaleScoring completo
+ * 5. Ensamblar ScaleWithDetails con todos los campos
+ *
+ * ⚠️ IMPORTANTE: Cada escala estándar (basada en preguntas) REQUIERE su
+ * función adaptadora. Sin ella, ScaleEvaluation no podrá renderizarla.
+ *
+ * Ver docs/ARCHITECTURE.md sección "Sistema de Adaptación" para detalles.
+ */
+
+/**
+ * Adapta Cuestionario de Boston al formato ScaleWithDetails.
+ *
+ * Boston tiene 2 subescalas:
+ * - Severidad de síntomas (11 preguntas)
+ * - Estado funcional (8 preguntas)
+ *
+ * Scoring: Promedio de respuestas por subescala (1-5 puntos)
+ */
 const buildBostonDetailed = (): ScaleWithDetails => {
   const now = new Date().toISOString();
   const scaleId = 'boston';
@@ -321,3 +433,275 @@ if (existingBostonIndex !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['boston'] = bostonDetailed as any;
+
+// Adapt Berg to generic evaluation shape expected by ScaleEvaluation
+const buildBergDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'berg';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = bergQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: undefined,
+      instructions: q.instructions,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = bergScoreInterp.map((r, idx) => ({
+    id: `r_berg_${idx+1}`,
+    scoring_id: 'scoring_berg',
+    min_value: r.min,
+    max_value: r.max,
+    interpretation_level: r.level,
+    interpretation_text: `${r.description} - ${r.risk}`,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: undefined,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_berg',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 56,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: bergScale.name,
+    acronym: bergScale.shortName,
+    description: bergScale.description,
+    category: bergScale.category,
+    specialty: bergScale.specialty,
+    body_system: 'Sistema Nervioso y Musculoesquelético',
+    tags: ['equilibrio', 'balance', 'caídas', 'adulto mayor', 'neurología'],
+    time_to_complete: bergScale.timeToComplete,
+    popularity: 0,
+    popular: false,
+    image_url: undefined,
+    instructions: bergScale.information,
+    version: '1.0',
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: [
+      {
+        id: 'ref_berg_1',
+        scale_id: scaleId,
+        title: 'Measuring balance in the elderly: validation of an instrument',
+        authors: ['Berg KO', 'Wood-Dauphinee SL', 'Williams JI', 'Maki B'],
+        year: 1992,
+        journal: 'Can J Public Health',
+        volume: '83 Suppl 2',
+        pages: 'S7-11',
+        is_primary: true,
+        reference_type: 'original',
+        created_at: now,
+      },
+      {
+        id: 'ref_berg_2',
+        scale_id: scaleId,
+        title: 'The Balance Scale: reliability assessment with elderly residents and patients with an acute stroke',
+        authors: ['Berg K', 'Wood-Dauphinee S', 'Williams JI'],
+        year: 1995,
+        journal: 'Scand J Rehabil Med',
+        volume: '27',
+        issue: '1',
+        pages: '27-36',
+        is_primary: true,
+        reference_type: 'validation',
+        created_at: now,
+      },
+    ],
+    translations: [],
+  };
+  return detailed;
+};
+
+const bergDetailed = buildBergDetailed();
+
+const existingBergIndex = scales.findIndex(s => s.id === 'berg');
+if (existingBergIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingBergIndex] = { ...(scales[existingBergIndex] as any), ...bergDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(bergDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['berg'] = bergDetailed as any;
+
+// Adapt Katz to generic evaluation shape expected by ScaleEvaluation
+const buildKatzDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'katz';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = katzQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: q.category,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = katzScoreInterp.map((r, idx) => ({
+    id: `r_katz_${idx+1}`,
+    scoring_id: 'scoring_katz',
+    min_value: r.score,
+    max_value: r.score,
+    interpretation_level: `${r.level} - ${r.description}`,
+    interpretation_text: r.interpretation,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: undefined,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_katz',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 6,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: katzScale.name,
+    acronym: katzScale.shortName,
+    description: katzScale.description,
+    category: katzScale.category,
+    specialty: katzScale.specialty,
+    body_system: 'Sistema Funcional',
+    tags: ['AVD', 'ABVD', 'independencia', 'geriatría', 'funcional', 'autocuidado'],
+    time_to_complete: katzScale.timeToComplete,
+    popularity: 0,
+    popular: true,
+    image_url: undefined,
+    instructions: katzScale.information,
+    version: '1.0',
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: [
+      {
+        id: 'ref_katz_1',
+        scale_id: scaleId,
+        title: 'Studies of illness in the aged. The Index of ADL: A standardized measure of biological and psychosocial function',
+        authors: ['Katz S', 'Ford AB', 'Moskowitz RW', 'Jackson BA', 'Jaffe MW'],
+        year: 1963,
+        journal: 'JAMA',
+        volume: '185',
+        pages: '914-919',
+        is_primary: true,
+        reference_type: 'original',
+        created_at: now,
+      },
+      {
+        id: 'ref_katz_2',
+        scale_id: scaleId,
+        title: 'Progress in development of the index of ADL',
+        authors: ['Katz S', 'Downs TD', 'Cash HR', 'Grotz RC'],
+        year: 1970,
+        journal: 'Gerontologist',
+        volume: '10',
+        issue: '1',
+        pages: '20-30',
+        is_primary: true,
+        reference_type: 'validation',
+        created_at: now,
+      },
+    ],
+    translations: [],
+  };
+  return detailed;
+};
+
+const katzDetailed = buildKatzDetailed();
+
+const existingKatzIndex = scales.findIndex(s => s.id === 'katz');
+if (existingKatzIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingKatzIndex] = { ...(scales[existingKatzIndex] as any), ...katzDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(katzDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['katz'] = katzDetailed as any;

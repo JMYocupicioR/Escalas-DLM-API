@@ -116,8 +116,10 @@ export default function SearchScreen() {
           scale.name.toLowerCase().includes(query) ||
           scale.description.toLowerCase().includes(query) ||
           scale.category.toLowerCase().includes(query) ||
+          (scale.acronym && scale.acronym.toLowerCase().includes(query)) ||
           (scale.specialty && scale.specialty.toLowerCase().includes(query)) ||
-          (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(query)))
+          (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(query))) ||
+          (scale.searchTerms && scale.searchTerms.some(term => term.toLowerCase().includes(query)))
         );
       }
 
@@ -163,17 +165,20 @@ export default function SearchScreen() {
     }
     
     return scales.filter(scale => {
-      const matchesSearch = 
-        searchQuery === '' || 
-        scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scale.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scale.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (scale.specialty && scale.specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
-      
-      const matchesCategory = selectedCategory === 'all' || 
+      const query = searchQuery.toLowerCase();
+      const matchesSearch =
+        searchQuery === '' ||
+        scale.name.toLowerCase().includes(query) ||
+        scale.description.toLowerCase().includes(query) ||
+        scale.category.toLowerCase().includes(query) ||
+        (scale.acronym && scale.acronym.toLowerCase().includes(query)) ||
+        (scale.specialty && scale.specialty.toLowerCase().includes(query)) ||
+        (scale.tags && scale.tags.some(tag => tag.toLowerCase().includes(query))) ||
+        (scale.searchTerms && scale.searchTerms.some(term => term.toLowerCase().includes(query)));
+
+      const matchesCategory = selectedCategory === 'all' ||
         scale.category.toLowerCase() === selectedCategory.toLowerCase();
-      
+
       return matchesSearch && matchesCategory;
     }).sort((a, b) => {
       if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);

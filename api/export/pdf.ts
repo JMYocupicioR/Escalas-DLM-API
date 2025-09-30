@@ -55,7 +55,7 @@ export const generatePdfFromService = async (
       const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
       if (!base) throw new Error('Direct PDF service URL not configured');
 
-      const res = await fetch(`${base}/api/pdf/export${dbg}`, {
+      const res = await fetch(`${base}/api/pdf/export`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

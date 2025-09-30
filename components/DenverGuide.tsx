@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Platform } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
-import { 
-  Info, 
-  X, 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle, 
+import {
+  Info,
+  X,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
   XCircle,
-  Baby,
   Brain,
-  Eye,
-  Hand,
-  MessageCircle,
-  Activity,
   HelpCircle,
-  Calendar,
   Calculator
 } from 'lucide-react-native';
 import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
@@ -49,6 +43,7 @@ export function DenverGuide({ visible, onClose }: DenverGuideProps) {
         'NO es una prueba de inteligencia ni un diagnóstico definitivo.',
         'Su propósito es identificar niños que podrían necesitar una evaluación más detallada.',
         'La prueba tiene alta sensibilidad (83%) pero baja especificidad (43%), lo que significa que puede generar falsos positivos.',
+        '(Agradecimiento especial para la Dra. Nidia Karen Soto por la revisión de la guía).',
       ]
     },
     {
@@ -113,7 +108,7 @@ export function DenverGuide({ visible, onClose }: DenverGuideProps) {
     }
   ];
 
-  const selectedSectionData = guideSections.find(s => s.id === selectedSection);
+  const selectedSectionData = guideSections.find((s: GuideSection) => s.id === selectedSection);
 
   return (
     <Modal
@@ -201,7 +196,7 @@ export function DenverGuide({ visible, onClose }: DenverGuideProps) {
                   </View>
 
                   <View style={styles.sectionBody}>
-                    {selectedSectionData.content.map((paragraph, index) => (
+                    {selectedSectionData.content.map((paragraph: string, index: number) => (
                       <View key={index} style={styles.bulletPoint}>
                         <View style={[styles.bullet, { backgroundColor: selectedSectionData.color }]} />
                         <Text style={styles.bulletText}>{paragraph}</Text>

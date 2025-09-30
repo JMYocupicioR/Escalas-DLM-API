@@ -234,57 +234,62 @@ export default function OgsScaleScreen() {
     </ScrollView>
   );
 
-  const renderResults = () => (
-    <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Resultados OGS</Text>
-        
-        <View style={styles.patientInfo}>
-          <View style={styles.patientInfoRow}>
-            <User size={16} color={colors.primary} />
-            <Text style={styles.patientInfoText}>{patientData.name}</Text>
-          </View>
-          <View style={styles.patientInfoRow}>
-            <Calendar size={16} color={colors.primary} />
-            <Text style={styles.patientInfoText}>{patientData.date}</Text>
-          </View>
-          <View style={styles.patientInfoRow}>
-            <Stethoscope size={16} color={colors.primary} />
-            <Text style={styles.patientInfoText}>{patientData.evaluator}</Text>
-          </View>
-        </View>
+  const renderResults = () => {
+    if (!results?.rightInterpretation || !results?.leftInterpretation) {
+      return null;
+    }
 
-        <View style={styles.resultsContainer}>
-          <View style={styles.resultCard}>
-            <Text style={styles.resultTitle}>Pierna Derecha</Text>
-            <Text style={styles.resultScore}>
-              {results.rightTotalScore} / 22
-            </Text>
-            <View style={[styles.resultBadge, { backgroundColor: results.rightInterpretation.color_code }]}>
-              <Text style={styles.resultBadgeText}>
-                {results.rightInterpretation.interpretation_level}
-              </Text>
+    return (
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Resultados OGS</Text>
+
+          <View style={styles.patientInfo}>
+            <View style={styles.patientInfoRow}>
+              <User size={16} color={colors.primary} />
+              <Text style={styles.patientInfoText}>{patientData.name}</Text>
             </View>
-            <Text style={styles.resultDescription}>
-              {results.rightInterpretation.interpretation_text}
-            </Text>
+            <View style={styles.patientInfoRow}>
+              <Calendar size={16} color={colors.primary} />
+              <Text style={styles.patientInfoText}>{patientData.date}</Text>
+            </View>
+            <View style={styles.patientInfoRow}>
+              <Stethoscope size={16} color={colors.primary} />
+              <Text style={styles.patientInfoText}>{patientData.evaluator}</Text>
+            </View>
           </View>
 
-          <View style={styles.resultCard}>
-            <Text style={styles.resultTitle}>Pierna Izquierda</Text>
-            <Text style={styles.resultScore}>
-              {results.leftTotalScore} / 22
-            </Text>
-            <View style={[styles.resultBadge, { backgroundColor: results.leftInterpretation.color_code }]}>
-              <Text style={styles.resultBadgeText}>
-                {results.leftInterpretation.interpretation_level}
+          <View style={styles.resultsContainer}>
+            <View style={styles.resultCard}>
+              <Text style={styles.resultTitle}>Pierna Derecha</Text>
+              <Text style={styles.resultScore}>
+                {results.rightTotalScore} / 21
+              </Text>
+              <View style={[styles.resultBadge, { backgroundColor: results.rightInterpretation.color_code }]}>
+                <Text style={styles.resultBadgeText}>
+                  {results.rightInterpretation.interpretation_level}
+                </Text>
+              </View>
+              <Text style={styles.resultDescription}>
+                {results.rightInterpretation.interpretation_text}
               </Text>
             </View>
-            <Text style={styles.resultDescription}>
-              {results.leftInterpretation.interpretation_text}
-            </Text>
+
+            <View style={styles.resultCard}>
+              <Text style={styles.resultTitle}>Pierna Izquierda</Text>
+              <Text style={styles.resultScore}>
+                {results.leftTotalScore} / 21
+              </Text>
+              <View style={[styles.resultBadge, { backgroundColor: results.leftInterpretation.color_code }]}>
+                <Text style={styles.resultBadgeText}>
+                  {results.leftInterpretation.interpretation_level}
+                </Text>
+              </View>
+              <Text style={styles.resultDescription}>
+                {results.leftInterpretation.interpretation_text}
+              </Text>
+            </View>
           </View>
-        </View>
 
         <View style={styles.detailedResults}>
           <Text style={styles.detailedTitle}>Puntuación Detallada por Ítem</Text>
@@ -323,7 +328,8 @@ export default function OgsScaleScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
-  );
+    );
+  };
 
   return (
     <>

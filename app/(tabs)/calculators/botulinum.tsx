@@ -36,7 +36,8 @@ interface MusculoSeleccionado {
 }
 
 export default function BotulinumCalculator() {
-  const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  // const id = params.id; // Not currently used
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
 

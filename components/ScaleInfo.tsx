@@ -75,24 +75,29 @@ export const ScaleInfo: React.FC<Props> = ({ info }) => {
 							{info.evidence?.summary ? (
 								<Text style={styles.paragraph}>{info.evidence.summary}</Text>
 							) : null}
-							{info.evidence?.references?.map((r, idx) => (
-								<View key={idx} style={styles.referenceRow}>
-									<Text style={styles.referenceText}>
-										{r.authors?.join(', ') ? `${r.authors?.join(', ')}. ` : ''}
-										{r.title}{r.year ? ` (${r.year})` : ''}
-									</Text>
-									{r.doi ? (
-										<TouchableOpacity onPress={() => Linking.openURL(`https://doi.org/${r.doi}`)}>
-											<Text style={styles.link}>doi:{r.doi}</Text>
-										</TouchableOpacity>
-									) : null}
-									{r.url ? (
-										<TouchableOpacity onPress={() => Linking.openURL(r.url!)}>
-											<Text style={styles.link}>Enlace</Text>
-										</TouchableOpacity>
-									) : null}
-								</View>
-							))}
+							{info.evidence?.references?.map((r, idx) => {
+								const authorsText = r.authors
+									? (Array.isArray(r.authors) ? r.authors.join(', ') : r.authors)
+									: '';
+								return (
+									<View key={idx} style={styles.referenceRow}>
+										<Text style={styles.referenceText}>
+											{authorsText ? `${authorsText}. ` : ''}
+											{r.title}{r.year ? ` (${r.year})` : ''}
+										</Text>
+										{r.doi ? (
+											<TouchableOpacity onPress={() => Linking.openURL(`https://doi.org/${r.doi}`)}>
+												<Text style={styles.link}>doi:{r.doi}</Text>
+											</TouchableOpacity>
+										) : null}
+										{r.url ? (
+											<TouchableOpacity onPress={() => Linking.openURL(r.url!)}>
+												<Text style={styles.link}>Enlace</Text>
+											</TouchableOpacity>
+										) : null}
+									</View>
+								);
+							})}
 						</View>
 					)}
 				</View>
