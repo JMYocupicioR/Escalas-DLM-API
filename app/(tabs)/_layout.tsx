@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs } from 'expo-router/tabs';
 import { Search, Chrome as Home, BookMarked as BookMedical, Settings } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
 import { Calculator } from 'lucide-react-native';

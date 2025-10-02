@@ -47,7 +47,8 @@
       "Bash(dir:*)",
       "Bash(timeout:*)",
       "Bash(npm:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
