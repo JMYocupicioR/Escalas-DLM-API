@@ -43,7 +43,11 @@
       "Bash(findstr:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npx tsc:*)",
-      "Bash(dir data*.ts /b)"
+      "Bash(dir data*.ts /b)",
+      "Bash(dir:*)",
+      "Bash(timeout:*)",
+      "Bash(npm:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuestionario de Salud SF-36</title>
+    <link rel="stylesheet" href="w3.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h3, h4 {
+            color: #00796b;
+            border-bottom: 2px solid #00796b;
+            padding-bottom: 5px;
+        }
+        .w3-radio {
+            margin-right: 10px;
+        }
+        .w3-label {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #e0f2f1;
+            border-radius: 5px;
+        }
+        .w3-button {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #00796b;
+            color: #fff;
+        }
+        .panel {
+            display: none;
+        }
+        .panel.active {
+            display: block;
+        }
+        #progress {
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="w3-container form-container">
+        <form id="formularioSF36" class="w3-container">
+            <!-- Indicador de progreso -->
+            <div id="progress">Pregunta <span id="currentQuestion">1</span> de 36</div>
+
+            <!-- Paneles de preguntas del SF-36 -->
+ <!-- Paneles de preguntas del SF-36 -->
+              <!-- Salud General -->
+            <div class="panel active">
+                <fieldset>
+                    <legend>1. En general, usted diría que su salud es:</legend>
+                    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_1" value="5" required> Excelente</label>
+                    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_1" value="4"> Muy buena</label>
+                    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_1" value="3"> Buena</label>
+                    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_1" value="2"> Regular</label>
+                    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_1" value="1"> Mala</label>
+                </fieldset>
+            </div>
+            
+			<div class="panel">
+			    <h4>2. ¿Cómo diría que es su salud actual, comparada con la de hace un año?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_2" value="5"> Mucho mejor ahora que hace un año</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_2" value="4"> Algo mejor ahora que hace un año</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_2" value="3"> Más o menos igual que hace un año</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_2" value="2"> Algo peor ahora que hace un año</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_2" value="1"> Mucho peor ahora que hace un año</label>
+			</div>
+			
+			<!-- Función Física -->
+			<div class="panel">
+			    <h4>3. Su salud actual, ¿le limita para hacer esfuerzos intensos (como correr, levantar objetos pesados)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_1" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_1" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_1" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>4. Su salud actual, ¿le limita para hacer esfuerzos moderados (como mover una mesa o caminar más de una hora)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_2" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_2" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_2" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>5. Su salud actual, ¿le limita para coger o llevar la bolsa de la compra?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_3" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_3" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_3" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 6 -->
+			<div class="panel">
+			    <h4>6. Su salud actual, ¿le limita para subir varios pisos por la escalera?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_4" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_4" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_4" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 7 -->
+			<div class="panel">
+			    <h4>7. Su salud actual, ¿le limita para subir un solo piso por la escalera?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_5" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_5" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_5" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 8 -->
+			<div class="panel">
+			    <h4>8. Su salud actual, ¿le limita para agacharse o arrodillarse?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_6" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_6" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_6" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 9 -->
+			<div class="panel">
+			    <h4>9. Su salud actual, ¿le limita para caminar un kilómetro o más?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_7" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_7" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_7" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 10 -->
+			<div class="panel">
+			    <h4>10. Su salud actual, ¿le limita para caminar varias manzanas?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_8" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_8" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_8" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 11 -->
+			<div class="panel">
+			    <h4>11. Su salud actual, ¿le limita para caminar una sola manzana?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_9" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_9" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_9" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Pregunta 12 -->
+			<div class="panel">
+			    <h4>12. Su salud actual, ¿le limita para bañarse o vestirse por sí mismo?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_10" value="1"> Sí, me limita mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_10" value="2"> Sí, me limita un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_fisica_10" value="3"> No, no me limita nada</label>
+			</div>
+			
+			<!-- Rol Físico -->
+			<!-- Pregunta 13 -->
+			<div class="panel">
+			    <h4>13. Durante las últimas 4 semanas, ¿tuvo que reducir el tiempo dedicado al trabajo o a sus actividades cotidianas a causa de su salud física?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_1" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_1" value="2"> No</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>14. Durante las últimas 4 semanas, ¿hizo menos de lo que hubiera querido hacer a causa de su salud física?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_2" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_2" value="2"> No</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>15. Durante las últimas 4 semanas, ¿tuvo que dejar de hacer algunas tareas en su trabajo o en sus actividades cotidianas, a causa de su salud física?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_3" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_3" value="2"> No</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>16. Durante las últimas 4 semanas, ¿tuvo dificultad para hacer su trabajo o sus actividades cotidianas (por ejemplo, le costó más de lo normal), a causa de su salud física?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_4" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_fisico_4" value="2"> No</label>
+			</div>
+			
+			<!-- Rol Emocional -->
+			<div class="panel">
+			    <h4>17. Durante las últimas 4 semanas, ¿tuvo que reducir el tiempo dedicado al trabajo o a sus actividades cotidianas a causa de algún problema emocional (como estar triste, deprimido o nervioso)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_1" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_1" value="2"> No</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>18. Durante las últimas 4 semanas, ¿hizo menos de lo que hubiera querido hacer a causa de algún problema emocional (como estar triste, deprimido o nervioso)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_2" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_2" value="2"> No</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>19. Durante las últimas 4 semanas, ¿no hizo su trabajo o sus actividades cotidianas tan cuidadosamente como de costumbre, a causa de algún problema emocional (como estar triste, deprimido o nervioso)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_3" value="1"> Sí</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="rol_emocional_3" value="2"> No</label>
+			</div>
+			
+			<!-- Función Social -->
+			<div class="panel">
+			    <h4>20. Durante las últimas 4 semanas, ¿hasta qué punto su salud física o los problemas emocionales han dificultado sus actividades sociales habituales con la familia, los amigos, los vecinos u otras personas?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_1" value="1"> Nada</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_1" value="2"> Un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_1" value="3"> Regular</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_1" value="4"> Bastante</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_1" value="5"> Mucho</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>21. ¿Tuvo dolor en alguna parte del cuerpo durante las últimas 4 semanas?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="6"> No, ninguno</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="5"> Sí, muy poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="4"> Sí, un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="3"> Sí, moderado</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="2"> Sí, mucho</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_1" value="1"> Sí, muchísimo</label>
+			</div>
+			
+			<!-- Dolor Corporal -->
+			<div class="panel">
+			    <h4>22. Durante las últimas 4 semanas, ¿hasta qué punto el dolor le ha dificultado su trabajo habitual (incluido el trabajo fuera de casa y las tareas domésticas)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_2" value="5"> Nada</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_2" value="4"> Un poco</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_2" value="3"> Regular</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_2" value="2"> Bastante</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="dolor_corporal_2" value="1"> Mucho</label>
+			</div>
+			
+			<!-- Vitalidad -->
+			<div class="panel">
+			    <h4>23. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido lleno de vitalidad?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="6"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="5"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="4"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="3"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="2"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_1" value="1"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>24. Durante las últimas 4 semanas, ¿cuánto tiempo ha estado muy nervioso?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_1" value="6"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>25. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido tan bajo de moral que nada podía animarle?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_2" value="6"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>26. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido calmado y tranquilo?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="6"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="5"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="4"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="3"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="2"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_3" value="1"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>27. Durante las últimas 4 semanas, ¿cuánto tiempo ha tenido mucha energía?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="6"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="5"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="4"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="3"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="2"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_2" value="1"> Nunca</label>
+			</div>
+			
+			<!-- Salud Mental -->
+			<div class="panel">
+			    <h4>28. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido desanimado y triste?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_4" value="6"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>29. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido agotado?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_3" value="6"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>30. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido feliz?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="6"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="5"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="4"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="3"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="2"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_mental_5" value="1"> Nunca</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>31. Durante las últimas 4 semanas, ¿cuánto tiempo se ha sentido cansado?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="vitalidad_4" value="6"> Nunca</label>
+			</div>
+			
+			<!-- Función Social -->
+			<div class="panel">
+			    <h4>32. Durante las últimas 4 semanas, ¿con qué frecuencia la salud física o los problemas emocionales le han dificultado sus actividades sociales (como visitar a amigos o familiares)?</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="1"> Siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="2"> Casi siempre</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="3"> Muchas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="4"> Algunas veces</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="5"> Solo alguna vez</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="funcion_social_2" value="6"> Nunca</label>
+			</div>
+			
+			<!-- Salud General -->
+			<div class="panel">
+			    <h4>33. Creo que me pongo enfermo más fácilmente que otras personas</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_3" value="5"> Totalmente cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_3" value="4"> Bastante cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_3" value="3"> No lo sé</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_3" value="2"> Bastante falso</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_3" value="1"> Totalmente falso</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>34. Estoy tan sano como cualquiera</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_4" value="5"> Totalmente cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_4" value="4"> Bastante cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_4" value="3"> No lo sé</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_4" value="2"> Bastante falso</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_4" value="1"> Totalmente falso</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>35. Creo que mi salud va a empeorar</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_5" value="5"> Totalmente cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_5" value="4"> Bastante cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_5" value="3"> No lo sé</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_5" value="2"> Bastante falso</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_5" value="1"> Totalmente falso</label>
+			</div>
+			
+			<div class="panel">
+			    <h4>36. Mi salud es excelente</h4>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_6" value="5"> Totalmente cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_6" value="4"> Bastante cierto</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_6" value="3"> No lo sé</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_6" value="2"> Bastante falso</label>
+			    <label class="w3-label"><input class="w3-radio" type="radio" name="salud_general_6" value="1"> Totalmente falso</label>
+			</div>
+
+            <!-- Más paneles de preguntas aquí -->
+
+            <!-- Botones para navegar -->
+            <button class="w3-button" id="previousButton" style="display: none;">Anterior</button>
+            <button class="w3-button" id="nextButton">Siguiente</button>
+            <button class="w3-button" id="finishButton" style="display: none; background-color: #4CAF50;">Finalizar</button>
+            <button class="w3-button" id="restartButton" style="display: none; background-color: #FF5722;">Reiniciar</button>
+        </form>
+
+        <!-- Pantalla de Resultados -->
+        <div id="resultScreen" style="display: none;">
+            <h3>Resultados del Cuestionario SF-36</h3>
+            <p><strong>Salud General:</strong> <span id="resultSaludGeneral"></span></p>
+            <p><strong>Función Física:</strong> <span id="resultFuncionFisica"></span></p>
+            <p><strong>Rol Físico:</strong> <span id="resultRolFisico"></span></p>
+            <p><strong>Rol Emocional:</strong> <span id="resultRolEmocional"></span></p>
+            <p><strong>Función Social:</strong> <span id="resultFuncionSocial"></span></p>
+            <p><strong>Salud Mental:</strong> <span id="resultSaludMental"></span></p>
+            <p><strong>Dolor Corporal:</strong> <span id="resultDolorCorporal"></span></p>
+            <p><strong>Vitalidad:</strong> <span id="resultVitalidad"></span></p>
+            <p><strong>Puntaje Total:</strong> <span id="resultTotal"></span></p>
+            <button class="w3-button" id="restartQuizButton">Reiniciar Cuestionario</button>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const panels = document.querySelectorAll('.panel');
+        const nextButton = document.getElementById('nextButton');
+        const previousButton = document.getElementById('previousButton');
+        const finishButton = document.getElementById('finishButton');
+        const restartButton = document.getElementById('restartButton');
+        const resultScreen = document.getElementById('resultScreen');
+        const progress = document.getElementById('progress');
+        const form = document.getElementById('formularioSF36');
+        const restartQuizButton = document.getElementById('restartQuizButton');
+        let currentPanel = 0;
+
+        // Mostrar el panel actual
+        const showPanel = (index) => {
+            panels.forEach((panel, i) => {
+                panel.classList.toggle('active', i === index);
+            });
+            progress.querySelector('#currentQuestion').textContent = index + 1;
+
+            // Control de visibilidad de botones
+            previousButton.style.display = index > 0 ? 'block' : 'none';
+            nextButton.style.display = index === panels.length - 1 ? 'none' : 'block';
+            finishButton.style.display = index === panels.length - 1 ? 'block' : 'none';
+        };
+
+        // Verificar si una pregunta ha sido respondida
+        const isAnswered = (panel) => {
+            const selectedRadio = panel.querySelector('input[type="radio"]:checked');
+            return selectedRadio !== null;
+        };
+
+        // Avanzar al siguiente panel
+        nextButton.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (isAnswered(panels[currentPanel])) {
+                currentPanel++;
+                if (currentPanel < panels.length) {
+                    showPanel(currentPanel);
+                }
+            } else {
+                alert('Por favor, seleccione una respuesta antes de continuar.');
+            }
+        });
+
+        // Retroceder al panel anterior
+        previousButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPanel > 0) {
+                currentPanel--;
+                showPanel(currentPanel);
+            }
+        });
+
+        // Calcular y mostrar resultados al finalizar
+        finishButton.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (isAnswered(panels[currentPanel])) {
+                calculateResults();
+                resultScreen.style.display = 'block';
+                form.style.display = 'none';  // Ocultar el formulario
+                progress.style.display = 'none';
+                nextButton.style.display = 'none';
+                finishButton.style.display = 'none';
+                previousButton.style.display = 'none';
+            } else {
+                alert('Por favor, seleccione una respuesta antes de finalizar.');
+            }
+        });
+
+        // Función para calcular los resultados normalizados
+        const calculateResults = () => {
+            const results = {
+                saludGeneral: normalizeScore('salud_general', 6, 5),
+                funcionFisica: normalizeScore('funcion_fisica', 10, 3),
+                rolFisico: normalizeScore('rol_fisico', 4, 2),
+                rolEmocional: normalizeScore('rol_emocional', 3, 2),
+                funcionSocial: normalizeScore('funcion_social', 2, 6),
+                saludMental: normalizeScore('salud_mental', 5, 6),
+                dolorCorporal: normalizeScore('dolor_corporal', 2, 6),
+                vitalidad: normalizeScore('vitalidad', 4, 6)
+            };
+
+            document.getElementById('resultSaludGeneral').textContent = results.saludGeneral.toFixed(2);
+            document.getElementById('resultFuncionFisica').textContent = results.funcionFisica.toFixed(2);
+            document.getElementById('resultRolFisico').textContent = results.rolFisico.toFixed(2);
+            document.getElementById('resultRolEmocional').textContent = results.rolEmocional.toFixed(2);
+            document.getElementById('resultFuncionSocial').textContent = results.funcionSocial.toFixed(2);
+            document.getElementById('resultSaludMental').textContent = results.saludMental.toFixed(2);
+            document.getElementById('resultDolorCorporal').textContent = results.dolorCorporal.toFixed(2);
+            document.getElementById('resultVitalidad').textContent = results.vitalidad.toFixed(2);
+
+            // Calcular y mostrar el puntaje total normalizado (promedio ponderado para que el máximo sea 100)
+            let totalScore = (
+                results.saludGeneral +
+                results.funcionFisica +
+                results.rolFisico +
+                results.rolEmocional +
+                results.funcionSocial +
+                results.saludMental +
+                results.dolorCorporal +
+                results.vitalidad
+            ) / 8;
+
+            if (totalScore > 100) {
+                totalScore = 100;
+            }
+
+            document.getElementById('resultTotal').textContent = totalScore.toFixed(2);
+        };
+
+        // Función para normalizar el puntaje de cada dimensión con inversión de ítems
+        const normalizeScore = (dimension, numQuestions, maxValue) => {
+            let inputs = document.querySelectorAll(`input[name^="${dimension}"]:checked`);
+            let rawScore = 0;
+
+            // Definir qué ítems necesitan inversión de puntuación (escala invertida)
+            const itemsToInvert = {
+                'salud_general_3': true,  // P33: "me pongo enfermo más fácilmente"
+                'salud_general_5': true,  // P35: "mi salud va a empeorar"
+                'funcion_social_1': true, // P20: la escala va de "Nada" a "Mucho" (invertir)
+                'funcion_social_2': true, // P32: la escala va de "Siempre" a "Nunca" (invertir)
+                'salud_mental_1': true,   // P24: "nervioso" (negativo)
+                'salud_mental_2': true,   // P25: "bajo de moral" (negativo)
+                'salud_mental_4': true,   // P28: "desanimado y triste" (negativo)
+                'vitalidad_3': true,      // P29: "agotado" (negativo)
+                'vitalidad_4': true       // P31: "cansado" (negativo)
+            };
+
+            inputs.forEach(input => {
+                let value = parseInt(input.value);
+                let itemName = input.name;
+
+                // Invertir puntuación si el ítem está en la lista
+                if (itemsToInvert[itemName]) {
+                    value = (maxValue + 1) - value;
+                }
+
+                rawScore += value;
+            });
+
+            let maxScore = numQuestions * maxValue;
+            return (rawScore / maxScore) * 100; // Normalizar a una escala de 0 a 100
+        };
+
+        // Reiniciar el cuestionario
+        restartButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            restartQuiz();
+        });
+
+        restartQuizButton.addEventListener('click', () => {
+            restartQuiz();
+        });
+
+        const restartQuiz = () => {
+            currentPanel = 0;
+            panels.forEach(panel => {
+                const radios = panel.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => radio.checked = false);
+            });
+
+            resultScreen.style.display = 'none';
+            form.style.display = 'block';
+            progress.style.display = 'block';
+            nextButton.style.display = 'block';
+            finishButton.style.display = 'none';
+            previousButton.style.display = 'none';
+
+            showPanel(currentPanel);
+        };
+
+        // Mostrar el primer panel al cargar la página
+        showPanel(currentPanel);
+    });
+</script>
+
+
+</body>
+</html>

@@ -19,6 +19,7 @@ import { denver2 } from './denver';
 import { boston, scoreInterpretation as bostonScoreInterp } from './boston';
 import { bergScale, questions as bergQuestions, scoreInterpretation as bergScoreInterp } from './berg';
 import { katzScale, questions as katzQuestions, scoreInterpretation as katzScoreInterp } from './katz';
+import { sf36Scale, questions as sf36Questions, scoreInterpretation as sf36ScoreInterp } from './sf36';
 import { sixMWT } from './6mwt';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
@@ -275,6 +276,16 @@ export const scales: Scale[] = [
     specialty: 'Medicina Física y Rehabilitación',
     searchTerms: ['6MWT', '6 minutos', 'six minute walk', 'caminata', 'capacidad funcional', 'cardiopulmonar', 'ejercicio'],
     imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'sf36',
+    name: 'Cuestionario de Salud SF-36',
+    description: 'Cuestionario de calidad de vida relacionada con la salud que evalúa 8 dimensiones del estado de salud físico y mental',
+    timeToComplete: '10-15 min',
+    category: 'Calidad de Vida',
+    specialty: 'Medicina General',
+    searchTerms: ['sf-36', 'sf36', 'calidad de vida', 'CVRS', 'salud general', 'función física', 'salud mental', 'dolor', 'vitalidad', 'función social', 'quality of life', 'health survey'],
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop&crop=center',
   },
 ];
 
@@ -705,3 +716,129 @@ if (existingKatzIndex !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['katz'] = katzDetailed as any;
+
+// ============================================================================
+// SF-36: Cuestionario de Salud SF-36
+// ============================================================================
+
+const buildSF36Detailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'sf36';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = sf36Questions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: q.dimension,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = sf36ScoreInterp.map((r, idx) => ({
+    id: `r_sf36_${idx+1}`,
+    scoring_id: 'scoring_sf36',
+    min_value: r.min,
+    max_value: r.max,
+    interpretation_level: r.level,
+    interpretation_text: r.description,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: undefined,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_sf36',
+    scale_id: scaleId,
+    scoring_method: 'complex',
+    min_score: 0,
+    max_score: 100,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: sf36Scale.name,
+    acronym: sf36Scale.acronym,
+    description: sf36Scale.description,
+    category: sf36Scale.category,
+    specialty: sf36Scale.specialty,
+    body_system: sf36Scale.bodySystem || 'Multisistémico',
+    tags: sf36Scale.tags || [],
+    time_to_complete: sf36Scale.timeToComplete,
+    popularity: 0,
+    popular: false,
+    image_url: sf36Scale.imageUrl,
+    instructions: sf36Scale.information,
+    version: sf36Scale.version,
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: sf36Scale.references?.map((ref, idx) => ({
+      id: `ref_sf36_${idx+1}`,
+      scale_id: scaleId,
+      title: ref.title,
+      authors: ref.authors,
+      year: ref.year,
+      journal: ref.journal,
+      volume: ref.volume,
+      issue: ref.issue,
+      pages: ref.pages,
+      doi: ref.doi,
+      is_primary: true,
+      reference_type: 'validation',
+      created_at: now,
+    })) || [],
+    translations: [],
+  };
+  return detailed;
+};
+
+const sf36Detailed = buildSF36Detailed();
+
+const existingSF36Index = scales.findIndex(s => s.id === 'sf36');
+if (existingSF36Index !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingSF36Index] = { ...(scales[existingSF36Index] as any), ...sf36Detailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(sf36Detailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['sf36'] = sf36Detailed as any;
