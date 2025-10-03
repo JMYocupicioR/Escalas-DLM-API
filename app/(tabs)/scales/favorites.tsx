@@ -4,56 +4,52 @@ import { Stack, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { useScalesStore } from '@/store/scales';
+import { useFavoritesStore } from '@/store/favoritesStore';
 import { scalesById } from '@/data/_scales';
-import { History, ArrowRight, Clock, Trash2 } from 'lucide-react-native';
+import { Heart, ArrowRight, Clock, Star, Trash2 } from 'lucide-react-native';
 import EmptyState from '@/components/errors/EmptyState';
 
-export default function RecentScalesScreen() {
+export default function FavoritesScreen() {
   const { colors, fontSizeMultiplier } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors, fontSizeMultiplier), [colors, fontSizeMultiplier]);
   const { columns, contentPadding } = useResponsiveLayout();
   const router = useRouter();
 
-  const { recentlyViewed, clearRecentlyViewed } = useScalesStore();
+  const { favorites, removeFavorite } = useFavoritesStore();
 
-  const recentScales = useMemo(() => {
-    return recentlyViewed
+  const favoriteScales = useMemo(() => {
+    return favorites
       .map(id => scalesById[id])
-      .filter(Boolean);
-  }, [recentlyViewed]);
+      .filter(Boolean)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [favorites]);
 
   const handleScalePress = (scaleId: string) => {
     router.push(`/scales/${scaleId}` as any);
   };
 
-  const handleClearHistory = () => {
-    clearRecentlyViewed();
+  const handleRemoveFavorite = (scaleId: string, e: any) => {
+    e.stopPropagation();
+    removeFavorite(scaleId);
   };
 
-  const formatTimeAgo = (index: number) => {
-    if (index === 0) return 'Hace poco';
-    if (index === 1) return 'Reciente';
-    if (index < 5) return 'Hoy';
-    return 'Esta semana';
-  };
-
-  const renderScaleCard = ({ item, index }: { item: typeof recentScales[0]; index: number }) => (
+  const renderScaleCard = ({ item }: { item: typeof favoriteScales[0] }) => (
     <TouchableOpacity
       style={styles.scaleCard}
       onPress={() => handleScalePress(item.id)}
       activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>
-        <View style={styles.timeContainer}>
-          <Clock size={14} color={colors.mutedText} />
-          <Text style={styles.timeText}>{formatTimeAgo(index)}</Text>
+        <View style={styles.cardIconContainer}>
+          <Heart size={20} color={colors.error} fill={colors.error} />
         </View>
-        {index === 0 && (
-          <View style={styles.recentBadge}>
-            <Text style={styles.recentBadgeText}>Último</Text>
-          </View>
-        )}
+        <TouchableOpacity
+          onPress={(e) => handleRemoveFavorite(item.id, e)}
+          style={styles.removeButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Trash2 size={16} color={colors.mutedText} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.cardContent}>
@@ -67,7 +63,10 @@ export default function RecentScalesScreen() {
         <View style={styles.cardFooter}>
           <View style={styles.metaInfo}>
             {item.timeToComplete && (
-              <Text style={styles.metaText}>{item.timeToComplete}</Text>
+              <View style={styles.metaItem}>
+                <Clock size={14} color={colors.mutedText} />
+                <Text style={styles.metaText}>{item.timeToComplete}</Text>
+              </View>
             )}
             {item.category && (
               <View style={[styles.categoryBadge, { backgroundColor: colors.surfaceVariant }]}>
@@ -83,9 +82,9 @@ export default function RecentScalesScreen() {
 
   const renderEmptyState = () => (
     <EmptyState
-      title="Sin historial"
-      message="Aún no has visitado ninguna escala. Explora el catálogo para comenzar."
-      icon={History}
+      title="No tienes favoritos"
+      message="Agrega escalas a favoritos presionando el ícono de corazón en cualquier escala."
+      icon={Heart}
       actionText="Explorar Escalas"
       onAction={() => router.push('/scales')}
     />
@@ -95,25 +94,20 @@ export default function RecentScalesScreen() {
     <View style={styles.header}>
       <View style={styles.headerTop}>
         <View style={styles.headerLeft}>
-          <History size={24} color={colors.primary} />
-          <Text style={styles.headerTitle}>Historial</Text>
+          <Heart size={24} color={colors.error} fill={colors.error} />
+          <Text style={styles.headerTitle}>Mis Favoritos</Text>
         </View>
-        {recentScales.length > 0 && (
-          <TouchableOpacity
-            onPress={handleClearHistory}
-            style={styles.clearButton}
-          >
-            <Trash2 size={16} color={colors.error} />
-            <Text style={styles.clearButtonText}>Limpiar</Text>
-          </TouchableOpacity>
-        )}
+        <View style={styles.countBadge}>
+          <Star size={14} color={colors.primary} fill={colors.primary} />
+          <Text style={styles.countText}>{favoriteScales.length}</Text>
+        </View>
       </View>
       <Text style={styles.headerSubtitle}>
-        {recentScales.length === 0
-          ? 'No has visitado ninguna escala recientemente'
-          : recentScales.length === 1
-          ? '1 escala reciente'
-          : `${recentScales.length} escalas recientes`}
+        {favoriteScales.length === 0
+          ? 'Aún no has agregado escalas favoritas'
+          : favoriteScales.length === 1
+          ? '1 escala guardada'
+          : `${favoriteScales.length} escalas guardadas`}
       </Text>
     </View>
   );
@@ -122,15 +116,15 @@ export default function RecentScalesScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Historial',
+          title: 'Favoritos',
           headerShown: true,
         }}
       />
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <FlatList
-          data={recentScales}
+          data={favoriteScales}
           renderItem={renderScaleCard}
-          keyExtractor={(item, index) => `${item.id}-${index}`}
+          keyExtractor={(item) => item.id}
           numColumns={columns}
           key={columns}
           contentContainerStyle={[
@@ -180,19 +174,19 @@ const createStyles = (colors: any, fontMultiplier: number) =>
       color: colors.mutedText,
       marginTop: 4,
     },
-    clearButton: {
+    countBadge: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      backgroundColor: colors.errorBackground,
+      backgroundColor: colors.surfaceVariant,
       paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 8,
+      paddingVertical: 6,
+      borderRadius: 20,
     },
-    clearButtonText: {
+    countText: {
       fontSize: 14 * fontMultiplier,
-      fontWeight: '600',
-      color: colors.error,
+      fontWeight: '700',
+      color: colors.text,
     },
     scaleCard: {
       flex: 1,
@@ -215,26 +209,18 @@ const createStyles = (colors: any, fontMultiplier: number) =>
       alignItems: 'center',
       marginBottom: 12,
     },
-    timeContainer: {
-      flexDirection: 'row',
+    cardIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: `${colors.error}15`,
+      justifyContent: 'center',
       alignItems: 'center',
-      gap: 6,
     },
-    timeText: {
-      fontSize: 12 * fontMultiplier,
-      color: colors.mutedText,
-      fontWeight: '500',
-    },
-    recentBadge: {
-      backgroundColor: colors.primary,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 6,
-    },
-    recentBadgeText: {
-      fontSize: 11 * fontMultiplier,
-      fontWeight: '700',
-      color: '#FFFFFF',
+    removeButton: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: colors.surfaceVariant,
     },
     cardContent: {
       flex: 1,
@@ -263,6 +249,11 @@ const createStyles = (colors: any, fontMultiplier: number) =>
       alignItems: 'center',
       gap: 8,
       flex: 1,
+    },
+    metaItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
     },
     metaText: {
       fontSize: 12 * fontMultiplier,

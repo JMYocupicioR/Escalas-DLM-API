@@ -20,6 +20,8 @@ import { boston, scoreInterpretation as bostonScoreInterp } from './boston';
 import { bergScale, questions as bergQuestions, scoreInterpretation as bergScoreInterp } from './berg';
 import { katzScale, questions as katzQuestions, scoreInterpretation as katzScoreInterp } from './katz';
 import { sf36Scale, questions as sf36Questions, scoreInterpretation as sf36ScoreInterp } from './sf36';
+import { lequesneQuestions, getLequesneInterpretation } from './lequesne';
+import { tinettiScale, tinettiQuestions, scoreInterpretation as tinettiScoreInterp } from './tinetti';
 import { sixMWT } from './6mwt';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
@@ -842,3 +844,335 @@ if (existingSF36Index !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['sf36'] = sf36Detailed as any;
+
+// ============================================================================
+// LEQUESNE: Índice de Lequesne para Osteoartritis de Rodilla
+// ============================================================================
+
+/**
+ * Adapta el Índice de Lequesne al formato ScaleWithDetails.
+ *
+ * Lequesne evalúa:
+ * - Dolor nocturno (0-2)
+ * - Rigidez matutina (0-2)
+ * - Dolor en bipedestación (0-1)
+ * - Dolor al caminar (0-2)
+ * - Dolor al levantarse (0-1)
+ * - Distancia máxima de marcha (0-7)
+ * - Ayuda para caminar (0-3)
+ * - Subir escaleras (0-2, con 0.5 incrementos)
+ * - Bajar escaleras (0-2, con 0.5 incrementos)
+ * - Ponerse en cuclillas (0-2, con 0.5 incrementos)
+ * - Caminar en terreno desigual (0-2, con 0.5 incrementos)
+ *
+ * Scoring: Suma directa (0-26 puntos)
+ * - 0-7: Leve
+ * - 7.5-13: Moderada
+ * - 13.5-26: Severa
+ */
+const buildLequesneDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'lequesne-rodilla-es-v1';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = lequesneQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: undefined,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  // Create scoring ranges based on Lequesne interpretation levels
+  const ranges: ScoringRange[] = [
+    {
+      id: 'r_lequesne_1',
+      scoring_id: 'scoring_lequesne',
+      min_value: 0,
+      max_value: 7,
+      interpretation_level: 'Leve',
+      interpretation_text: 'Impacto limitado en la vida diaria. Mantener actividad física moderada y control médico periódico.',
+      order_index: 1,
+      created_at: now,
+      color_code: '#10B981',
+      recommendations: 'Mantener actividad física moderada y control médico periódico.',
+    },
+    {
+      id: 'r_lequesne_2',
+      scoring_id: 'scoring_lequesne',
+      min_value: 7.5,
+      max_value: 13,
+      interpretation_level: 'Moderada',
+      interpretation_text: 'Impacto significativo en la calidad de vida. Considerar fisioterapia, analgésicos y evaluación ortopédica.',
+      order_index: 2,
+      created_at: now,
+      color_code: '#F59E0B',
+      recommendations: 'Considerar fisioterapia, analgésicos y evaluación ortopédica.',
+    },
+    {
+      id: 'r_lequesne_3',
+      scoring_id: 'scoring_lequesne',
+      min_value: 13.5,
+      max_value: 26,
+      interpretation_level: 'Severa',
+      interpretation_text: 'Pronóstico malo para la función. Evaluación ortopédica urgente, considerar opciones quirúrgicas.',
+      order_index: 3,
+      created_at: now,
+      color_code: '#EF4444',
+      recommendations: 'Evaluación ortopédica urgente, considerar opciones quirúrgicas.',
+    },
+  ];
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_lequesne',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 26,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: 'Índice de Lequesne para Osteoartritis de Rodilla',
+    acronym: 'Lequesne',
+    description: 'Cuestionario para cuantificar dolor/malestar, distancia máxima de marcha y dificultades en la vida diaria en osteoartritis de rodilla.',
+    category: 'Orthopedics',
+    specialty: 'Traumatología',
+    body_system: 'Sistema Musculoesquelético',
+    tags: ['lequesne', 'osteoartritis', 'OA', 'artrosis', 'rodilla', 'gonartrosis', 'dolor rodilla', 'funcional'],
+    time_to_complete: '3-5 min',
+    popularity: 0,
+    popular: false,
+    image_url: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=400&h=300&fit=crop&crop=center',
+    instructions: 'Responda a cada pregunta seleccionando la opción que mejor describa su situación actual en relación a su rodilla afectada.',
+    version: '1.0',
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: [
+      {
+        id: 'ref_lequesne_1',
+        scale_id: scaleId,
+        title: 'The Lequesne algofunctional indices for hip and knee osteoarthritis',
+        authors: ['Lequesne MG', 'Mery C', 'Samson M', 'Gerard P'],
+        year: 1987,
+        journal: 'J Rheumatol',
+        volume: '14',
+        issue: '1',
+        pages: '3-6',
+        is_primary: true,
+        reference_type: 'original',
+        created_at: now,
+      },
+    ],
+    translations: [],
+  };
+  return detailed;
+};
+
+const lequesneDetailed = buildLequesneDetailed();
+
+const existingLequesneIndex = scales.findIndex(s => s.id === 'lequesne-rodilla-es-v1');
+if (existingLequesneIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingLequesneIndex] = { ...(scales[existingLequesneIndex] as any), ...lequesneDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(lequesneDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['lequesne-rodilla-es-v1'] = lequesneDetailed as any;
+
+// ============================================================================
+// TINETTI: Escala de Tinetti (POMA - Performance Oriented Mobility Assessment)
+// ============================================================================
+
+/**
+ * Adapta la Escala de Tinetti al formato ScaleWithDetails.
+ *
+ * Tinetti/POMA evalúa:
+ * - Equilibrio (9 ítems, máx 16 puntos):
+ *   - Equilibrio sentado, levantarse, intentos, equilibrio de pie (inmediato y prolongado)
+ *   - Romberg, resistencia al empujón, giro 360°, sentarse
+ * - Marcha (7 ítems, máx 12 puntos):
+ *   - Inicio, longitud y altura del paso (bilateral), simetría, continuidad,
+ *   - trayectoria, tronco, distancia entre pies
+ *
+ * Scoring: Suma directa (0-28 puntos)
+ * - 25-28: Riesgo bajo de caídas
+ * - 19-24: Riesgo moderado de caídas
+ * - 0-18: Riesgo alto de caídas
+ */
+const buildTinettiDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'tinetti';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = tinettiQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: q.section,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = tinettiScoreInterp.map((r, idx) => ({
+    id: `r_tinetti_${idx+1}`,
+    scoring_id: 'scoring_tinetti',
+    min_value: r.min,
+    max_value: r.max,
+    interpretation_level: r.level,
+    interpretation_text: `${r.description} - ${r.risk}`,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: r.risk,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_tinetti',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 28,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: tinettiScale.name,
+    acronym: tinettiScale.shortName,
+    description: tinettiScale.description,
+    category: tinettiScale.category,
+    specialty: tinettiScale.specialty,
+    body_system: 'Sistema Nervioso y Musculoesquelético',
+    tags: ['tinetti', 'POMA', 'equilibrio', 'marcha', 'balance', 'caídas', 'riesgo caída', 'geriatría', 'adulto mayor'],
+    time_to_complete: tinettiScale.timeToComplete,
+    popularity: 0,
+    popular: false,
+    image_url: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=300&fit=crop&crop=center',
+    instructions: tinettiScale.information,
+    version: '1.0',
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: [
+      {
+        id: 'ref_tinetti_1',
+        scale_id: scaleId,
+        title: 'Performance-oriented assessment of mobility problems in elderly patients',
+        authors: ['Tinetti ME'],
+        year: 1986,
+        journal: 'J Am Geriatr Soc',
+        volume: '34',
+        issue: '2',
+        pages: '119-126',
+        is_primary: true,
+        reference_type: 'original',
+        created_at: now,
+      },
+      {
+        id: 'ref_tinetti_2',
+        scale_id: scaleId,
+        title: 'Fall risk index for elderly patients based on number of chronic disabilities',
+        authors: ['Tinetti ME', 'Williams TF', 'Mayewski R'],
+        year: 1986,
+        journal: 'Am J Med',
+        volume: '80',
+        issue: '3',
+        pages: '429-434',
+        is_primary: true,
+        reference_type: 'validation',
+        created_at: now,
+      },
+    ],
+    translations: [],
+  };
+  return detailed;
+};
+
+const tinettiDetailed = buildTinettiDetailed();
+
+const existingTinettiIndex = scales.findIndex(s => s.id === 'tinetti');
+if (existingTinettiIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingTinettiIndex] = { ...(scales[existingTinettiIndex] as any), ...tinettiDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(tinettiDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['tinetti'] = tinettiDetailed as any;

@@ -16,7 +16,12 @@ import { PatientForm } from '@/components/PatientForm';
 import { ResultsActions } from '@/components/ResultsActions';
 import LoadingState from '@/components/errors/LoadingState';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
+import { useSettingsStore } from '@/store/settingsStore';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react-native';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { OptionCard } from '@/components/ui/OptionCard';
+import { ScoreCircle } from '@/components/ui/ScoreCircle';
+import { calculateSF36, getSF36Interpretation, getSF36DetailedResults, SF36Scores } from '@/utils/sf36Calculator';
 
 interface ScaleEvaluationProps {
   scale: ScaleWithDetails;
@@ -46,6 +51,7 @@ interface EvaluationState {
     sssLevel: string;
     fssLevel: string;
   } | null;
+  sf36Scores?: SF36Scores | null;
 }
 
 export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
@@ -56,6 +62,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 }) => {
   const { colors, fontSizeMultiplier } = useThemedStyles();
   const { isDesktop, isTablet } = useResponsiveLayout();
+  const autoAdvanceQuestions = useSettingsStore((state) => state.autoAdvanceQuestions);
   const styles = useMemo(() => createStyles(colors, isDesktop || isTablet, fontSizeMultiplier), [colors, isDesktop, isTablet, fontSizeMultiplier]);
   
   const [state, setState] = useState<EvaluationState>({
@@ -166,6 +173,19 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
     // Find interpretation based on scoring ranges
     let interpretation = findInterpretation(totalScore, scoring.ranges);
 
+    // SF-36: calcular las 8 dimensiones
+    let sf36Scores: SF36Scores | null = null;
+    if (scale.id === 'sf36') {
+      sf36Scores = calculateSF36(workingResponses);
+      totalScore = sf36Scores.promedioTotal;
+      const sf36Interp = getSF36Interpretation(totalScore);
+      interpretation = {
+        level: sf36Interp.level,
+        text: sf36Interp.text,
+        colorCode: sf36Interp.colorCode,
+      } as Interpretation;
+    }
+
     // Boston: calcular subescalas SSS/FSS y enriquecer interpretación
     let bostonSubscores: EvaluationState['bostonSubscores'] = null;
     if (scale.id === 'boston') {
@@ -207,6 +227,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       totalScore,
       interpretation,
       bostonSubscores,
+      sf36Scores,
     }));
   }, [scale.scoring, state.responses]);
 
@@ -248,7 +269,6 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   );
 
   const renderEvaluationStep = () => {
-    const autoAdvance = scale.id === 'boston';
     if (!currentQuestion) {
       return <LoadingState message="Cargando pregunta..." />;
     }
@@ -261,27 +281,21 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
         {/* Progress Bar & Question Title for Mobile */}
         {!isDesktop && !isTablet && (
           <>
-            <View style={styles.progressContainer}>
-              <View style={styles.progressTrack}>
-                <Animated.View 
-                  style={[
-                    styles.progressBar,
-                    { 
-                      width: animatedValue.interpolate({
-                        inputRange: [0, 100],
-                        outputRange: ['0%', '100%'],
-                        extrapolate: 'clamp',
-                      })
-                    }
-                  ]}
-                />
-              </View>
-              <Text style={styles.progressText}>
-                {state.currentQuestionIndex + 1} de {sortedQuestions.length}
-              </Text>
+            <View style={styles.progressWrapper}>
+              <ProgressBar
+                current={state.currentQuestionIndex + 1}
+                total={sortedQuestions.length}
+                showCounter={true}
+                showPercentage={false}
+                animated={true}
+                height={6}
+              />
             </View>
             <View style={styles.questionContainer}>
               <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
+              {currentQuestion.description && (
+                <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
+              )}
             </View>
           </>
         )}
@@ -290,35 +304,26 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           {/* Question (Left Column on Desktop/Tablet) */}
           {(isDesktop || isTablet) && (
             <View style={styles.questionPanel}>
-              <View style={styles.progressContainer}>
-                <Text style={styles.progressText}>
-                  Pregunta {state.currentQuestionIndex + 1} de {sortedQuestions.length}
-                </Text>
-                <View style={styles.progressTrack}>
-                  <Animated.View 
-                    style={[
-                      styles.progressBar,
-                      { 
-                        width: animatedValue.interpolate({
-                          inputRange: [0, 100],
-                          outputRange: ['0%', '100%'],
-                          extrapolate: 'clamp',
-                        })
-                      }
-                    ]}
-                  />
-                </View>
+              <ProgressBar
+                current={state.currentQuestionIndex + 1}
+                total={sortedQuestions.length}
+                showCounter={true}
+                showPercentage={true}
+                animated={true}
+                height={8}
+              />
+              <View style={{ marginTop: 24 }}>
+                <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
+                {currentQuestion.description && (
+                  <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
+                )}
+                {currentQuestion.instructions && (
+                  <View style={styles.instructionsContainer}>
+                    <Text style={styles.instructionsLabel}>Instrucciones:</Text>
+                    <Text style={styles.instructionsText}>{currentQuestion.instructions}</Text>
+                  </View>
+                )}
               </View>
-              <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
-              {currentQuestion.description && (
-                <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
-              )}
-              {currentQuestion.instructions && (
-                <View style={styles.instructionsContainer}>
-                  <Text style={styles.instructionsLabel}>Instrucciones:</Text>
-                  <Text style={styles.instructionsText}>{currentQuestion.instructions}</Text>
-                </View>
-              )}
             </View>
           )}
 
@@ -326,56 +331,24 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           <ScrollView style={styles.optionsPanel} showsVerticalScrollIndicator={false}>
             {sortedOptions.map((option) => {
               const isSelected = selectedValue === option.option_value;
-              
+
               return (
-                <TouchableOpacity
+                <OptionCard
                   key={option.id}
-                  style={[
-                    styles.optionButton,
-                    isSelected && styles.optionButtonSelected,
-                  ]}
+                  label={option.option_label}
+                  description={option.option_description}
+                  value={option.option_value}
+                  selected={isSelected}
+                  showValue={true}
                   onPress={() => {
                     handleAnswerSelect(option.option_value);
-                    if (autoAdvance) {
+                    if (autoAdvanceQuestions) {
                       setTimeout(() => {
                         handleNext();
-                      }, 150);
+                      }, 300);
                     }
                   }}
-                >
-                  <View style={styles.optionContent}>
-                    <View style={[
-                      styles.optionIndicator,
-                      isSelected && styles.optionIndicatorSelected,
-                    ]}>
-                      {isSelected && <View style={styles.optionIndicatorDot} />}
-                    </View>
-                    
-                    <View style={styles.optionTextContainer}>
-                      <Text style={[
-                        styles.optionLabel,
-                        isSelected && styles.optionLabelSelected,
-                      ]}>
-                        {option.option_label}
-                      </Text>
-                      {option.option_description && !isDesktop && (
-                        <Text style={[
-                          styles.optionDescription,
-                          isSelected && styles.optionDescriptionSelected,
-                        ]}>
-                          {option.option_description}
-                        </Text>
-                      )}
-                    </View>
-                    
-                    <Text style={[
-                      styles.optionValue,
-                      isSelected && styles.optionValueSelected,
-                    ]}>
-                      {option.option_value}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                />
               );
             })}
           </ScrollView>
@@ -485,6 +458,45 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           </View>
         )}
 
+        {/* SF-36 dimensions breakdown */}
+        {scale.id === 'sf36' && state.sf36Scores && (
+          <View style={styles.summaryContainer}>
+            <Text style={styles.summaryTitle}>Puntuaciones por Dimensión</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Función Física:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.funcionFisica}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Rol Físico:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.rolFisico}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Dolor Corporal:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.dolorCorporal}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Salud General:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.saludGeneral}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Vitalidad:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.vitalidad}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Función Social:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.funcionSocial}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Rol Emocional:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.rolEmocional}/100</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Salud Mental:</Text>
+              <Text style={styles.summaryValue}>{state.sf36Scores.saludMental}/100</Text>
+            </View>
+          </View>
+        )}
+
         {/* Summary */}
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>Resumen de la Evaluación</Text>
@@ -516,6 +528,8 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
             score: state.totalScore!,
             interpretation: (scale.id === 'boston' && state.bostonSubscores)
               ? `SSS: ${state.bostonSubscores.sssLevel} (${state.bostonSubscores.sssAvg}) | FSS: ${state.bostonSubscores.fssLevel} (${state.bostonSubscores.fssAvg})`
+              : (scale.id === 'sf36' && state.sf36Scores)
+              ? getSF36DetailedResults(state.sf36Scores)
               : (state.interpretation?.text || ''),
             answers: Object.entries(state.responses).map(([id, value]) => ({ id, value }))
           }}
@@ -608,6 +622,10 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 16,
+  },
+  progressWrapper: {
+    marginBottom: 24,
+    paddingHorizontal: isLargeScreen ? 0 : 4,
   },
   progressContainer: {
     marginBottom: 24,
