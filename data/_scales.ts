@@ -1220,8 +1220,8 @@ const buildMocaDetailed = (): ScaleWithDetails => {
       question_type: (q.question_type === 'text_input' ? 'text' : q.question_type) as any,
       order_index: q.order_index,
       is_required: true,
-      category: q.category || null,
-      instructions: q.instructions || null,
+      category: q.category || undefined,
+      instructions: q.instructions || undefined,
       conditional_logic: null,
       validation_rules: null,
       help_text: null,
@@ -1231,8 +1231,10 @@ const buildMocaDetailed = (): ScaleWithDetails => {
     };
   });
 
+  const scoringId = `moca-scoring`;
   const ranges: ScoringRange[] = (mocaScale.scoring?.ranges || []).map((r, idx) => ({
     id: `moca-range-${idx + 1}`,
+    scoring_id: scoringId,
     scale_id: scaleId,
     min_value: r.min_value,
     max_value: r.max_value,
@@ -1240,21 +1242,20 @@ const buildMocaDetailed = (): ScaleWithDetails => {
     interpretation_text: r.interpretation_text,
     color_code: r.color_code || '#3b82f6',
     order_index: r.order_index,
-    recommendations: r.recommendations || null,
+    recommendations: r.recommendations || undefined,
     created_at: now,
   }));
 
   const scoring: ScaleScoring = {
-    id: `moca-scoring`,
+    id: scoringId,
     scale_id: scaleId,
     scoring_method: mocaScale.scoring?.scoring_method || 'sum',
     min_score: mocaScale.scoring?.min_score || 0,
     max_score: mocaScale.scoring?.max_score || 30,
-    formula: null,
     passing_score: 26,
-    custom_calculation: null,
-    reverse_scored_items: null,
-    weighted_items: null,
+    custom_calculation: undefined,
+    reverse_scored_items: undefined,
+    weighted_items: undefined,
     created_at: now,
     updated_at: now,
     ranges,
@@ -1275,7 +1276,6 @@ const buildMocaDetailed = (): ScaleWithDetails => {
     language: mocaScale.language || 'es',
     license: mocaScale.license || 'Uso clínico permitido con certificación',
     cross_references: mocaScale.cross_references || [],
-    is_public: true,
     requires_certification: false,
     scoring,
     questions,
