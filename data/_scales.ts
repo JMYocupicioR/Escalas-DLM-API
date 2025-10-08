@@ -23,6 +23,7 @@ import { sf36Scale, questions as sf36Questions, scoreInterpretation as sf36Score
 import { lequesneQuestions, getLequesneInterpretation } from './lequesne';
 import { tinettiScale, tinettiQuestions, scoreInterpretation as tinettiScoreInterp } from './tinetti';
 import { sixMWT } from './6mwt';
+import { mocaScale, mocaQuestions } from './moca';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
 /**
@@ -89,6 +90,17 @@ export const scales: Scale[] = [
     searchTerms: ['MMSE', 'mini mental', 'folstein', 'cognitivo', 'cognición', 'demencia', 'memoria', 'orientación'],
     crossReferences: ['geriatria'],
     imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'moca',
+    name: 'Evaluación Cognitiva de Montreal',
+    description: 'Herramienta de cribado cognitivo de alta sensibilidad para detectar Deterioro Cognitivo Leve (DCL)',
+    timeToComplete: '10-15 min',
+    category: 'Cognitive',
+    specialty: 'Neurología',
+    searchTerms: ['MoCA', 'montreal', 'cognitivo', 'cognición', 'deterioro cognitivo leve', 'DCL', 'MCI', 'demencia', 'alzheimer', 'memoria', 'funciones ejecutivas', 'screening cognitivo', 'nasreddine'],
+    crossReferences: ['mmse', 'geriatria'],
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=300&fit=crop&crop=center',
   },
   {
     id: 'norton',
@@ -1176,3 +1188,135 @@ if (existingTinettiIndex !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['tinetti'] = tinettiDetailed as any;
+
+// ========================================
+// MOCA (MONTREAL COGNITIVE ASSESSMENT)
+// ========================================
+
+const buildMocaDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'moca';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = mocaQuestions.map((q) => {
+    const questionId = `${scaleId}-q${++order}`;
+    const options: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}-opt${idx + 1}`,
+      question_id: questionId,
+      option_value: opt.option_value,
+      option_label: opt.option_label,
+      option_description: opt.option_description || '',
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    return {
+      id: questionId,
+      scale_id: scaleId,
+      question_id: q.id,
+      question_text: q.question,
+      description: q.description || '',
+      question_type: (q.question_type === 'text_input' ? 'text' : q.question_type) as any,
+      order_index: q.order_index,
+      is_required: true,
+      category: q.category || null,
+      instructions: q.instructions || null,
+      conditional_logic: null,
+      validation_rules: null,
+      help_text: null,
+      created_at: now,
+      updated_at: now,
+      options,
+    };
+  });
+
+  const ranges: ScoringRange[] = (mocaScale.scoring?.ranges || []).map((r, idx) => ({
+    id: `moca-range-${idx + 1}`,
+    scale_id: scaleId,
+    min_value: r.min_value,
+    max_value: r.max_value,
+    interpretation_level: r.interpretation_level,
+    interpretation_text: r.interpretation_text,
+    color_code: r.color_code || '#3b82f6',
+    order_index: r.order_index,
+    recommendations: r.recommendations || null,
+    created_at: now,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: `moca-scoring`,
+    scale_id: scaleId,
+    scoring_method: mocaScale.scoring?.scoring_method || 'sum',
+    min_score: mocaScale.scoring?.min_score || 0,
+    max_score: mocaScale.scoring?.max_score || 30,
+    formula: null,
+    passing_score: 26,
+    custom_calculation: null,
+    reverse_scored_items: null,
+    weighted_items: null,
+    created_at: now,
+    updated_at: now,
+    ranges,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: mocaScale.name,
+    acronym: mocaScale.acronym,
+    description: mocaScale.description,
+    category: mocaScale.category || 'Cognitive',
+    specialty: mocaScale.specialty || 'Neurología',
+    body_system: mocaScale.body_system || 'Sistema Nervioso Central',
+    tags: mocaScale.tags || ['cognición', 'screening'],
+    time_to_complete: mocaScale.time_to_complete || '10-15 minutos',
+    instructions: mocaScale.instructions || '',
+    version: mocaScale.version || '8.1',
+    language: mocaScale.language || 'es',
+    license: mocaScale.license || 'Uso clínico permitido con certificación',
+    cross_references: mocaScale.cross_references || [],
+    is_public: true,
+    requires_certification: false,
+    scoring,
+    questions,
+    created_at: now,
+    updated_at: now,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=300&fit=crop&crop=center',
+  };
+
+  if (mocaScale.references) {
+    // @ts-ignore
+    detailed.references = mocaScale.references.map((ref, idx) => ({
+      id: `moca-ref-${idx + 1}`,
+      scale_id: scaleId,
+      title: ref.title,
+      authors: ref.authors,
+      year: ref.year,
+      journal: ref.journal || null,
+      volume: ref.volume || null,
+      pages: ref.pages || null,
+      doi: ref.doi || null,
+      pmid: ref.pmid || null,
+      url: ref.url || null,
+      is_primary: ref.is_primary || false,
+      reference_type: ref.reference_type || 'general',
+      created_at: now,
+    }));
+  }
+
+  return detailed;
+};
+
+const mocaDetailed = buildMocaDetailed();
+
+const existingMocaIndex = scales.findIndex(s => s.id === 'moca');
+if (existingMocaIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingMocaIndex] = { ...(scales[existingMocaIndex] as any), ...mocaDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(mocaDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['moca'] = mocaDetailed as any;

@@ -23,6 +23,7 @@ export { generateHtml as renderLequesneHtml } from './lequesne';
 export { generateHtml as renderOgsHtml } from './ogs';
 export { generateHtml as renderBergHtml } from './berg';
 export { generateHtml as renderSixMWTHtml } from './6mwt';
+export { generateHtml as renderMocaHtml } from './moca';
 
 export const renderHtmlForScale = (payload: PdfTemplatePayload): string => {
   const id = payload?.scale?.id || '';
@@ -48,6 +49,9 @@ export const renderHtmlForScale = (payload: PdfTemplatePayload): string => {
   if (id === '6mwt') {
     return (require('./6mwt') as typeof import('./6mwt')).generateHtml(payload as any);
   }
+  if (id === 'moca') {
+    return (require('./moca') as typeof import('./moca')).generateHtml(payload as any);
+  }
   return (require('./generic') as typeof import('./generic')).generateHtml(payload as any);
 };
 
@@ -61,6 +65,7 @@ export const TEMPLATE_MAP = {
   ogs: (payload: PdfTemplatePayload) => (require('./ogs') as typeof import('./ogs')).generateHtml(payload as any),
   berg: (payload: PdfTemplatePayload) => (require('./berg') as typeof import('./berg')).generateHtml(payload as any),
   '6mwt': (payload: PdfTemplatePayload) => (require('./6mwt') as typeof import('./6mwt')).generateHtml(payload as any),
+  moca: (payload: PdfTemplatePayload) => (require('./moca') as typeof import('./moca')).generateHtml(payload as any),
   generic: (payload: PdfTemplatePayload) => (require('./generic') as typeof import('./generic')).generateHtml(payload as any),
 } as const;
 
