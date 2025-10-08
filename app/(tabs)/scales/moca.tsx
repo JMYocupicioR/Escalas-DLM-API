@@ -114,19 +114,42 @@ export default function MocaScaleScreen() {
   }, [step, initializeResponses]);
 
   const handleComplete = useCallback(() => {
-    // Verificar que se hayan ingresado los años de educación
-    if (patientData.educationYears === undefined) {
+    console.log('handleComplete llamado');
+    console.log('Todas las preguntas respondidas:', isAllQuestionsAnswered());
+    console.log('Años de educación:', patientData.educationYears);
+    
+    if (!isAllQuestionsAnswered()) {
+      console.log('Mostrando alerta: evaluación incompleta');
       Alert.alert(
-        'Años de Educación Requeridos',
-        'Por favor ingrese los años de educación formal del paciente para calcular el ajuste educativo del MoCA.',
+        'Evaluación Incompleta',
+        'Por favor responda todas las preguntas antes de completar.',
         [{ text: 'OK' }]
       );
       return;
     }
 
-    if (isAllQuestionsAnswered()) {
-      setStep('results');
+    // Verificar años de educación (advertencia pero permite continuar)
+    if (patientData.educationYears === undefined) {
+      console.log('Mostrando alerta: años de educación no ingresados');
+      Alert.alert(
+        'Años de Educación No Ingresados',
+        'No se ha ingresado el nivel educativo. Se continuará sin ajuste educativo. ¿Desea continuar de todas formas?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Continuar sin ajuste', 
+            onPress: () => {
+              console.log('Usuario eligió continuar sin ajuste');
+              setStep('results');
+            }
+          }
+        ]
+      );
+      return;
     }
+
+    console.log('Cambiando a step results');
+    setStep('results');
   }, [isAllQuestionsAnswered, patientData.educationYears]);
 
   const handleReset = useCallback(() => {
