@@ -125,24 +125,24 @@ export const mocaQuestions: MocaQuestion[] = [
     id: 'memoria-registro-1',
     question: 'Memoria - Primera Lectura',
     description: 'Registro inicial de 5 palabras (no se puntúa, solo registro para recuerdo diferido posterior).',
-    question_type: 'text_input',
+    question_type: 'single_choice',
     order_index: 9,
     category: 'Memoria',
-    instructions: 'Lea la lista de 5 palabras a razón de una por segundo. Pida al paciente que las repita. PRIMERA LECTURA: ROSTRO, SEDA, IGLESIA, CLAVEL, ROJO. Registre cuántas recordó (no se puntúa en esta fase).',
+    instructions: 'Lea la lista de 5 palabras a razón de una por segundo. Pida al paciente que las repita. PRIMERA LECTURA: ROSTRO, SEDA, IGLESIA, CLAVEL, ROJO. Esta fase NO se puntúa, es solo registro para establecer línea base.',
     options: [
-      { option_value: 0, option_label: 'Número de palabras recordadas (0-5)', option_description: 'Solo para registro, no suma puntos' }
+      { option_value: 0, option_label: '✓ Primera lectura completada', option_description: 'Palabras leídas: ROSTRO, SEDA, IGLESIA, CLAVEL, ROJO (no suma puntos)' }
     ]
   },
   {
     id: 'memoria-registro-2',
     question: 'Memoria - Segunda Lectura',
     description: 'Segunda presentación de las 5 palabras para evaluar curva de aprendizaje.',
-    question_type: 'text_input',
+    question_type: 'single_choice',
     order_index: 10,
     category: 'Memoria',
-    instructions: 'Lea nuevamente la lista: ROSTRO, SEDA, IGLESIA, CLAVEL, ROJO. Pida al paciente que las repita. Registre cuántas recordó en este segundo intento (no se puntúa en esta fase).',
+    instructions: 'Lea nuevamente la lista: ROSTRO, SEDA, IGLESIA, CLAVEL, ROJO. Pida al paciente que las repita. Observe si hay curva de aprendizaje. Esta fase NO se puntúa.',
     options: [
-      { option_value: 0, option_label: 'Número de palabras recordadas (0-5)', option_description: 'Solo para registro, no suma puntos' }
+      { option_value: 0, option_label: '✓ Segunda lectura completada', option_description: 'Repetición de palabras registrada (no suma puntos)' }
     ]
   },
   {
