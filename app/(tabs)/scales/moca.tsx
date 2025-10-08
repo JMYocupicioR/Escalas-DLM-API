@@ -222,16 +222,42 @@ export default function MocaScaleScreen() {
   );
 
   // Renderizar formulario de paciente
-  const renderForm = () => (
-    <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Datos del Paciente</Text>
-        
-        <PatientForm
-          patientData={patientData}
-          onUpdate={updatePatientData}
-          currentPatient={currentPatient}
-        />
+  const renderForm = () => {
+    const handleContinue = () => {
+      // Validar que se hayan ingresado años de educación
+      if (patientData.educationYears === undefined) {
+        Alert.alert(
+          'Años de Educación Requeridos',
+          'Por favor ingrese los años de educación formal del paciente antes de continuar.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+      
+      // Sincronizar datos del paciente desde el store al hook
+      if (currentPatient) {
+        updatePatientData({
+          id: currentPatient.id,
+          name: currentPatient.name || '',
+          age: currentPatient.age?.toString() || '',
+          gender: currentPatient.gender || '',
+          doctorName: currentPatient.doctorName || '',
+        });
+      }
+      
+      setStep('evaluation');
+    };
+
+    return (
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Datos del Paciente</Text>
+          
+          <PatientForm
+            scaleId="moca"
+            onContinue={handleContinue}
+            allowSkip={false}
+          />
 
         {/* Campo especial para años de educación */}
         <View style={styles.educationSection}>
@@ -262,18 +288,6 @@ export default function MocaScaleScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.primaryButton, !patientData.name && styles.disabledButton]}
-          onPress={() => {
-            if (patientData.name) {
-              setStep('evaluation');
-            }
-          }}
-          disabled={!patientData.name}
-        >
-          <Text style={styles.primaryButtonText}>Iniciar Evaluación</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => setStep('info')}
         >
@@ -282,7 +296,8 @@ export default function MocaScaleScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
-  );
+    );
+  };
 
   // Renderizar evaluación
   const renderEvaluation = () => {
