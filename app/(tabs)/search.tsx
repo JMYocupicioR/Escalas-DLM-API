@@ -1,16 +1,20 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, TextInput, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, TextInput, TouchableOpacity, Platform, Animated as RNAnimated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { Search as SearchIcon, SlidersHorizontal, X, ChevronRight } from 'lucide-react-native';
+import { Search as SearchIcon, SlidersHorizontal, X, ChevronRight, Activity, Brain, Heart, TrendingUp, Zap } from 'lucide-react-native';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { AdvancedSearch } from '@/components/AdvancedSearch';
+import { ScaleCard, ScaleCardData } from '@/components/Card';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { ScaleGridSkeleton, EmptyState } from '@/components/LoadingStates';
 import { GetScalesParams } from '@/api/scales/types';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { useScalesStore } from '@/store/scalesStore';
+import { calculateGridConfig, shouldUseListView } from '@/utils/responsiveGrid';
 import type { Scale } from '@/types/scale';
-import { useEffect } from 'react';
 
 // Interfaces para mejorar el tipado
 interface CategoryOption {
@@ -21,6 +25,71 @@ interface CategoryOption {
 interface SortOption {
   id: string;
   name: string;
+}
+
+// Category icons and colors mapping
+const CATEGORY_STYLES: Record<string, { icon: React.ComponentType<any>, color: string }> = {
+  'Funcional': { icon: Activity, color: '#10b981' },
+  'Neurológica': { icon: Brain, color: '#8b5cf6' },
+  'Cognitiva': { icon: Brain, color: '#f59e0b' },
+  'Dolor': { icon: Heart, color: '#ef4444' },
+  'Cardiovascular': { icon: Heart, color: '#dc2626' },
+  'Respiratoria': { icon: Activity, color: '#06b6d4' },
+  'Geriátrica': { icon: TrendingUp, color: '#6366f1' },
+  'Pediátrica': { icon: Activity, color: '#f59e0b' },
+  'Rehab': { icon: TrendingUp, color: '#10b981' },
+  'Rehabilitación': { icon: TrendingUp, color: '#10b981' },
+  'ADL': { icon: Activity, color: '#10b981' },
+  'Balance': { icon: TrendingUp, color: '#06b6d4' },
+  'Cognitive': { icon: Brain, color: '#f59e0b' },
+  'Risk': { icon: Activity, color: '#ef4444' },
+  'Pain': { icon: Heart, color: '#ef4444' },
+  'Neurology': { icon: Brain, color: '#8b5cf6' },
+  'default': { icon: Activity, color: '#0891b2' },
+};
+
+// Animated Card Wrapper for stagger effect
+interface AnimatedCardWrapperProps {
+  children: React.ReactNode;
+  delay: number;
+  style?: any;
+}
+
+function AnimatedCardWrapper({ children, delay, style }: AnimatedCardWrapperProps) {
+  const fadeAnim = React.useRef(new RNAnimated.Value(0)).current;
+  const slideAnim = React.useRef(new RNAnimated.Value(20)).current;
+
+  React.useEffect(() => {
+    RNAnimated.parallel([
+      RNAnimated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        delay,
+        useNativeDriver: true,
+      }),
+      RNAnimated.spring(slideAnim, {
+        toValue: 0,
+        delay,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [delay]);
+
+  return (
+    <RNAnimated.View
+      style={[
+        style,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
+    >
+      {children}
+    </RNAnimated.View>
+  );
 }
 
 // We'll get scales from the store instead of hardcoded data
@@ -46,6 +115,7 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function SearchScreen() {
   const { colors, isDark } = useThemedStyles();
+  const { isTablet, isDesktop, width, isLandscape } = useResponsiveLayout();
   const router = useRouter();
   
   // Get scales from store
@@ -64,6 +134,18 @@ export default function SearchScreen() {
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [scales, setScales] = useState(allScales);
+
+  // Enhanced grid configuration
+  const gridConfig = useMemo(() => calculateGridConfig({
+    screenWidth: width,
+    isPhone: !isTablet && !isDesktop,
+    isTablet,
+    isDesktop,
+    isLandscape,
+  }), [width, isTablet, isDesktop, isLandscape]);
+
+  const columns = gridConfig.columns;
+  const useListView = shouldUseListView(width);
 
   // Update scales when store changes
   useEffect(() => {
@@ -188,62 +270,56 @@ export default function SearchScreen() {
     });
   }, [searchQuery, selectedCategory, sortBy, scales, useAdvancedSearch]);
 
-  // Componente para renderizar cada escala
-  const renderScaleItem = useCallback(({ item }: { item: Scale }) => (
-    <Link href={`/scales/${item.id}`} asChild>
-      <Pressable 
-        style={styles.scaleCard}
-        accessible={true}
-        accessibilityLabel={`Escala ${item.name}`}
-        accessibilityHint={item.description}
-        accessibilityRole="button"
-      >
-        <View style={styles.imageContainer}>
-          {item.imageUrl ? (
-            <Image 
-              source={{ uri: item.imageUrl }} 
-              style={styles.image}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.imagePlaceholder} />
-          )}
-        </View>
-        <View style={styles.cardContent}>
-          <Text style={styles.scaleName}>{item.name}</Text>
-          <Text style={styles.scaleDescription} numberOfLines={2}>
-            {item.description}
-          </Text>
-          {item.timeToComplete && (
-            <Text style={styles.timeText}>⏱️ {item.timeToComplete}</Text>
-          )}
-          {item.tags && item.tags.length > 0 && (
-            <View style={styles.tags}>
-              {item.tags.slice(0, 2).map(tag => (
-                <View key={tag} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-          <View style={styles.cardFooter}>
-            <Text style={styles.categoryText}>{item.category}</Text>
-            <ChevronRight size={16} color="#64748b" />
-          </View>
-        </View>
-      </Pressable>
-    </Link>
-  ), []);
+  // Convert scale to ScaleCardData format
+  const convertToCardData = useCallback((scale: Scale): ScaleCardData => {
+    const categoryStyle = CATEGORY_STYLES[scale.category] || CATEGORY_STYLES.default;
+    return {
+      id: scale.id,
+      name: scale.name,
+      description: scale.description,
+      category: scale.category,
+      categoryColor: categoryStyle.color,
+      icon: categoryStyle.icon,
+      uses: scale.popularity,
+      rating: scale.rating,
+      timeToComplete: scale.timeToComplete,
+    };
+  }, []);
 
-  // Componente para mostrar cuando no hay resultados
+  // Componente para renderizar cada escala con animación
+  const renderScaleItem = useCallback(({ item, index }: { item: Scale; index: number }) => {
+    const scaleData = convertToCardData(item);
+    
+    return (
+      <AnimatedCardWrapper
+        delay={index * 60}
+        style={[
+          styles.cardWrapper,
+          useListView ? styles.cardWrapperFull : styles.cardWrapperGrid(columns)
+        ]}
+      >
+        <ScaleCard
+          scale={scaleData}
+          layout={useListView ? 'list' : 'grid'}
+          onPress={() => router.push(`/scales/${item.id}`)}
+          showStats={true}
+          showCategory={true}
+          rightElement={
+            <FavoriteButton scaleId={item.id} size={18} />
+          }
+        />
+      </AnimatedCardWrapper>
+    );
+  }, [convertToCardData, useListView, columns, router]);
+
+  // Componente para mostrar cuando no hay resultados - usando el nuevo EmptyState
   const EmptyResultsComponent = useCallback(() => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyTitle}>No se encontraron resultados</Text>
-      <Text style={styles.emptyText}>
-        Intenta con otra búsqueda o cambia los filtros aplicados
-      </Text>
-    </View>
-  ), []);
+    <EmptyState
+      title="No se encontraron resultados"
+      description="Intenta con otra búsqueda o cambia los filtros aplicados"
+      icon={<SearchIcon size={40} color={colors.mutedText} />}
+    />
+  ), [colors]);
 
   if (useAdvancedSearch) {
     return (
@@ -274,17 +350,32 @@ export default function SearchScreen() {
         
         {/* Results */}
         <View style={styles.listContainer}>
-          <FlatList
-            data={filteredScales}
-            renderItem={renderScaleItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.resultsGrid}
-            ListEmptyComponent={EmptyResultsComponent}
-            initialNumToRender={5}
-            maxToRenderPerBatch={3}
-            windowSize={5}
-            showsVerticalScrollIndicator={true}
-          />
+          {isLoading ? (
+            <View style={styles.resultsGrid}>
+              <ScaleGridSkeleton 
+                count={6} 
+                layout={useListView ? 'list' : 'grid'} 
+                columns={columns} 
+              />
+            </View>
+          ) : (
+            <FlatList
+              data={filteredScales}
+              renderItem={renderScaleItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={[
+                styles.resultsGrid,
+                !useListView && styles.resultsGridColumns
+              ]}
+              ListEmptyComponent={EmptyResultsComponent}
+              initialNumToRender={8}
+              maxToRenderPerBatch={4}
+              windowSize={8}
+              showsVerticalScrollIndicator={true}
+              numColumns={useListView ? 1 : undefined}
+              key={useListView ? 'list' : `grid-${columns}`}
+            />
+          )}
         </View>
       </SafeAreaView>
     );
@@ -408,17 +499,32 @@ export default function SearchScreen() {
       )}
 
       <View style={styles.listContainer}>
-        <FlatList
-          data={filteredScales}
-          renderItem={renderScaleItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.resultsGrid}
-          ListEmptyComponent={EmptyResultsComponent}
-          initialNumToRender={5}
-          maxToRenderPerBatch={3}
-          windowSize={5}
-          showsVerticalScrollIndicator={true}
-        />
+        {isLoading ? (
+          <View style={styles.resultsGrid}>
+            <ScaleGridSkeleton 
+              count={6} 
+              layout={useListView ? 'list' : 'grid'} 
+              columns={columns} 
+            />
+          </View>
+        ) : (
+          <FlatList
+            data={filteredScales}
+            renderItem={renderScaleItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={[
+              styles.resultsGrid,
+              !useListView && styles.resultsGridColumns
+            ]}
+            ListEmptyComponent={EmptyResultsComponent}
+            initialNumToRender={8}
+            maxToRenderPerBatch={4}
+            windowSize={8}
+            showsVerticalScrollIndicator={true}
+            numColumns={useListView ? 1 : undefined}
+            key={useListView ? 'list' : `grid-${columns}`}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -442,22 +548,50 @@ const styles = StyleSheet.create({
   },
   modeToggle: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    minHeight: 44,
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+    }),
   },
   modeToggleText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   advancedButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    minHeight: 44,
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+    }),
   },
   advancedButtonText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   searchContainer: {
@@ -465,35 +599,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    height: 48,
-    borderWidth: 2,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    minHeight: 52,
+    borderWidth: 1,
     borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      },
+    }),
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: '#0f172a',
-    marginLeft: 8,
-    marginRight: 8,
+    marginLeft: 10,
+    marginRight: 10,
     height: '100%',
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }),
   },
   filterButton: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     backgroundColor: '#f1f5f9',
-    borderRadius: 12,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+        elevation: 2,
+      },
+    }),
   },
   filtersContainer: {
     padding: 16,
@@ -505,146 +662,136 @@ const styles = StyleSheet.create({
   },
   filterTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#0f172a',
-    marginBottom: 12,
+    marginBottom: 14,
+    letterSpacing: -0.3,
   },
   categoryScroll: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   categoryChip: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
     backgroundColor: '#f1f5f9',
-    marginRight: 8,
+    marginRight: 10,
+    minHeight: 40,
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 2,
+        elevation: 1,
+      },
+    }),
   },
   categoryChipSelected: {
     backgroundColor: '#0891b2',
+    borderColor: '#0891b2',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(8, 145, 178, 0.3)',
+      },
+      default: {
+        shadowColor: '#0891b2',
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 3,
+      },
+    }),
   },
   categoryChipText: {
     fontSize: 14,
     color: '#64748b',
+    fontWeight: '600',
   },
   categoryChipTextSelected: {
     color: '#ffffff',
+    fontWeight: '700',
   },
   sortOptions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
+    flexWrap: 'wrap',
   },
   sortChip: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
     backgroundColor: '#f1f5f9',
+    minHeight: 40,
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 2,
+        elevation: 1,
+      },
+    }),
   },
   sortChipSelected: {
     backgroundColor: '#0891b2',
+    borderColor: '#0891b2',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(8, 145, 178, 0.3)',
+      },
+      default: {
+        shadowColor: '#0891b2',
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 3,
+      },
+    }),
   },
   sortChipText: {
     fontSize: 14,
     color: '#64748b',
+    fontWeight: '600',
   },
   sortChipTextSelected: {
     color: '#ffffff',
+    fontWeight: '700',
   },
   listContainer: {
     flex: 1,
   },
   resultsGrid: {
     padding: 16,
+    flexGrow: 1,
+  },
+  resultsGridColumns: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 16,
-    flexGrow: 1, // Asegurar que la lista ocupe todo el espacio disponible
   },
-  scaleCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    overflow: 'hidden',
+  cardWrapper: {
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  imageContainer: {
-    height: 160,
-    backgroundColor: '#f1f5f9',
-  },
-  image: {
-    flex: 1,
+  cardWrapperFull: {
     width: '100%',
-    height: '100%',
   },
-  imagePlaceholder: {
-    flex: 1,
-    backgroundColor: '#e2e8f0',
-  },
-  cardContent: {
-    padding: 16,
-  },
-  scaleName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0f172a',
-    marginBottom: 4,
-  },
-  scaleDescription: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  timeText: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 12,
-    fontStyle: 'italic',
-  },
-  tags: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  tag: {
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  tagText: {
-    fontSize: 12,
-    color: '#64748b',
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  categoryText: {
-    fontSize: 14,
-    color: '#0891b2',
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    height: 200,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0f172a',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-  },
+  cardWrapperGrid: (columns: number) => ({
+    width: columns === 3 ? 'calc(33.333% - 12px)' : columns === 2 ? 'calc(50% - 12px)' : '100%',
+    ...Platform.select({
+      default: {
+        width: columns === 3 ? '31%' : columns === 2 ? '47%' : '100%',
+      },
+    }),
+  }),
 });

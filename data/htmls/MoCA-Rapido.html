@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoCA - Evaluación Rápida</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #00796b;
+      --primary-dark: #005f56;
+      --secondary: #43cea2;
+      --accent: #ffd60a;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-dark: #212529;
+      --text-muted: #6c757d;
+      --border: #e9ecef;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    /* Datos del Paciente */
+    .patient-data {
+      background: var(--light-bg);
+      padding: 25px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .patient-data h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 10px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Secciones del Test */
+    .test-section {
+      margin-bottom: 30px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: var(--primary);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .section-header:hover {
+      background: var(--primary-dark);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .section-points {
+      background: rgba(255,255,255,0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .section-content {
+      padding: 25px;
+      background: white;
+    }
+
+    .section-content.collapsed {
+      display: none;
+    }
+
+    /* Guía Clínica */
+    .clinical-guide {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .clinical-guide h4 {
+      color: #1976d2;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .clinical-guide p,
+    .clinical-guide ul {
+      color: #0d47a1;
+      font-size: 0.95rem;
+    }
+
+    .clinical-guide ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .clinical-guide strong {
+      color: #0d47a1;
+    }
+
+    /* Items de Evaluación */
+    .evaluation-items {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .eval-item {
+      background: var(--light-bg);
+      padding: 15px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .eval-item:hover {
+      border-color: var(--primary);
+    }
+
+    .eval-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .eval-item-title {
+      font-weight: 600;
+      color: var(--text-dark);
+      flex: 1;
+    }
+
+    .eval-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Input numérico */
+    .number-input {
+      width: 80px;
+      padding: 8px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /* Puntuación Total */
+    .total-score {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .total-score h2 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .score-display {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .interpretation {
+      background: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .interpretation h3 {
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    /* Botones */
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: var(--text-muted);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    /* Estilos de Impresión */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .container {
+        box-shadow: none;
+        max-width: 100%;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .section-content {
+        display: block !important;
+      }
+
+      .section-header {
+        background: white !important;
+        color: black !important;
+        border-bottom: 2px solid black;
+      }
+
+      .test-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+      }
+
+      @page {
+        margin: 2cm;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .score-display {
+        font-size: 3rem;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 MoCA - Evaluación Cognitiva Rápida</h1>
+      <p>Montreal Cognitive Assessment - Versión para Calificación Médica</p>
+    </header>
+
+    <div class="content">
+      <!-- Datos del Paciente -->
+      <section class="patient-data">
+        <h2>📝 Datos del Paciente</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="paciente-nombre">Nombre Completo *</label>
+            <input type="text" id="paciente-nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="paciente-edad">Edad (años) *</label>
+            <input type="number" id="paciente-edad" min="1" max="120" required>
+          </div>
+          <div class="form-group">
+            <label for="paciente-escolaridad">Años de Escolaridad *</label>
+            <input type="number" id="paciente-escolaridad" min="0" max="30" required>
+          </div>
+          <div class="form-group">
+            <label for="medico-nombre">Médico Evaluador *</label>
+            <input type="text" id="medico-nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="fecha-evaluacion">Fecha de Evaluación *</label>
+            <input type="date" id="fecha-evaluacion" required>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 1: Funciones Visoespaciales y Ejecutivas -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>🎯</span>
+            <span>1. Funciones Visoespaciales y Ejecutivas</span>
+          </div>
+          <div class="section-points">0/5 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Esta sección evalúa la capacidad ejecutiva, flexibilidad cognitiva y habilidades visuoconstructivas.</p>
+          </div>
+
+          <div class="evaluation-items">
+            <!-- Alternancia Conceptual -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Alternancia Conceptual (Trail Making)</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Pida al paciente que trace una línea alternando números y letras: <strong>1-A-2-B-3-C-4-D-5-E</strong>.
+                    No otorgue puntos si hay 2 o más errores.
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="visuoesp-alternancia" onchange="calcularPuntuacion()">
+                  <label for="visuoesp-alternancia">✓ Correcto</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cubo -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Copia del Cubo</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Pida al paciente que copie un cubo tridimensional. El dibujo debe tener:
+                    <strong>todas las líneas presentes, sin líneas adicionales, perspectiva correcta y paralelismo adecuado</strong>.
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="visuoesp-cubo" onchange="calcularPuntuacion()">
+                  <label for="visuoesp-cubo">✓ Correcto</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reloj -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Dibujo del Reloj (11:10)</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Pida al paciente que dibuje un reloj marcando las <strong>11:10</strong>. Evalúe 3 aspectos:
+                  </p>
+                </div>
+              </div>
+              <div style="margin-top: 10px; margin-left: 20px;">
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="reloj-contorno" onchange="calcularPuntuacion()">
+                  <label for="reloj-contorno">Contorno: círculo cerrado (1 pt)</label>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="reloj-numeros" onchange="calcularPuntuacion()">
+                  <label for="reloj-numeros">Números: todos presentes en posiciones correctas (1 pt)</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="reloj-agujas" onchange="calcularPuntuacion()">
+                  <label for="reloj-agujas">Agujas: hora correcta, manecilla corta apunta al 11 (1 pt)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: Identificación / Nominación -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>🦁</span>
+            <span>2. Identificación / Nominación</span>
+          </div>
+          <div class="section-points">0/3 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Muestre al paciente imágenes de 3 animales de baja frecuencia y pida que los nombre.
+            No acepte descripciones, solo el nombre específico.</p>
+          </div>
+
+          <div class="evaluation-items">
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>🦁 León</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="identificacion-leon" onchange="calcularPuntuacion()">
+                  <label for="identificacion-leon">✓ Correcto</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>🦏 Rinoceronte</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="identificacion-rinoceronte" onchange="calcularPuntuacion()">
+                  <label for="identificacion-rinoceronte">✓ Correcto</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>🐪 Camello</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="identificacion-camello" onchange="calcularPuntuacion()">
+                  <label for="identificacion-camello">✓ Correcto</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: Memoria -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>🧠</span>
+            <span>3. Memoria - Registro Inmediato</span>
+          </div>
+          <div class="section-points">0 puntos (no puntúa)</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p><strong>Lea las siguientes 5 palabras</strong> a razón de 1 palabra por segundo:</p>
+            <p style="margin-top: 10px; font-size: 1.2rem; color: var(--primary);"><strong>ROSTRO - SEDA - IGLESIA - CLAVEL - ROJO</strong></p>
+            <p style="margin-top: 10px;">
+              Pida al paciente que las repita. Haga 2 intentos de registro.
+              <strong>Esta fase NO se puntúa</strong>, solo se registra para evaluar la curva de aprendizaje.
+            </p>
+          </div>
+
+          <div class="evaluation-items">
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Primer intento</strong>
+                </div>
+                <input type="number" id="memoria-intento1" min="0" max="5" value="0" class="number-input">
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Segundo intento</strong>
+                </div>
+                <input type="number" id="memoria-intento2" min="0" max="5" value="0" class="number-input">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 4: Atención -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>👂</span>
+            <span>4. Atención</span>
+          </div>
+          <div class="section-points">0/6 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Esta sección evalúa diferentes componentes de la atención: simple, sostenida y memoria de trabajo.</p>
+          </div>
+
+          <div class="evaluation-items">
+            <!-- Dígitos Directo -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Dígitos en Orden Directo</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Lea los números a razón de 1 por segundo: <strong>2-1-8-5-4</strong>.
+                    El paciente debe repetirlos en el mismo orden.
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="atencion-directo" onchange="calcularPuntuacion()">
+                  <label for="atencion-directo">✓ Correcto (1 pt)</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dígitos Inverso -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Dígitos en Orden Inverso</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Lea los números: <strong>7-4-2</strong>.
+                    El paciente debe repetirlos al revés: <strong>2-4-7</strong>.
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="atencion-inverso" onchange="calcularPuntuacion()">
+                  <label for="atencion-inverso">✓ Correcto (1 pt)</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vigilancia -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Vigilancia (Detección de letra A)</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Lea la siguiente secuencia de letras (1 por segundo): <strong>F-B-A-C-M-N-A-A-J-K-L-B-A-F-A-K-D-E-A-A-A-J-A-M-O-F-A-A-B</strong>
+                    <br>El paciente debe golpear la mesa cada vez que escuche la letra "A" (hay 11 letras A).
+                    <br><strong>Sin errores = 1 punto.</strong>
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="atencion-vigilancia" onchange="calcularPuntuacion()">
+                  <label for="atencion-vigilancia">✓ Correcto (1 pt)</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Series de 7 -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Cálculo Mental - Series de 7</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Pida al paciente que reste 7 desde 100, 5 veces consecutivas:
+                    <strong>100 → 93 → 86 → 79 → 72 → 65</strong>
+                    <br>Otorgue 1 punto por cada resta correcta (3 puntos máximo). Si falla la primera, no continúe.
+                  </p>
+                </div>
+              </div>
+              <div style="margin-top: 10px; margin-left: 20px;">
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="series-1" onchange="calcularPuntuacion()">
+                  <label for="series-1">93 ✓ (1 pt)</label>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="series-2" onchange="calcularPuntuacion()">
+                  <label for="series-2">86 ✓ (1 pt)</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="series-3" onchange="calcularPuntuacion()">
+                  <label for="series-3">79 ✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 5: Lenguaje -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>💬</span>
+            <span>5. Lenguaje</span>
+          </div>
+          <div class="section-points">0/3 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Evalúa la capacidad de repetición de frases complejas y la fluidez verbal fonológica.</p>
+          </div>
+
+          <div class="evaluation-items">
+            <!-- Frase 1 -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Repetición de Frase 1</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Lea la frase UNA SOLA VEZ y pida al paciente que la repita exactamente:
+                    <br><strong>"Solo sé que Juan es el que ayuda hoy"</strong>
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="lenguaje-frase1" onchange="calcularPuntuacion()">
+                  <label for="lenguaje-frase1">✓ Exacta (1 pt)</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Frase 2 -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Repetición de Frase 2</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Lea la frase UNA SOLA VEZ:
+                    <br><strong>"El gato siempre se escondía bajo el sofá cuando los perros estaban en la habitación"</strong>
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="lenguaje-frase2" onchange="calcularPuntuacion()">
+                  <label for="lenguaje-frase2">✓ Exacta (1 pt)</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fluidez Verbal -->
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Fluidez Verbal Fonológica</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Pida al paciente que diga en <strong>1 minuto</strong> todas las palabras que comiencen con la letra <strong>"F"</strong>.
+                    <br>No se aceptan nombres propios ni derivaciones (ej: familia, familiar, familiarizar = 1 palabra).
+                    <br><strong>≥11 palabras = 1 punto</strong>
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="lenguaje-fluidez" onchange="calcularPuntuacion()">
+                  <label for="lenguaje-fluidez">✓ ≥11 palabras (1 pt)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 6: Abstracción -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>🤔</span>
+            <span>6. Abstracción</span>
+          </div>
+          <div class="section-points">0/2 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Evalúa el razonamiento conceptual. Se espera una respuesta <strong>abstracta</strong>, no concreta.</p>
+            <p style="margin-top: 8px;"><strong>Correcto:</strong> "medios de transporte", "instrumentos de medición"</p>
+            <p><strong>Incorrecto:</strong> "ambos tienen ruedas", "ambos tienen números"</p>
+          </div>
+
+          <div class="evaluation-items">
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué se parecen un TREN y una BICICLETA?</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Respuesta esperada: "medios de transporte", "vehículos", "sirven para transportarse"
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="abstraccion-1" onchange="calcularPuntuacion()">
+                  <label for="abstraccion-1">✓ Abstracta (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué se parecen un RELOJ y una REGLA?</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Respuesta esperada: "instrumentos de medición", "sirven para medir"
+                  </p>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="abstraccion-2" onchange="calcularPuntuacion()">
+                  <label for="abstraccion-2">✓ Abstracta (1 pt)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 7: Recuerdo Diferido -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>🔄</span>
+            <span>7. Recuerdo Diferido</span>
+          </div>
+          <div class="section-points">0/5 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p><strong>Pida al paciente que recuerde las 5 palabras de la Sección 3 (sin ayuda)</strong></p>
+            <p style="margin-top: 8px;">Palabras: <strong>ROSTRO - SEDA - IGLESIA - CLAVEL - ROJO</strong></p>
+            <p style="margin-top: 8px;">
+              <strong>Opcional:</strong> Si no recuerda alguna palabra, puede dar pistas categoriales:
+              <br>• ROSTRO (categoría: parte del cuerpo)
+              <br>• SEDA (categoría: tela)
+              <br>• IGLESIA (categoría: edificio)
+              <br>• CLAVEL (categoría: flor)
+              <br>• ROJO (categoría: color)
+            </p>
+            <p style="margin-top: 8px; color: var(--danger);"><strong>Solo puntúan las palabras recordadas sin pistas.</strong></p>
+          </div>
+
+          <div class="evaluation-items">
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>Palabras recordadas espontáneamente (sin pistas)</strong>
+                  <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">
+                    Marque solo las palabras que el paciente recordó SIN ayuda
+                  </p>
+                </div>
+              </div>
+              <div style="margin-top: 10px; margin-left: 20px;">
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="recuerdo-rostro" onchange="calcularPuntuacion()">
+                  <label for="recuerdo-rostro">ROSTRO</label>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="recuerdo-seda" onchange="calcularPuntuacion()">
+                  <label for="recuerdo-seda">SEDA</label>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="recuerdo-iglesia" onchange="calcularPuntuacion()">
+                  <label for="recuerdo-iglesia">IGLESIA</label>
+                </div>
+                <div class="checkbox-group" style="margin-bottom: 8px;">
+                  <input type="checkbox" id="recuerdo-clavel" onchange="calcularPuntuacion()">
+                  <label for="recuerdo-clavel">CLAVEL</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="recuerdo-rojo" onchange="calcularPuntuacion()">
+                  <label for="recuerdo-rojo">ROJO</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 8: Orientación -->
+      <section class="test-section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title">
+            <span>📍</span>
+            <span>8. Orientación</span>
+          </div>
+          <div class="section-points">0/6 puntos</div>
+        </div>
+        <div class="section-content">
+          <div class="clinical-guide">
+            <h4>📖 Guía Clínica</h4>
+            <p>Evalúa la orientación temporal y espacial. Pregunte al paciente:</p>
+          </div>
+
+          <div class="evaluation-items">
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿Qué fecha es hoy? (día del mes)</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-fecha" onchange="calcularPuntuacion()">
+                  <label for="orient-fecha">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué mes estamos?</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-mes" onchange="calcularPuntuacion()">
+                  <label for="orient-mes">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué año estamos?</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-anio" onchange="calcularPuntuacion()">
+                  <label for="orient-anio">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿Qué día de la semana es hoy?</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-dia" onchange="calcularPuntuacion()">
+                  <label for="orient-dia">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué lugar estamos? (nombre del lugar)</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-lugar" onchange="calcularPuntuacion()">
+                  <label for="orient-lugar">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+            <div class="eval-item">
+              <div class="eval-item-header">
+                <div class="eval-item-title">
+                  <strong>¿En qué ciudad estamos?</strong>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="orient-ciudad" onchange="calcularPuntuacion()">
+                  <label for="orient-ciudad">✓ (1 pt)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Puntuación Total -->
+      <div class="total-score">
+        <h2>Puntuación Total</h2>
+        <div class="score-display" id="puntuacion-total">0/30</div>
+        <div id="ajuste-escolaridad" style="font-size: 1.1rem; margin-bottom: 10px;"></div>
+        <div class="interpretation">
+          <h3>Interpretación Clínica</h3>
+          <p id="interpretacion-texto">Complete la evaluación para ver la interpretación.</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="button-group no-print">
+        <button class="btn-primary" onclick="imprimirResultados()">
+          🖨️ Imprimir Resultados
+        </button>
+        <button class="btn-primary" onclick="exportarPDF()">
+          📄 Exportar PDF
+        </button>
+        <button class="btn-secondary" onclick="reiniciarTest()">
+          🔄 Reiniciar Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Establecer fecha actual por defecto
+    document.getElementById('fecha-evaluacion').valueAsDate = new Date();
+
+    // Toggle secciones
+    function toggleSection(header) {
+      const content = header.nextElementSibling;
+      content.classList.toggle('collapsed');
+    }
+
+    // Calcular puntuación
+    function calcularPuntuacion() {
+      let puntuacion = {
+        visuoespacial: 0,
+        identificacion: 0,
+        atencion: 0,
+        lenguaje: 0,
+        abstraccion: 0,
+        recuerdo: 0,
+        orientacion: 0
+      };
+
+      // 1. Funciones Visoespaciales y Ejecutivas (5 pts)
+      if (document.getElementById('visuoesp-alternancia').checked) puntuacion.visuoespacial++;
+      if (document.getElementById('visuoesp-cubo').checked) puntuacion.visuoespacial++;
+      if (document.getElementById('reloj-contorno').checked) puntuacion.visuoespacial++;
+      if (document.getElementById('reloj-numeros').checked) puntuacion.visuoespacial++;
+      if (document.getElementById('reloj-agujas').checked) puntuacion.visuoespacial++;
+
+      // 2. Identificación (3 pts)
+      if (document.getElementById('identificacion-leon').checked) puntuacion.identificacion++;
+      if (document.getElementById('identificacion-rinoceronte').checked) puntuacion.identificacion++;
+      if (document.getElementById('identificacion-camello').checked) puntuacion.identificacion++;
+
+      // 4. Atención (6 pts)
+      if (document.getElementById('atencion-directo').checked) puntuacion.atencion++;
+      if (document.getElementById('atencion-inverso').checked) puntuacion.atencion++;
+      if (document.getElementById('atencion-vigilancia').checked) puntuacion.atencion++;
+      if (document.getElementById('series-1').checked) puntuacion.atencion++;
+      if (document.getElementById('series-2').checked) puntuacion.atencion++;
+      if (document.getElementById('series-3').checked) puntuacion.atencion++;
+
+      // 5. Lenguaje (3 pts)
+      if (document.getElementById('lenguaje-frase1').checked) puntuacion.lenguaje++;
+      if (document.getElementById('lenguaje-frase2').checked) puntuacion.lenguaje++;
+      if (document.getElementById('lenguaje-fluidez').checked) puntuacion.lenguaje++;
+
+      // 6. Abstracción (2 pts)
+      if (document.getElementById('abstraccion-1').checked) puntuacion.abstraccion++;
+      if (document.getElementById('abstraccion-2').checked) puntuacion.abstraccion++;
+
+      // 7. Recuerdo Diferido (5 pts)
+      if (document.getElementById('recuerdo-rostro').checked) puntuacion.recuerdo++;
+      if (document.getElementById('recuerdo-seda').checked) puntuacion.recuerdo++;
+      if (document.getElementById('recuerdo-iglesia').checked) puntuacion.recuerdo++;
+      if (document.getElementById('recuerdo-clavel').checked) puntuacion.recuerdo++;
+      if (document.getElementById('recuerdo-rojo').checked) puntuacion.recuerdo++;
+
+      // 8. Orientación (6 pts)
+      if (document.getElementById('orient-fecha').checked) puntuacion.orientacion++;
+      if (document.getElementById('orient-mes').checked) puntuacion.orientacion++;
+      if (document.getElementById('orient-anio').checked) puntuacion.orientacion++;
+      if (document.getElementById('orient-dia').checked) puntuacion.orientacion++;
+      if (document.getElementById('orient-lugar').checked) puntuacion.orientacion++;
+      if (document.getElementById('orient-ciudad').checked) puntuacion.orientacion++;
+
+      // Calcular total
+      let total = puntuacion.visuoespacial + puntuacion.identificacion +
+                  puntuacion.atencion + puntuacion.lenguaje +
+                  puntuacion.abstraccion + puntuacion.recuerdo +
+                  puntuacion.orientacion;
+
+      // Ajuste por escolaridad
+      const escolaridad = parseInt(document.getElementById('paciente-escolaridad').value) || 0;
+      let ajuste = 0;
+      if (escolaridad > 0 && escolaridad <= 12) {
+        ajuste = 1;
+        total += ajuste;
+      }
+
+      // Actualizar displays
+      actualizarDisplays(puntuacion);
+      document.getElementById('puntuacion-total').textContent = total + '/30';
+
+      if (ajuste > 0) {
+        document.getElementById('ajuste-escolaridad').textContent =
+          `(+1 punto por escolaridad ≤12 años)`;
+      } else {
+        document.getElementById('ajuste-escolaridad').textContent = '';
+      }
+
+      // Interpretación
+      interpretarResultado(total);
+
+      return total;
+    }
+
+    function actualizarDisplays(puntuacion) {
+      const sections = document.querySelectorAll('.test-section');
+
+      sections[0].querySelector('.section-points').textContent =
+        `${puntuacion.visuoespacial}/5 puntos`;
+      sections[1].querySelector('.section-points').textContent =
+        `${puntuacion.identificacion}/3 puntos`;
+      sections[3].querySelector('.section-points').textContent =
+        `${puntuacion.atencion}/6 puntos`;
+      sections[4].querySelector('.section-points').textContent =
+        `${puntuacion.lenguaje}/3 puntos`;
+      sections[5].querySelector('.section-points').textContent =
+        `${puntuacion.abstraccion}/2 puntos`;
+      sections[6].querySelector('.section-points').textContent =
+        `${puntuacion.recuerdo}/5 puntos`;
+      sections[7].querySelector('.section-points').textContent =
+        `${puntuacion.orientacion}/6 puntos`;
+    }
+
+    function interpretarResultado(total) {
+      const interpretacionDiv = document.getElementById('interpretacion-texto');
+      let texto = '';
+      let color = '';
+
+      if (total >= 26) {
+        texto = '✅ Rendimiento cognitivo dentro de lo normal. No se sugiere deterioro cognitivo significativo.';
+        color = 'var(--success)';
+      } else if (total >= 22) {
+        texto = '⚠️ Posible deterioro cognitivo leve. Se recomienda seguimiento y evaluación neuropsicológica completa.';
+        color = 'var(--warning)';
+      } else if (total >= 18) {
+        texto = '⚠️ Deterioro cognitivo moderado. Se requiere evaluación especializada urgente.';
+        color = 'var(--warning)';
+      } else {
+        texto = '🔴 Deterioro cognitivo severo. Se requiere evaluación neurológica y neuropsicológica integral inmediata.';
+        color = 'var(--danger)';
+      }
+
+      interpretacionDiv.innerHTML = `<p style="color: white; font-size: 1.1rem;">${texto}</p>`;
+    }
+
+    function imprimirResultados() {
+      window.print();
+    }
+
+    function exportarPDF() {
+      // Esta función se puede implementar con una librería como jsPDF
+      alert('Función de exportación PDF. Use "Imprimir > Guardar como PDF" por ahora.');
+    }
+
+    function reiniciarTest() {
+      if (confirm('¿Está seguro de que desea reiniciar el test? Se perderán todos los datos.')) {
+        location.reload();
+      }
+    }
+
+    // Calcular al cargar
+    calcularPuntuacion();
+  </script>
+</body>
+</html>

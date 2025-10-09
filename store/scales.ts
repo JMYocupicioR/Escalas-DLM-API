@@ -35,6 +35,7 @@ interface ScalesState {
   patients: Record<string, Patient>;
   currentPatientId?: string;
   lastPatientIdByScale: Record<string, string>;
+  lastExploreSection?: string;
   
   // Acciones existentes
   addFavorite: (id: string) => void;
@@ -57,6 +58,7 @@ interface ScalesState {
   getPatientForScale: (scaleId: string) => Patient | undefined;
   ensureDefaultPatient: () => Patient;
   clear: () => void;
+  setLastExploreSection: (id: string) => void;
 }
 
 // Generador de IDs único
@@ -75,6 +77,7 @@ export const useScalesStore = create<ScalesState>()(
       patients: {},
       currentPatientId: undefined,
       lastPatientIdByScale: {},
+      lastExploreSection: undefined,
       
       // Implementación de acciones existentes
       addFavorite: (id) => set((state) => ({
@@ -95,7 +98,9 @@ export const useScalesStore = create<ScalesState>()(
           recentlyViewed: [id, ...filtered].slice(0, 10),
         };
       }),
-      
+
+      setLastExploreSection: (id) => set(() => ({ lastExploreSection: id })),
+
       // Implementación de nuevas acciones
       saveAssessment: (assessment) => set((state) => {
         const now = Date.now();
@@ -249,6 +254,7 @@ export const useScalesStore = create<ScalesState>()(
         patients: state.patients,
         currentPatientId: state.currentPatientId,
         lastPatientIdByScale: state.lastPatientIdByScale,
+        lastExploreSection: state.lastExploreSection,
       }),
       // Función de migración para evitar errores de estado
       migrate: (persistedState: any, _version: number) => {
@@ -259,10 +265,11 @@ export const useScalesStore = create<ScalesState>()(
             recentlyViewed: [],
             assessments: {},
             patients: {},
-            currentPatientId: undefined,
-            lastPatientIdByScale: {},
-          };
-        }
+          currentPatientId: undefined,
+          lastPatientIdByScale: {},
+          lastExploreSection: undefined,
+        };
+      }
         
         // Migrar estado existente a nueva estructura
         return {
@@ -272,6 +279,7 @@ export const useScalesStore = create<ScalesState>()(
           patients: persistedState.patients || {},
           currentPatientId: persistedState.currentPatientId || undefined,
           lastPatientIdByScale: persistedState.lastPatientIdByScale || {},
+          lastExploreSection: persistedState.lastExploreSection || undefined,
         };
       },
       version: 1, // Versión del esquema de estado

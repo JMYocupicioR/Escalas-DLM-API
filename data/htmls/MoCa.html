@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test MoCA </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    /* =========================
+       ESTILOS BÁSICOS GLOBALES
+       ========================= */
+    :root {
+      --primary-color: #00796b;
+      --primary-dark: #005f56;
+      --secondary-color: #43cea2;
+      --accent-color: #ffd60a;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-dark: #212529;
+      --text-muted: #6c757d;
+      --border-color: #e9ecef;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #00796b 0%, #43cea2 100%);
+      color: var(--text-dark, #212529);
+      line-height: 1.6;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 10px;
+    }
+
+    header {
+      background-color: #00796b;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    /* Barra de navegación de secciones */
+    .nav-secciones {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: #e0e0e0;
+      padding: 10px;
+    }
+    .nav-secciones button {
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      margin: 5px;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .nav-secciones button:hover {
+      background-color: #005f56;
+    }
+
+    /* Contenedor principal de las "ventanas" */
+    .form-container {
+      background-color: #fff;
+      margin-top: 20px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      position: relative;
+    }
+    .ventana {
+      display: none; /* Controlar su visualización con JS */
+    }
+    .ventana.active {
+      display: block;
+    }
+    h2 {
+      color: #00796b;
+      border-bottom: 2px solid #00796b;
+      padding-bottom: 5px;
+    }
+    p {
+      line-height: 1.4;
+      margin: 5px 0 15px 0;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    input[type=text],
+    input[type=date],
+    input[type=number] {
+      display: block;
+      width: calc(100% - 20px);
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #00796b;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #005f56;
+    }
+
+    /* Progreso */
+    .progreso {
+      float: right;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #555;
+    }
+
+    /* Contenedor de mensajes */
+    #mensaje-resultado {
+      display: none; /* Se mostrará con JS */
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    .close-message {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #333;
+    }
+    .info { background-color: #cce5ff; }
+    .error { background-color: #f8d7da; }
+    .success { background-color: #d4edda; }
+    .info::before,
+    .error::before,
+    .success::before {
+      content: attr(data-icon);
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    /* SECCIÓN 1: Alternancia Conceptual (SVG) */
+    .connection-point {
+      fill: #cccccc;
+      cursor: pointer;
+      transition: fill 0.3s ease;
+    }
+    .connection-point.selected-correct {
+      fill: #2ecc40 !important;
+      transition: fill 0.3s;
+    }
+    .connection-point.selected-wrong {
+      fill: #ff4136 !important;
+      transition: fill 0.3s;
+    }
+    .connection-point.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .connection-point.highlight:not(.disabled):not(.selected-correct):not(.selected-wrong) {
+      fill: #4FC3F7 !important;
+      transition: fill 0.2s;
+    }
+    .svg-indicator {
+      text-align: center;
+      margin: 10px 0 5px 0;
+      font-weight: bold;
+      color: #00796b;
+    }
+    .svg-progress {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .svg-restart-btn {
+      display: inline-block;
+      margin: 0 auto 10px auto;
+      background: #ffb347;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .svg-restart-btn:hover {
+      background: #ff9800;
+    }
+    .svg-line {
+      stroke: #00796b;
+      stroke-width: 1;
+      stroke-linecap: round;
+      stroke-dasharray: 5, 4;
+      transition: stroke 0.3s;
+    }
+
+    /* 
+      ============= SECCIÓN 2 y SECCIÓN 3 (Dibujo) =============
+      Para el canvas responsivo se emplea un contenedor 
+      con aspect-ratio cuadrado (1:1).
+    */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* Mantener relación de aspecto 1:1 */
+      background: #fafafa;
+      border: 1px solid #ccc;
+      margin: 10px 0;
+    }
+    /* Canvas en posición absoluta, ocupando todo el contenedor */
+    .canvas-wrapper canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    /* Checklists y demás */
+    .checklist-reloj {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px dashed #aaa;
+      border-radius: 5px;
+    }
+
+    /* Sección Final */
+    #resumen-final ul {
+      list-style: none;
+      padding: 0;
+    }
+    #resumen-final li {
+      margin: 5px 0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 10px;
+      background-color: #e0e0e0;
+    }
+
+    /* ================
+       MEDIA QUERIES
+       ================ */
+    @media screen and (max-width: 600px) {
+      .progreso {
+        float: none;
+        display: block;
+        margin-top: 10px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        color: #222 !important;
+        font-family: 'Georgia', 'Times New Roman', Times, serif !important;
+        margin: 0;
+        padding: 0;
+      }
+      .main-container, .form-container, .results-summary {
+        background: #fff !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      header, .header, .progress-container, .nav-sidebar, .section-navigation, .ventana:not(#ventana-12), .alert, .btn, .svg-container, .canvas-container, .animal-section, .checklist, .canvas-tools, .section-header, .section-indicators, .section-icon, .section-title, .section-subtitle, .form-group, .form-label, .form-input, .timer, .canvas-wrapper, .canvas-wrapper canvas, .svg-line, .connection-point, #mensaje-resultado {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+      }
+      #ventana-12 {
+        display: block !important;
+        page-break-before: always;
+        padding: 40px 60px !important;
+        font-size: 1.1rem;
+        color: #222 !important;
+      }
+      #ventana-12 .section-header {
+        display: flex !important;
+        align-items: center !important;
+        border-bottom: 2px solid #00796b !important;
+        margin-bottom: 30px !important;
+        padding-bottom: 15px !important;
+      }
+      #ventana-12 h2 {
+        color: #00796b !important;
+        font-size: 2.2rem !important;
+        margin: 0 !important;
+        font-family: 'Georgia', serif !important;
+        font-weight: 700 !important;
+      }
+      #ventana-12 .results-summary {
+        background: #fff !important;
+        color: #222 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #ventana-12 .results-grid {
+        display: table !important;
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 30px 0 !important;
+      }
+      #ventana-12 .result-card {
+        display: table-row !important;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        backdrop-filter: none !important;
+      }
+      #ventana-12 .result-score, #ventana-12 .result-label {
+        display: table-cell !important;
+        padding: 12px 18px !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+        font-size: 1.1rem !important;
+        color: #222 !important;
+        font-family: 'Georgia', serif !important;
+      }
+      #ventana-12 .result-score {
+        font-weight: 700 !important;
+        font-size: 1.3rem !important;
+        color: #00796b !important;
+      }
+      #ventana-12 .result-label {
+        font-weight: 400 !important;
+        color: #333 !important;
+      }
+      #ventana-12 .results-summary > h3, #ventana-12 .results-summary > p {
+        color: #00796b !important;
+        font-family: 'Georgia', serif !important;
+        font-size: 1.2rem !important;
+        margin-top: 18px !important;
+        margin-bottom: 10px !important;
+      }
+      #ventana-12 .results-summary > em, #ventana-12 .results-summary > strong {
+        color: #222 !important;
+        font-size: 1.1rem !important;
+        font-style: italic !important;
+      }
+      @page {
+        margin: 30mm 20mm 30mm 20mm;
+      }
+      .no-print, .no-print * {
+        display: none !important;
+        visibility: hidden !important;
+      }
+    }
+  </style>
+
+ 
+</head>
+<script>
+    /* ======================================================
+       VARIABLES GLOBALES Y OBJETOS DE PUNTAJE
+       ====================================================== */
+    let indiceVentanaActual = 0;
+    let puntajesSecciones = {
+      alternanciaConceptual: 0,
+      capacidadesVisuoconstructivasCubo: 0,
+      capacidadesVisuoconstructivasReloj: 0,
+      identificacionAnimales: 0,
+      memoriaInmediata: 0,
+      atencion: 0,
+      repeticionFrases: 0,
+      fluidezVerbal: 0,
+      abstraccion: 0,
+      recuerdoDiferido: 0,
+      orientacion: 0
+    };
+    let datosPaciente = {
+      nombre: "",
+      edad: 0,
+      escolaridad: 0,
+      medico: ""
+    };
+  
+    const listaPalabras = ["flor", "tijera", "luna", "carro", "perro"];
+  
+    /* ======================================================
+       AL CARGAR EL DOCUMENTO
+       ====================================================== */
+    document.addEventListener("DOMContentLoaded", () => {
+      mostrarVentana(indiceVentanaActual);
+  
+      // Inicializar Sección 1 (SVG)
+      inicializarSeccion1();
+  
+      // Inicializar Sección 2 (Cubo) con Pointer Events
+      inicializarCubo();
+  
+      // Inicializar Sección 3 (Reloj) con Pointer Events
+      inicializarReloj();
+    });
+  
+    /* ======================================================
+       FUNCIONES DE NAVEGACIÓN
+       ====================================================== */
+    function irASeccion(n) {
+      indiceVentanaActual = n;
+      mostrarVentana(indiceVentanaActual);
+    }
+    function mostrarVentana(i) {
+      const ventanas = document.querySelectorAll('.ventana');
+      ventanas.forEach((ventana, idx) => {
+        if (idx === i) {
+          ventana.classList.add('active');
+        } else {
+          ventana.classList.remove('active');
+        }
+      });
+  
+      // Ajustar texto del progreso si existe
+      let progresoSpan = document.getElementById(`progreso-${i}`);
+      if (progresoSpan) {
+        progresoSpan.textContent = `Sección ${i} de 12`;
+      }
+    }
+    function siguienteVentana() {
+      if (indiceVentanaActual < 12) {
+        indiceVentanaActual++;
+        mostrarVentana(indiceVentanaActual);
+      }
+    }
+    function anteriorVentana() {
+      if (indiceVentanaActual > 0) {
+        indiceVentanaActual--;
+        mostrarVentana(indiceVentanaActual);
+      }
+    }
+  
+    /* ======================================================
+       FUNCIÓN PARA MOSTRAR/CERRAR MENSAJES
+       ====================================================== */
+    function mostrarMensaje(texto, tipo="info") {
+      const divMensaje = document.getElementById("mensaje-resultado");
+      const textoMensaje = document.getElementById("texto-mensaje");
+      divMensaje.className = ""; // reset classes
+      divMensaje.classList.add(tipo);
+      divMensaje.setAttribute("data-icon", tipo==="error" ? "❌" : (tipo==="success" ? "✔️" : "ℹ️"));
+      textoMensaje.textContent = texto;
+      divMensaje.style.display = "block";
+  
+      // Cierre automático en 5s
+      setTimeout(() => {
+        if (divMensaje.style.display === "block") {
+          divMensaje.style.display = "none";
+        }
+      }, 5000);
+    }
+    function cerrarMensaje() {
+      document.getElementById("mensaje-resultado").style.display = "none";
+    }
+  
+    /* ======================================================
+       SECCIÓN 1: ALTERNANCIA CONCEPTUAL (SVG)
+       ====================================================== */
+    let currentSequence = [];
+    const correctSequence = ['1','A','2','B','3','C','4','D','5','E'];
+    const pointsData = [
+      { id: '1' }, { id: 'A' }, { id: '2' }, { id: 'B' },
+      { id: '3' }, { id: 'C' }, { id: '4' }, { id: 'D' },
+      { id: '5' }, { id: 'E' },
+    ];
+    let intentosFallidosSec1 = 0;
+    let drawnLines = [];
+    let lastPointsArray = [];
+  
+    function inicializarSeccion1() {
+      const svgContainer = document.getElementById("svg-container");
+      svgContainer.innerHTML = '';
+      let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svgContainer.appendChild(svg);
+      const randomPoints = crearPuntosEspaciados(pointsData);
+      lastPointsArray = randomPoints;
+      dibujarPuntos(randomPoints);
+      updateSVGIndicators();
+    }
+  
+    function crearPuntosEspaciados(baseData) {
+      let placedPoints = [];
+      baseData.forEach(obj => {
+        let newCoord;
+        let isValid = false;
+        while (!isValid) {
+          let randX = Math.floor(Math.random() * 360) + 20; 
+          let randY = Math.floor(Math.random() * 360) + 20;
+          let ok = true;
+          for (let p of placedPoints) {
+            let dist = Math.hypot(p.x - randX, p.y - randY);
+            if (dist < 60) {
+              ok = false;
+              break;
+            }
+          }
+          if (ok) {
+            newCoord = { id: obj.id, x: randX, y: randY };
+            placedPoints.push(newCoord);
+            isValid = true;
+          }
+        }
+      });
+      return placedPoints;
+    }
+  
+    function dibujarPuntos(pointsArray) {
+      const svg = document.querySelector('#svg-container svg');
+      if (!svg) return;
+      while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+      }
+      pointsArray.forEach(point => {
+        let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", point.x);
+        circle.setAttribute("cy", point.y);
+        circle.setAttribute("r", 15);
+        circle.classList.add("connection-point");
+        circle.setAttribute("tabindex", "0");
+        circle.setAttribute("role", "button");
+        circle.setAttribute("aria-label", `Punto ${point.id}`);
+        circle.dataset.pointId = point.id;
+        svg.appendChild(circle);
+        let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", point.x);
+        text.setAttribute("y", point.y + 5);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "#000000");
+        text.setAttribute("font-size", "12");
+        text.textContent = point.id;
+        svg.appendChild(text);
+        circle.addEventListener('mouseenter', () => {
+          if (!circle.classList.contains('disabled') && !circle.classList.contains('selected-correct') && !circle.classList.contains('selected-wrong')) {
+            circle.classList.add("highlight");
+          }
+        });
+        circle.addEventListener('mouseleave', () => circle.classList.remove("highlight"));
+        circle.addEventListener('click', () => handlePointClick(point, circle, pointsArray));
+        circle.addEventListener('keydown', (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            handlePointClick(point, circle, pointsArray);
+          }
+        });
+      });
+    }
+  
+    function handlePointClick(point, circle, pointsArray) {
+      const nombreVal = document.getElementById("paciente-nombre").value.trim();
+      const edadVal = document.getElementById("paciente-edad").value.trim();
+      const medicoVal = document.getElementById("medico-nombre").value.trim();
+      if (!nombreVal || !edadVal || !medicoVal) {
+        mostrarMensaje("Completa los datos obligatorios: nombre, edad y médico.", "error");
+        return;
+      }
+      datosPaciente.nombre = nombreVal;
+      datosPaciente.edad = parseInt(edadVal) || 0;
+      datosPaciente.escolaridad = parseInt(document.getElementById("anios-escolaridad").value) || 0;
+      datosPaciente.medico = medicoVal;
+      // Si ya está seleccionado, no permitir doble clic
+      if (circle.classList.contains('disabled')) return;
+      // Verificar secuencia
+      if (currentSequence.length === 0 && point.id !== '1') {
+        mostrarMensaje("Debes comenzar desde el punto 1", "error");
+        animateWrong(circle);
+        return;
+      }
+      if (currentSequence.length > 0) {
+        const expectedNextId = correctSequence[currentSequence.length];
+        if (point.id !== expectedNextId) {
+          mostrarMensaje("Secuencia incorrecta. Intente de nuevo.", "error");
+          animateWrong(circle);
+          intentosFallidosSec1++;
+          setTimeout(() => {
+            resetPointsAndLines(pointsArray);
+            updateSVGIndicators();
+          }, 700);
+          if (intentosFallidosSec1 >= 3) {
+            mostrarMensaje("Has fallado 3 veces. Continúa con la siguiente sección.", "error");
+            document.getElementById("btnSiguiente1").disabled = false;
+          }
+          puntajesSecciones.alternanciaConceptual = 0;
+          return;
+        }
+        // Dibuja línea y guarda referencia
+        const lastPointId = currentSequence[currentSequence.length - 1];
+        const lastPoint = pointsArray.find(p => p.id === lastPointId);
+        let line = drawLine(lastPoint, point);
+        drawnLines.push(line);
+      }
+      currentSequence.push(point.id);
+      circle.classList.add('selected-correct', 'disabled');
+      updateSVGIndicators();
+      // Check final
+      if (currentSequence.length === correctSequence.length) {
+        mostrarMensaje("¡Secuencia completada correctamente!", "success");
+        puntajesSecciones.alternanciaConceptual = 1;
+        document.getElementById("btnSiguiente1").disabled = false;
+        guardarProgreso();
+      }
+    }
+  
+    function animateWrong(circle) {
+      circle.classList.add('selected-wrong');
+      setTimeout(() => {
+        circle.classList.remove('selected-wrong');
+      }, 600);
+    }
+  
+    function drawLine(start, end) {
+      const svg = document.querySelector('#svg-container svg');
+      if (!svg) return;
+      let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", start.x);
+      line.setAttribute("y1", start.y);
+      line.setAttribute("x2", end.x);
+      line.setAttribute("y2", end.y);
+      line.classList.add("svg-line");
+      svg.appendChild(line);
+      return line;
+    }
+  
+    function resetPointsAndLines(pointsArray) {
+      // Borra líneas
+      drawnLines.forEach(line => line.remove());
+      drawnLines = [];
+      // Reinicia colores y habilita puntos
+      document.querySelectorAll('.connection-point').forEach(el => {
+        el.classList.remove('selected-correct', 'disabled');
+        el.setAttribute('fill', '#cccccc');
+      });
+      currentSequence = [];
+    }
+  
+    function updateSVGIndicators() {
+      // Siguiente esperado
+      const nextIdx = currentSequence.length;
+      const nextVal = correctSequence[nextIdx] || '-';
+      document.getElementById('svg-next-indicator').textContent = `Siguiente: ${nextVal}`;
+      document.getElementById('svg-progress-indicator').textContent = `Aciertos: ${currentSequence.length}/10 | Fallos: ${intentosFallidosSec1}`;
+    }
+  
+    function reiniciarSecuenciaSVG() {
+      inicializarSeccion1();
+      intentosFallidosSec1 = 0;
+    }
+  
+    /* ======================================================
+       SECCIÓN 2: CUBO (Pointer Events + Responsivo)
+       ====================================================== */
+    let pathsCubo = [];
+    let currentPathCubo = [];
+    let drawingCubo = false;
+    let ctxCubo, canvasCubo;
+  
+    function inicializarCubo() {
+      canvasCubo = document.getElementById("canvas-cubo");
+      if (!canvasCubo) return;
+      ctxCubo = canvasCubo.getContext("2d");
+  
+      // Usar Pointer Events
+      canvasCubo.addEventListener("pointerdown", startDrawingCubo);
+      canvasCubo.addEventListener("pointermove", drawCubo);
+      canvasCubo.addEventListener("pointerup", endDrawingCubo);
+      canvasCubo.addEventListener("pointercancel", endDrawingCubo);
+      // Opcionalmente, pointerleave para terminar trazo si sale del canvas
+      canvasCubo.addEventListener("pointerleave", endDrawingCubo);
+  
+      // Configuraciones de dibujo
+      ctxCubo.lineCap = "round";
+      ctxCubo.lineJoin = "round";
+      ctxCubo.lineWidth = 3;
+      ctxCubo.strokeStyle = "#000";
+    }
+  
+    function startDrawingCubo(e) {
+      e.preventDefault();
+      drawingCubo = true;
+      currentPathCubo = [];
+      addPointCubo(e);
+    }
+    function drawCubo(e) {
+      if (!drawingCubo) return;
+      e.preventDefault();
+      addPointCubo(e);
+      redrawCanvasCubo();
+    }
+    function endDrawingCubo(e) {
+      if (!drawingCubo) return;
+      e.preventDefault();
+      drawingCubo = false;
+      addPointCubo(e);
+      pathsCubo.push(currentPathCubo);
+      currentPathCubo = [];
+      redrawCanvasCubo();
+    }
+  
+    // Calcula coordenadas internas (canvas=800x800) vs posición en pantalla
+    function addPointCubo(e) {
+      const rect = canvasCubo.getBoundingClientRect();
+      let scaleX = canvasCubo.width / rect.width;
+      let scaleY = canvasCubo.height / rect.height;
+      let x = (e.clientX - rect.left) * scaleX;
+      let y = (e.clientY - rect.top) * scaleY;
+      currentPathCubo.push({ x, y });
+    }
+  
+    function redrawCanvasCubo() {
+      ctxCubo.clearRect(0, 0, canvasCubo.width, canvasCubo.height);
+      // Redibujar paths anteriores
+      pathsCubo.forEach(path => drawSinglePathCubo(path));
+      // Redibujar trazo actual
+      if (currentPathCubo.length > 1) {
+        drawSinglePathCubo(currentPathCubo);
+      }
+    }
+    function drawSinglePathCubo(path) {
+      ctxCubo.beginPath();
+      ctxCubo.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctxCubo.lineTo(path[i].x, path[i].y);
+      }
+      ctxCubo.stroke();
+    }
+  
+    function deshacerCubo() {
+      if(pathsCubo.length > 0) {
+        pathsCubo.pop();
+        redrawCanvasCubo();
+      }
+    }
+    function borrarTodoCubo() {
+      pathsCubo = [];
+      currentPathCubo = [];
+      redrawCanvasCubo();
+    }
+    function evaluarCubo() {
+      if (pathsCubo.length === 0) {
+        mostrarMensaje("Debes dibujar el cubo para poder evaluarlo.", "error");
+        return;
+      }
+      const checkLineas = document.getElementById("cubo-lineas").checked;
+      const checkPersp = document.getElementById("cubo-perspectiva").checked;
+      let puntuacion = 0;
+      if (checkLineas && checkPersp) {
+        puntuacion = 1;
+      }
+      puntajesSecciones.capacidadesVisuoconstructivasCubo = puntuacion;
+      mostrarMensaje(`¡Cubo evaluado con ${puntuacion} punto(s)!`, (puntuacion>0?"success":"info"));
+      document.getElementById("btnSiguiente2").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 3: RELOJ (Pointer Events + Responsivo)
+       ====================================================== */
+    let pathsReloj = [];
+    let currentPathReloj = [];
+    let drawingReloj = false;
+    let ctxReloj, canvasReloj;
+  
+    function inicializarReloj() {
+      canvasReloj = document.getElementById("canvas-reloj");
+      if (!canvasReloj) return;
+      ctxReloj = canvasReloj.getContext("2d");
+  
+      // Pointer events
+      canvasReloj.addEventListener("pointerdown", startDrawingReloj);
+      canvasReloj.addEventListener("pointermove", drawRelojPointer);
+      canvasReloj.addEventListener("pointerup", endDrawingReloj);
+      canvasReloj.addEventListener("pointercancel", endDrawingReloj);
+      canvasReloj.addEventListener("pointerleave", endDrawingReloj);
+  
+      ctxReloj.lineCap = "round";
+      ctxReloj.lineJoin = "round";
+      ctxReloj.lineWidth = 3;
+      ctxReloj.strokeStyle = "#000";
+    }
+  
+    function startDrawingReloj(e) {
+      e.preventDefault();
+      drawingReloj = true;
+      currentPathReloj = [];
+      addPointReloj(e);
+    }
+    function drawRelojPointer(e) {
+      if (!drawingReloj) return;
+      e.preventDefault();
+      addPointReloj(e);
+      redrawCanvasReloj();
+    }
+    function endDrawingReloj(e) {
+      if (!drawingReloj) return;
+      e.preventDefault();
+      drawingReloj = false;
+      addPointReloj(e);
+      pathsReloj.push(currentPathReloj);
+      currentPathReloj = [];
+      redrawCanvasReloj();
+    }
+  
+    function addPointReloj(e) {
+      const rect = canvasReloj.getBoundingClientRect();
+      let scaleX = canvasReloj.width / rect.width;
+      let scaleY = canvasReloj.height / rect.height;
+      let x = (e.clientX - rect.left) * scaleX;
+      let y = (e.clientY - rect.top) * scaleY;
+      currentPathReloj.push({ x, y });
+    }
+  
+    function redrawCanvasReloj() {
+      ctxReloj.clearRect(0, 0, canvasReloj.width, canvasReloj.height);
+      // Redibujar paths anteriores
+      pathsReloj.forEach(path => drawSinglePathReloj(path));
+      // Redibujar trazo actual
+      if (currentPathReloj.length > 1) {
+        drawSinglePathReloj(currentPathReloj);
+      }
+    }
+    function drawSinglePathReloj(path) {
+      ctxReloj.beginPath();
+      ctxReloj.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctxReloj.lineTo(path[i].x, path[i].y);
+      }
+      ctxReloj.stroke();
+    }
+  
+    function deshacerReloj() {
+      if(pathsReloj.length > 0) {
+        pathsReloj.pop();
+        redrawCanvasReloj();
+      }
+    }
+    function borrarTodoReloj() {
+      pathsReloj = [];
+      currentPathReloj = [];
+      redrawCanvasReloj();
+    }
+    function evaluarReloj() {
+      if (pathsReloj.length === 0) {
+        mostrarMensaje("Debes dibujar el reloj para poder evaluarlo.", "error");
+        return;
+      }
+      let checks = document.querySelectorAll(".check-reloj:checked");
+      let score = checks.length;
+      if (score > 3) score = 3;
+      puntajesSecciones.capacidadesVisuoconstructivasReloj = score;
+      mostrarMensaje(`Reloj evaluado con ${score} punto(s). (Máx. 3)`, "success");
+      document.getElementById("btnSiguiente3").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 4: ANIMALES
+       ====================================================== */
+    function checkAnimales() {
+      let leon = document.getElementById("animal-leon").value.trim().toLowerCase();
+      let rinoceronte = document.getElementById("animal-rinoceronte").value.trim().toLowerCase();
+      let camello = document.getElementById("animal-camello").value.trim().toLowerCase();
+  
+      let score = 0;
+      if (leon === "león" || leon === "leon") score++;
+      if (rinoceronte === "rinoceronte" || rinoceronte === "rhino") score++;
+      if (camello === "camello") score++;
+  
+      puntajesSecciones.identificacionAnimales = score;
+      mostrarMensaje(`Puntuación en Animales: ${score}/3`, (score>0?"success":"info"));
+      document.getElementById("btnSiguiente4").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 5: MEMORIA INMEDIATA
+       ====================================================== */
+    function iniciarMemoria() {
+      mostrarMensaje("Palabras a memorizar: " + listaPalabras.join(", "), "info");
+    }
+    function evaluarMemoriaInmediata() {
+      let respuesta = document.getElementById("memoria-inmediata").value.trim().toLowerCase();
+      if (!respuesta) {
+        mostrarMensaje("No has ingresado ninguna palabra.", "error");
+        return;
+      }
+      let palabrasUsuario = respuesta.split(/[\s,]+/).filter(Boolean);
+      let aciertos = 0;
+      listaPalabras.forEach(pal => {
+        if (palabrasUsuario.includes(pal)) {
+          aciertos++;
+        }
+      });
+      puntajesSecciones.memoriaInmediata = aciertos; // 0-5
+      mostrarMensaje(`Has recordado ${aciertos} de 5 palabras (recuerdo inmediato).`, "info");
+      document.getElementById("btnSiguiente5").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 6: ATENCIÓN
+       ====================================================== */
+    function detectarLetraA() {
+      let inputA = document.getElementById("contador-letra-a");
+      let valor = parseInt(inputA.value) || 0;
+      inputA.value = valor + 1;
+    }
+    function evaluarAtencion() {
+      let directa = document.getElementById("atencion-directa").value.trim().toLowerCase();
+      let inversa = document.getElementById("atencion-inversa").value.trim().toLowerCase();
+      let contadorA = parseInt(document.getElementById("contador-letra-a").value) || 0;
+  
+      let score = 0;
+      let directArr = directa.split(/[\s,]+/);
+      let invArr = inversa.split(/[\s,]+/);
+  
+      if (directArr.join(" ") === "2 1 8") score++;
+      if (invArr.join(" ") === "8 1 2") score++;
+      if (contadorA >= 3) score++;
+  
+      puntajesSecciones.atencion = score;
+      mostrarMensaje(`Puntuación en Atención: ${score} (máx. 3).`, "info");
+      document.getElementById("btnSiguiente6").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 7: REPETICIÓN DE FRASES
+       ====================================================== */
+    function evaluarRepeticionFrases() {
+      let fraseUsuario = document.getElementById("frase-repetida").value.trim().toLowerCase();
+      let fraseCorrecta = "solo sé que le toca a juan ayudar hoy";
+  
+      if (!fraseUsuario) {
+        mostrarMensaje("No has ingresado la frase.", "error");
+        return;
+      }
+      let score = (fraseUsuario === fraseCorrecta) ? 1 : 0;
+      puntajesSecciones.repeticionFrases = score;
+      mostrarMensaje("Puntuación de frase: " + score, (score>0?"success":"info"));
+      document.getElementById("btnSiguiente7").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 8: FLUIDEZ VERBAL
+       ====================================================== */
+    let cronometroIniciado = false;
+    let tiempoRestante = 60;
+    let intervaloFluidez = null;
+  
+    function iniciarCronometro() {
+      if (!cronometroIniciado) {
+        cronometroIniciado = true;
+        tiempoRestante = 60;
+        document.getElementById("fluidez-input").disabled = false;
+        mostrarMensaje("Cronómetro iniciado: 60s para escribir palabras con 'F'.", "info");
+        actualizarCronometro();
+  
+        intervaloFluidez = setInterval(() => {
+          tiempoRestante--;
+          actualizarCronometro();
+          if (tiempoRestante <= 0) {
+            clearInterval(intervaloFluidez);
+            document.getElementById("fluidez-input").disabled = true;
+            mostrarMensaje("Tiempo terminado para Fluidez Verbal", "error");
+          }
+        }, 1000);
+      }
+    }
+    function actualizarCronometro() {
+      document.getElementById("cronometro-s8").textContent = `Tiempo restante: ${tiempoRestante}s`;
+    }
+    function evaluarFluidezVerbal() {
+      let palabrasF = document.getElementById("fluidez-input").value.trim().toLowerCase();
+      if (!palabrasF) {
+        mostrarMensaje("No ingresaste palabras para Fluidez Verbal.", "error");
+        return;
+      }
+      let arrayPalabrasF = palabrasF.split(/[\s,]+/).filter(Boolean);
+      let countF = arrayPalabrasF.filter(p => p.startsWith("f")).length;
+  
+      // Ejemplo: 1 punto si >= 11
+      let score = (countF >= 11) ? 1 : 0;
+  
+      puntajesSecciones.fluidezVerbal = score;
+      mostrarMensaje(`Dijiste ${countF} palabra(s) con 'F'. Puntuación: ${score}`, (score>0?"success":"info"));
+      document.getElementById("btnSiguiente8").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 9: ABSTRACCIÓN
+       ====================================================== */
+    function evaluarAbstraccion() {
+      let respuesta = document.getElementById("abstraccion-input").value.trim().toLowerCase();
+      if (!respuesta) {
+        mostrarMensaje("No ingresaste ninguna respuesta.", "error");
+        return;
+      }
+      let score = 0;
+      if (respuesta.includes("transporte") || 
+          respuesta.includes("vehículos") ||
+          respuesta.includes("vehiculos") ||
+          respuesta.includes("medios de transporte") ||
+          respuesta.includes("se usan para trasladarse")) {
+        score = 1;
+      }
+      puntajesSecciones.abstraccion = score;
+      mostrarMensaje("Puntuación de abstracción: " + score, (score>0?"success":"info"));
+      document.getElementById("btnSiguiente9").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 10: RECUERDO DIFERIDO
+       ====================================================== */
+    function evaluarRecuerdoDiferido() {
+      let respuesta = document.getElementById("memoria-diferida").value.trim().toLowerCase();
+      if (!respuesta) {
+        mostrarMensaje("No has ingresado palabras para el recuerdo diferido.", "error");
+        return;
+      }
+      let palabrasUsuario = respuesta.split(/[\s,]+/).filter(Boolean);
+      let aciertos = 0;
+      listaPalabras.forEach(pal => {
+        if (palabrasUsuario.includes(pal)) {
+          aciertos++;
+        }
+      });
+      puntajesSecciones.recuerdoDiferido = aciertos;
+      mostrarMensaje(`Has recordado ${aciertos} palabra(s) en el recuerdo diferido.`, (aciertos>0?"info":"error"));
+      document.getElementById("btnSiguiente10").disabled = false;
+    }
+  
+    /* ======================================================
+       SECCIÓN 11: ORIENTACIÓN
+       ====================================================== */
+    function evaluarOrientacion() {
+      let fecha = document.getElementById("fecha").value;
+      let lugar = document.getElementById("lugar").value.trim().toLowerCase();
+  
+      if (!fecha || !lugar) {
+        mostrarMensaje("Completa la fecha y el lugar para evaluar la orientación.", "error");
+        return;
+      }
+  
+      let hoy = new Date();
+      let hoyString = hoy.toISOString().split("T")[0];
+  
+      let score = 0;
+      if (fecha === hoyString) score++;
+      if (lugar.includes("clínica") || lugar.includes("clinica") 
+          || lugar.includes("hospital") || lugar.includes("consultorio")) {
+        score++;
+      }
+      puntajesSecciones.orientacion = score;
+      mostrarMensaje("Puntuación de orientación: " + score, (score>0?"success":"info"));
+    }
+  
+    /* ======================================================
+       SECCIÓN 12: RESUMEN FINAL
+       ====================================================== */
+    function calcularPuntuacionTotal() {
+      irASeccion(12);
+      let puntuacionTotal = Object.values(puntajesSecciones).reduce((total, val) => total + val, 0);
+      if (datosPaciente.escolaridad > 0 && datosPaciente.escolaridad <= 12) {
+        puntuacionTotal += 1;
+      }
+      let hoy = new Date();
+      let hoyString = hoy.toLocaleDateString();
+      // Rellenar datos del paciente
+      document.getElementById('print-nombre').textContent = datosPaciente.nombre || '(No especificado)';
+      document.getElementById('print-edad').textContent = datosPaciente.edad || '(Sin dato)';
+      document.getElementById('print-fecha').textContent = hoyString;
+      document.getElementById('print-fecha-footer').textContent = hoyString;
+      document.getElementById('print-medico').textContent = datosPaciente.medico || '(No especificado)';
+      document.getElementById('print-escolaridad').textContent = datosPaciente.escolaridad || '(Sin dato)';
+      // Rellenar resultados
+      document.getElementById('print-alternancia').textContent = puntajesSecciones.alternanciaConceptual;
+      document.getElementById('print-cubo').textContent = puntajesSecciones.capacidadesVisuoconstructivasCubo;
+      document.getElementById('print-reloj').textContent = puntajesSecciones.capacidadesVisuoconstructivasReloj;
+      document.getElementById('print-animales').textContent = puntajesSecciones.identificacionAnimales;
+      document.getElementById('print-memoria-inmediata').textContent = puntajesSecciones.memoriaInmediata;
+      document.getElementById('print-atencion').textContent = puntajesSecciones.atencion;
+      document.getElementById('print-frases').textContent = puntajesSecciones.repeticionFrases;
+      document.getElementById('print-fluidez').textContent = puntajesSecciones.fluidezVerbal;
+      document.getElementById('print-abstraccion').textContent = puntajesSecciones.abstraccion;
+      document.getElementById('print-memoria-diferida').textContent = puntajesSecciones.recuerdoDiferido;
+      document.getElementById('print-orientacion').textContent = puntajesSecciones.orientacion;
+      // Total y recomendación
+      document.getElementById('print-total').textContent = 'Puntuación Total: ' + puntuacionTotal;
+      let interpretacion = '';
+      if (puntuacionTotal >= 26) {
+        interpretacion = '<h4>Interpretación Clínica</h4><p>Rendimiento cognitivo dentro de lo normal.</p>';
+      } else {
+        interpretacion = '<h4>Interpretación Clínica</h4><p>Puede existir deterioro cognitivo leve. Requiere evaluación adicional.</p>';
+      }
+      document.getElementById('print-interpretacion').innerHTML = interpretacion;
+    }
+    function imprimirResultado() {
+      window.print();
+    }
+    function reiniciarTest() {
+      location.reload();
+    }
+    function noLogrado(seccion, idBtnSiguiente) {
+      puntajesSecciones[seccion] = 0;
+      mostrarMensaje("Se ha calificado como 'No logrado'.", "error");
+      if (idBtnSiguiente) {
+        document.getElementById(idBtnSiguiente).disabled = false;
+      }
+    }
+  </script>
+<body>
+
+<header>
+  <h1>Evaluación Cognitiva Montreal (MoCA) </h1>
+</header>
+
+<!-- Barra de navegación para saltar a secciones específicas -->
+<div class="nav-secciones">
+  <button onclick="irASeccion(0)">Inicio</button>
+  <button onclick="irASeccion(1)">Sección 1</button>
+  <button onclick="irASeccion(2)">Sección 2</button>
+  <button onclick="irASeccion(3)">Sección 3</button>
+  <button onclick="irASeccion(4)">Sección 4</button>
+  <button onclick="irASeccion(5)">Sección 5</button>
+  <button onclick="irASeccion(6)">Sección 6</button>
+  <button onclick="irASeccion(7)">Sección 7</button>
+  <button onclick="irASeccion(8)">Sección 8</button>
+  <button onclick="irASeccion(9)">Sección 9</button>
+  <button onclick="irASeccion(10)">Sección 10</button>
+  <button onclick="irASeccion(11)">Sección 11</button>
+  <button onclick="irASeccion(12)">Sección 12</button>
+</div>
+
+<div class="container">
+  <div class="form-container">
+    <!-- Contenedor de mensajes -->
+    <div id="mensaje-resultado">
+      <button class="close-message" onclick="cerrarMensaje()">x</button>
+      <span id="texto-mensaje"></span>
+    </div>
+
+    <!-- VENTANA 0: Presentación/Inicio -->
+    <section id="ventana-0" class="ventana active">
+      <h2>Bienvenido(a) al Test MoCA</h2>
+      <p>Esta herramienta evalúa distintas áreas cognitivas. Por favor, llena la información requerida y sigue las instrucciones con atención. Puedes navegar libremente con el menú o con los botones "Siguiente / Anterior".</p>
+       <p><strong>Datos del Paciente (Obligatorios):</strong></p>
+      
+      <label for="paciente-nombre">Nombre del Paciente:</label>
+      <input type="text" id="paciente-nombre" placeholder="Ej. Juan Pérez" required>
+
+      <label for="paciente-edad">Edad (años):</label>
+      <input type="number" id="paciente-edad" placeholder="Ej. 65" min="1" max="120" required>
+
+      <label for="anios-escolaridad">Años de Escolaridad:</label>
+      <input type="number" id="anios-escolaridad" placeholder="Ej. 12" min="0" max="40">
+
+      <label for="medico-nombre">Nombre del Médico Evaluador:</label>
+      <input type="text" id="medico-nombre" placeholder="Ej. Dr. Gómez" required>
+      <button onclick="irASeccion(1)">Ir a Sección 1</button>
+    </section>
+
+    <!-- SECCIÓN 1: Alternancia Conceptual (SVG) -->
+    <section id="ventana-1" class="ventana">
+      <h2>1. Alternancia Conceptual 
+        <span class="progreso" id="progreso-1">Sección 1 de 12</span>
+      </h2>
+     
+
+      <p style="margin-top: 20px;">
+        Dibuja una línea alternando entre cifras y letras <strong>(1 - A - 2 - B - 3 - C - 4 - D - 5 - E)</strong>.
+        Haz clic primero en el 1, luego la A, y así sucesivamente. 
+      </p>
+      <div class="svg-indicator" id="svg-next-indicator">Siguiente: 1</div>
+      <div class="svg-progress" id="svg-progress-indicator">Aciertos: 0/10 | Fallos: 0</div>
+      <button class="svg-restart-btn" onclick="reiniciarSecuenciaSVG()">Reiniciar Secuencia</button>
+      <div id="svg-container" style="width:400px; height:400px; margin: 0 auto; border: 1px solid #ccc; background:#fff;"></div>
+      
+      <!-- Botones de navegación -->
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('alternanciaConceptual', 'btnSiguiente1')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente1" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: Capacidades Visuoconstructivas (Cubo) -->
+    <section id="ventana-2" class="ventana">
+      <h2>2. Capacidades Visuoconstructivas: Cubo
+        <span class="progreso" id="progreso-2">Sección 2 de 12</span>
+      </h2>
+      <p>Dibuja un cubo lo más preciso posible. Evalúa los ángulos y líneas rectas.</p>
+
+      <!-- Contenedor responsivo para el canvas -->
+      <div class="canvas-wrapper">
+        <!-- 
+          Canvas con dimensiones internas fijas (800x800) 
+          que se escalará al 100% del contenedor
+        -->
+        <canvas id="canvas-cubo" width="800" height="800"></canvas>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <p><strong>Evalúa el Cubo (checklist):</strong></p>
+        <label><input type="checkbox" id="cubo-lineas" value="lineas"> Líneas rectas</label>
+        <label><input type="checkbox" id="cubo-perspectiva" value="perspectiva"> Perspectiva coherente</label>
+      </div>
+
+      <button onclick="evaluarCubo()">Evaluar Cubo</button>
+      <button onclick="deshacerCubo()">Deshacer último trazo</button>
+      <button onclick="borrarTodoCubo()">Borrar todo</button>
+      
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('capacidadesVisuoconstructivasCubo', 'btnSiguiente2')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente2" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: Capacidades Visuoconstructivas (Reloj) -->
+    <section id="ventana-3" class="ventana">
+      <h2>3. Capacidades Visuoconstructivas: Reloj
+        <span class="progreso" id="progreso-3">Sección 3 de 12</span>
+      </h2>
+      <p>Dibuja un reloj que marque las 11:10. (Evaluación de contorno, números y agujas)</p>
+
+      <!-- Contenedor responsivo para el canvas -->
+      <div class="canvas-wrapper">
+        <canvas id="canvas-reloj" width="800" height="800"></canvas>
+      </div>
+
+      <div class="checklist-reloj">
+        <p><strong>Evaluación del Reloj (marca lo que está correcto):</strong></p>
+        <label><input type="checkbox" class="check-reloj" value="contorno"> Contorno correcto</label>
+        <label><input type="checkbox" class="check-reloj" value="numeros"> Números en posición adecuada</label>
+        <label><input type="checkbox" class="check-reloj" value="agujas"> Agujas marcando 11:10</label>
+      </div>
+
+      <button onclick="evaluarReloj()">Evaluar Reloj</button>
+      <button onclick="deshacerReloj()">Deshacer último trazo</button>
+      <button onclick="borrarTodoReloj()">Borrar todo</button>
+      
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('capacidadesVisuoconstructivasReloj', 'btnSiguiente3')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente3" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: Identificación de Animales -->
+    <section id="ventana-4" class="ventana">
+      <h2>4. Identificación de Animales
+        <span class="progreso" id="progreso-4">Sección 4 de 12</span>
+      </h2>
+      <div style="font-size: 5rem; text-align: center;">🦁</div>
+      <input type="text" id="animal-leon" placeholder="Nombre del animal">
+
+      <div style="font-size: 5rem; text-align: center;">🦏</div>
+      <input type="text" id="animal-rinoceronte" placeholder="Nombre del animal">
+
+      <div style="font-size: 5rem; text-align: center;">🐪</div>
+      <input type="text" id="animal-camello" placeholder="Nombre del animal">
+
+      <button onclick="checkAnimales()">Evaluar Animales</button>
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('identificacionAnimales', 'btnSiguiente4')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente4" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: Memoria Inmediata -->
+    <section id="ventana-5" class="ventana">
+      <h2>5. Memoria (Recuerdo Inmediato)
+        <span class="progreso" id="progreso-5">Sección 5 de 12</span>
+      </h2>
+      <p>Se leerán 5 palabras. Después de un breve tiempo, escribe las que recuerdes.</p>
+      <button onclick="iniciarMemoria()">Iniciar Lista de Palabras</button>
+      <input type="text" id="memoria-inmediata" placeholder="Escribe las palabras que recuerdes ahora (sepáralas por espacios o comas)">
+      <button onclick="evaluarMemoriaInmediata()">Evaluar Recuerdo Inmediato</button>
+      
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('memoriaInmediata', 'btnSiguiente5')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente5" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 6: Atención -->
+    <section id="ventana-6" class="ventana">
+      <h2>6. Atención
+        <span class="progreso" id="progreso-6">Sección 6 de 12</span>
+      </h2>
+      <p>Repite la serie de números (hacia adelante y hacia atrás).</p>
+      <input type="text" id="atencion-directa" placeholder="Serie hacia adelante (ej. 2 1 8)">
+      <input type="text" id="atencion-inversa" placeholder="Serie hacia atrás (ej. 8 1 2)">
+
+      <p>Cuando escuches la letra 'A', pulsa el botón (ejemplo simplificado).</p>
+      <button onclick="detectarLetraA()">Detectar Letra A</button>
+      <input type="text" id="contador-letra-a" placeholder="Veces que detectaste 'A'" readonly>
+
+      <button onclick="evaluarAtencion()">Evaluar Atención</button>
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('atencion', 'btnSiguiente6')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente6" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 7: Repetición de Frases -->
+    <section id="ventana-7" class="ventana">
+      <h2>7. Repetición de Frases
+        <span class="progreso" id="progreso-7">Sección 7 de 12</span>
+      </h2>
+      <p>Por favor, repite la siguiente frase exactamente:</p>
+      <p><strong>"Solo sé que le toca a Juan ayudar hoy"</strong></p>
+      <input type="text" id="frase-repetida" placeholder="Repite la frase aquí">
+      <button onclick="evaluarRepeticionFrases()">Evaluar Repetición</button>
+
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('repeticionFrases', 'btnSiguiente7')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente7" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 8: Fluidez Verbal -->
+    <section id="ventana-8" class="ventana">
+      <h2>8. Fluidez Verbal
+        <span class="progreso" id="progreso-8">Sección 8 de 12</span>
+      </h2>
+      <p>Di tantas palabras como puedas que comiencen con la letra 'F' en un minuto.</p>
+      <input type="text" id="fluidez-input" placeholder="Escribe tus palabras separadas por comas" disabled>
+      <button onclick="iniciarCronometro()">Iniciar Cronómetro (60s)</button>
+      <div style="font-weight:bold; color:#c00; margin-top:5px;" id="cronometro-s8"></div>
+      <button onclick="evaluarFluidezVerbal()">Evaluar Fluidez</button>
+
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('fluidezVerbal', 'btnSiguiente8')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente8" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 9: Abstracción -->
+    <section id="ventana-9" class="ventana">
+      <h2>9. Abstracción
+        <span class="progreso" id="progreso-9">Sección 9 de 12</span>
+      </h2>
+      <p>¿Qué tienen en común estas dos cosas?</p>
+      <p><strong>"Tren y Bicicleta"</strong></p>
+      <input type="text" id="abstraccion-input" placeholder="Respuesta (ej. 'medios de transporte')">
+      <button onclick="evaluarAbstraccion()">Evaluar Abstracción</button>
+
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('abstraccion', 'btnSiguiente9')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente9" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 10: Recuerdo Diferido -->
+    <section id="ventana-10" class="ventana">
+      <h2>10. Recuerdo Diferido
+        <span class="progreso" id="progreso-10">Sección 10 de 12</span>
+      </h2>
+      <p>Escribe las 5 palabras mencionadas anteriormente (Sección 5):</p>
+      <input type="text" id="memoria-diferida" placeholder="Escribe las palabras que recuerdes">
+      <button onclick="evaluarRecuerdoDiferido()">Evaluar Recuerdo Diferido</button>
+
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('recuerdoDiferido', 'btnSiguiente10')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente10" onclick="siguienteVentana()" disabled>
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 11: Orientación -->
+    <section id="ventana-11" class="ventana">
+      <h2>11. Orientación
+        <span class="progreso" id="progreso-11">Sección 11 de 12</span>
+      </h2>
+      <p>¿En qué fecha estamos hoy?</p>
+      <input type="date" id="fecha">
+      <p>¿Dónde nos encontramos? (Ej. "clínica", "hospital"...)</p>
+      <input type="text" id="lugar" placeholder="Lugar actual">
+
+      <button onclick="evaluarOrientacion()">Evaluar Orientación</button>
+      <div class="section-navigation">
+        <button class="btn btn-secondary" onclick="anteriorVentana()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <button class="btn btn-danger" onclick="noLogrado('orientacion', 'btnSiguiente11')">
+          No logrado
+        </button>
+        <button class="btn btn-primary" id="btnSiguiente11" onclick="calcularPuntuacionTotal()">
+          Calcular Puntuación Total
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 12: Resumen Final -->
+    <section id="ventana-12" class="ventana">
+      <div class="print-header">
+        <div class="clinic-logo">DeepLuxMed.mx</div>
+        <div class="report-title">Resultados de la Evaluación Cognitiva MoCA</div>
+        <div class="report-subtitle">Reporte Individual</div>
+      </div>
+      <div class="patient-info">
+        <h3>Datos del Paciente</h3>
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-label">Nombre:</div>
+            <div class="info-value" id="print-nombre"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Edad:</div>
+            <div class="info-value" id="print-edad"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Fecha:</div>
+            <div class="info-value" id="print-fecha"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Médico Evaluador:</div>
+            <div class="info-value" id="print-medico"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Escolaridad:</div>
+            <div class="info-value" id="print-escolaridad"></div>
+          </div>
+        </div>
+      </div>
+      <div class="results-summary">
+        <h3>Resumen de Calificaciones</h3>
+        <div class="results-grid">
+          <div class="result-card"><div class="result-label">1. Alternancia Conceptual</div><div class="result-score" id="print-alternancia"></div></div>
+          <div class="result-card"><div class="result-label">2. Cubo</div><div class="result-score" id="print-cubo"></div></div>
+          <div class="result-card"><div class="result-label">3. Reloj</div><div class="result-score" id="print-reloj"></div></div>
+          <div class="result-card"><div class="result-label">4. Animales</div><div class="result-score" id="print-animales"></div></div>
+          <div class="result-card"><div class="result-label">5. Memoria Inmediata</div><div class="result-score" id="print-memoria-inmediata"></div></div>
+          <div class="result-card"><div class="result-label">6. Atención</div><div class="result-score" id="print-atencion"></div></div>
+          <div class="result-card"><div class="result-label">7. Repetición Frases</div><div class="result-score" id="print-frases"></div></div>
+          <div class="result-card"><div class="result-label">8. Fluidez Verbal</div><div class="result-score" id="print-fluidez"></div></div>
+          <div class="result-card"><div class="result-label">9. Abstracción</div><div class="result-score" id="print-abstraccion"></div></div>
+          <div class="result-card"><div class="result-label">10. Recuerdo Diferido</div><div class="result-score" id="print-memoria-diferida"></div></div>
+          <div class="result-card"><div class="result-label">11. Orientación</div><div class="result-score" id="print-orientacion"></div></div>
+        </div>
+        <div class="total-score" id="print-total"></div>
+        <div class="clinical-interpretation" id="print-interpretacion"></div>
+      </div>
+      <div class="report-footer">
+        Reporte generado por DeepLuxMed.mx - Fecha: <span id="print-fecha-footer"></span>
+      </div>
+      <div class="section-navigation no-print" style="margin-top: 40px; text-align: center;">
+        <button class="btn btn-primary" onclick="imprimirResultado()">
+          <i class="fas fa-print"></i> Imprimir Resultado
+        </button>
+        <button class="btn btn-secondary" onclick="reiniciarTest()">
+          <i class="fas fa-redo"></i> Reiniciar Test
+        </button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 - Herramienta de Evaluación Cognitiva por DeepLuxMed. </p>
+</footer>
+
+
+
+</body>
+</html>

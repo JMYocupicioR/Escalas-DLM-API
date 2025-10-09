@@ -58,6 +58,13 @@ const SPECIALTIES = {
       },
     ],
   },
+  pediatria: {
+    name: 'Pediatria',
+    scales: [
+      { id: 'weefim', name: 'WeeFIM', description: 'Medida de independencia funcional pediatrica (18 items, 1-7)', timeToComplete: '15-30 min' },
+      { id: 'denver2', name: 'Denver II', description: 'Evaluacion del desarrollo: personal-social, motricidad, lenguaje', timeToComplete: '10-20 min' },
+    ],
+  },
 };
 
 export default function SpecialtyScalesScreen() {
@@ -67,17 +74,19 @@ export default function SpecialtyScalesScreen() {
   const [selectedSpecialty, setSelectedSpecialty] = useState(null);
 
   const filteredSpecialties = useMemo(() => {
-    return Object.entries(SPECIALTIES).filter(([key, specialty]) => {
+    const entries = Object.entries(SPECIALTIES).filter(([_, specialty]) => {
       if (searchQuery === '') return true;
-      
-      const matchesSpecialty = specialty.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesScales = specialty.scales.some(scale => 
-        scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scale.description.toLowerCase().includes(searchQuery.toLowerCase())
+      const q = searchQuery.toLowerCase();
+      const matchesSpecialty = specialty.name.toLowerCase().includes(q);
+      const matchesScales = specialty.scales.some(scale =>
+        scale.name.toLowerCase().includes(q) ||
+        scale.description.toLowerCase().includes(q)
       );
-      
       return matchesSpecialty || matchesScales;
     });
+    // Destacar Pediatría primero en la lista
+    entries.sort((a, b) => (a[0] === 'pediatria' ? -1 : b[0] === 'pediatria' ? 1 : 0));
+    return entries;
   }, [searchQuery]);
 
   const AlphabeticalIndex = () => {
@@ -114,6 +123,18 @@ export default function SpecialtyScalesScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
+          headerLeft: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => router.push('/')}> 
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Inicio</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / </Text>
+              <TouchableOpacity onPress={() => router.push('/scales')}>
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Escalas</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / Por especialidad</Text>
+            </View>
+          ),
         }}
       />
       <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -140,6 +161,11 @@ export default function SpecialtyScalesScreen() {
                   <View style={styles.scaleContent}>
                     <Text style={styles.scaleName}>{scale.name}</Text>
                     <Text style={styles.scaleDescription}>{scale.description}</Text>
+                    {scale.id === 'weefim' && (
+                      <View style={styles.newBadge}>
+                        <Text style={styles.newBadgeText}>Nuevo</Text>
+                      </View>
+                    )}
                     <View style={styles.timeInfo}>
                       <Clock size={16} color={colors.mutedText} />
                       <Text style={styles.timeText}>{scale.timeToComplete}</Text>
@@ -253,5 +279,22 @@ const createStyles = (colors: any) => StyleSheet.create({
   lastUpdateText: {
     fontSize: 12,
     color: colors.mutedText,
+  },
+  newBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: `${colors.primary}15`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}40`,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    marginBottom: 8,
+  },
+  newBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });

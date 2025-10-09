@@ -2,6 +2,7 @@ export interface BarthelQuestion {
   id: string;
   question: string;
   description: string;
+  category: 'autocuidado' | 'esfinteres' | 'movilidad';
   options: Array<{
     value: number;
     label: string;
@@ -14,6 +15,7 @@ export const questions: BarthelQuestion[] = [
     id: 'comida',
     question: 'Comida',
     description: 'Capacidad para comer por sí mismo',
+    category: 'autocuidado',
     options: [
       {
         value: 10,
@@ -38,6 +40,7 @@ export const questions: BarthelQuestion[] = [
     id: 'lavado',
     question: 'Lavado (Baño)',
     description: 'Capacidad para lavarse solo',
+    category: 'autocuidado',
     options: [
       {
         value: 5,
@@ -56,6 +59,7 @@ export const questions: BarthelQuestion[] = [
     id: 'vestido',
     question: 'Vestirse',
     description: 'Capacidad para ponerse y quitarse la ropa',
+    category: 'autocuidado',
     options: [
       {
         value: 10,
@@ -79,6 +83,7 @@ export const questions: BarthelQuestion[] = [
     id: 'arreglo',
     question: 'Arreglo personal',
     description: 'Capacidad para arreglarse y mantener la higiene personal',
+    category: 'autocuidado',
     options: [
       {
         value: 5,
@@ -97,6 +102,7 @@ export const questions: BarthelQuestion[] = [
     id: 'deposicion',
     question: 'Deposición',
     description: 'Control de la deposición',
+    category: 'esfinteres',
     options: [
       {
         value: 10,
@@ -120,6 +126,7 @@ export const questions: BarthelQuestion[] = [
     id: 'miccion',
     question: 'Micción',
     description: 'Control de la micción',
+    category: 'esfinteres',
     options: [
       {
         value: 10,
@@ -142,6 +149,7 @@ export const questions: BarthelQuestion[] = [
     id: 'retrete',
     question: 'Uso del retrete',
     description: 'Capacidad para utilizar el retrete de forma autónoma',
+    category: 'movilidad',
     options: [
       {
         value: 10,
@@ -166,6 +174,7 @@ export const questions: BarthelQuestion[] = [
     id: 'transferencias',
     question: 'Transferencias',
     description: 'Capacidad para transferirse de la cama o silla',
+    category: 'movilidad',
     options: [
       {
         value: 15,
@@ -197,6 +206,7 @@ export const questions: BarthelQuestion[] = [
     id: 'deambulacion',
     question: 'Deambulación',
     description: 'Capacidad para caminar o desplazarse',
+    category: 'movilidad',
     options: [
       {
         value: 15,
@@ -227,6 +237,7 @@ export const questions: BarthelQuestion[] = [
     id: 'escaleras',
     question: 'Subir y bajar escaleras',
     description: 'Capacidad para subir y bajar escaleras de forma autónoma',
+    category: 'movilidad',
     options: [
       {
         value: 10,

@@ -126,6 +126,9 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           if (scale.id === 'barthel') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'weefim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/weefim').weefimQuestions;
           } else if (scale.id === 'fim') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/fim').questions;
@@ -136,9 +139,30 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
         } catch {
           questions = undefined;
         }
-        
+        // For WeeFIM: transform assessment to expected FIM-like schema for PDF template
+        const assessmentForPayload: any = (() => {
+          if (scale.id !== 'weefim') return assessment;
+          const q = questions || [];
+          const answersArr = Array.isArray((assessment as any).answers) ? (assessment as any).answers as Array<{ id: string; value: number }> : [];
+          const answersRecord: Record<string, number> = {};
+          for (const a of answersArr) {
+            if (typeof a.value === 'number') answersRecord[a.id] = Number(a.value);
+          }
+          const motorIds = q.slice(0, 13).map((qq: any) => qq.id);
+          const motor = motorIds.reduce((sum: number, id: string) => sum + (answersRecord[id] || 0), 0);
+          const total = Object.values(answersRecord).reduce((s, v) => s + (typeof v === 'number' ? v : 0), 0);
+          const cognitive = total - motor;
+          return {
+            patientData: (assessment as any).patientData || {},
+            totalScore: total,
+            motorScore: motor,
+            cognitiveScore: cognitive,
+            answers: answersRecord,
+          };
+        })();
+
         const payload = { 
-          assessment, 
+          assessment: assessmentForPayload, 
           scale: { id: (scale as Scale).id, name: (scale as Scale).name }, 
           options,
           ...(questions ? { questions } : {}),
@@ -196,13 +220,37 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           ...assessment,
           puntosMotoresData: (assessment as any).puntosMotoresData,
           dosisDataComplete: (assessment as any).dosisDataComplete,
-        } : assessment;
+        } : scale.id === 'weefim' ? (() => {
+          // Build WeeFIM-specific structure expected by FIM template
+          let questions: any[] | undefined;
+          try { questions = require('@/data/weefim').weefimQuestions; } catch { questions = undefined; }
+          const q = questions || [];
+          const answersArr = Array.isArray((assessment as any).answers) ? (assessment as any).answers as Array<{ id: string; value: number }> : [];
+          const answersRecord: Record<string, number> = {};
+          for (const a of answersArr) {
+            if (typeof a.value === 'number') answersRecord[a.id] = Number(a.value);
+          }
+          const motorIds = q.slice(0, 13).map((qq: any) => qq.id);
+          const motor = motorIds.reduce((sum: number, id: string) => sum + (answersRecord[id] || 0), 0);
+          const total = Object.values(answersRecord).reduce((s, v) => s + (typeof v === 'number' ? v : 0), 0);
+          const cognitive = total - motor;
+          return {
+            patientData: (assessment as any).patientData || {},
+            totalScore: total,
+            motorScore: motor,
+            cognitiveScore: cognitive,
+            answers: answersRecord,
+          } as any;
+        })() : assessment;
         // Provide questions for native too so server templates can render detailed tables
         let questions: any[] | undefined;
         try {
           if (scale.id === 'barthel') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'weefim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/weefim').weefimQuestions;
           } else if (scale.id === 'fim') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/fim').questions;
@@ -238,6 +286,9 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           if (scale.id === 'barthel') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/barthel').questions;
+          } else if (scale.id === 'weefim') {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            questions = require('@/data/weefim').weefimQuestions;
           } else if (scale.id === 'fim') {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             questions = require('@/data/fim').questions;

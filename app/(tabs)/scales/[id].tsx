@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +13,7 @@ import { useScaleDetails } from '@/hooks/useScaleDetails';
 import Denver2Screen from '@/app/(tabs)/scales/denver2';
 import BergScaleScreen from '@/app/(tabs)/scales/berg';
 import KatzScaleScreen from '@/app/(tabs)/scales/katz';
+import { useScalesStore } from '@/store/scales';
 
 export default function ScaleDetailsScreen() {
   const { colors } = useScaleStyles();
@@ -23,6 +24,13 @@ export default function ScaleDetailsScreen() {
   const [mode, setMode] = useState<'info' | 'evaluation'>('info');
   
   const { data: scale, isLoading, error, refetch } = useScaleDetails(id as string);
+  const addRecentlyViewed = useScalesStore(s => s.addRecentlyViewed);
+
+  useEffect(() => {
+    if (scale?.id) {
+      try { addRecentlyViewed(scale.id); } catch {}
+    }
+  }, [scale?.id]);
 
   const handleComplete = async (assessment: ScaleAssessmentRequest) => {
     try {

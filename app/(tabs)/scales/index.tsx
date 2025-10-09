@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMemo } from 'react';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { Activity, Brain, Heart, Stethoscope, Bone, Baby, ListOrdered } from 'lucide-react-native';
+import { useScalesStore } from '@/store/scales';
 
 const BROWSE_OPTIONS = [
   {
@@ -41,6 +42,8 @@ export default function ScalesBrowseScreen() {
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { isDesktop, isTablet } = useResponsiveLayout();
+  const lastSection = useScalesStore(s => s.lastExploreSection);
+  const setLastSection = useScalesStore(s => s.setLastExploreSection);
 
   const numColumns = useMemo(() => {
     if (isDesktop) return 4;
@@ -66,7 +69,17 @@ export default function ScalesBrowseScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Explorar Escalas', headerShown: true }} />
+      <Stack.Screen 
+        options={{ 
+          title: 'Explorar Escalas', 
+          headerShown: true,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.push('/')}> 
+              <Text style={{ color: colors.linkText || colors.primary, fontWeight: '600' }}>Inicio</Text>
+            </TouchableOpacity>
+          ),
+        }} 
+      />
       <SafeAreaView style={styles.container}>
         <FlatList
           data={BROWSE_OPTIONS}
@@ -76,11 +89,32 @@ export default function ScalesBrowseScreen() {
           key={numColumns}
           contentContainerStyle={styles.list}
           ListHeaderComponent={
-            <View style={styles.header}>
-              <Text style={styles.title}>Explorar Escalas Médicas</Text>
-              <Text style={styles.subtitle}>
-                Encuentra la herramienta de evaluación que necesitas.
-              </Text>
+            <View>
+              <View style={styles.header}>
+                <Text style={styles.title}>Explorar Escalas Médicas</Text>
+                <Text style={styles.subtitle}>
+                  Encuentra la herramienta de evaluación que necesitas.
+                </Text>
+              </View>
+              {/* Saltos rápidos */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.quickNavRow}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
+              >
+                {BROWSE_OPTIONS.map(opt => (
+                  <TouchableOpacity
+                    key={opt.id}
+                    style={[styles.quickChip, lastSection === opt.id ? styles.quickChipActive : null]}
+                    onPress={() => { setLastSection(opt.id); router.push(`/scales/${opt.id}`); }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Ir a ${opt.name}`}
+                  >
+                    <Text style={[styles.quickChipText, lastSection === opt.id ? styles.quickChipTextActive : null]}>{opt.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
           }
         />
@@ -96,6 +130,31 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   list: {
     padding: 16,
+  },
+  quickNavRow: {
+    paddingBottom: 8,
+  },
+  quickChip: {
+    backgroundColor: colors.sectionBackground,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+  },
+  quickChipActive: {
+    backgroundColor: `${colors.primary}15`,
+    borderColor: colors.primary,
+  },
+  quickChipText: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  quickChipTextActive: {
+    color: colors.primary,
+    fontWeight: '700',
   },
   header: {
     marginBottom: 16,

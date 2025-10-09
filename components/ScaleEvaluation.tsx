@@ -52,6 +52,15 @@ interface EvaluationState {
     fssLevel: string;
   } | null;
   sf36Scores?: SF36Scores | null;
+  mmseScores?: {
+    orientacionTemporal: number;
+    orientacionEspacial: number;
+    memoriaInmediata: number;
+    atencionCalculo: number;
+    memoriaDiferida: number;
+    lenguaje: number;
+    construccion: number;
+  } | null;
 }
 
 export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
@@ -186,6 +195,28 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       } as Interpretation;
     }
 
+    // MMSE: calcular puntuaciones por dominio cognitivo
+    let mmseScores: EvaluationState['mmseScores'] = null;
+    if (scale.id === 'mmse') {
+      const categorizeScore = (category: string) => {
+        return sortedQuestions
+          .filter(q => q.category === category)
+          .reduce((sum, q) => sum + (Number(workingResponses[q.question_id]) || 0), 0);
+      };
+
+      mmseScores = {
+        orientacionTemporal: categorizeScore('Orientación Temporal'),
+        orientacionEspacial: categorizeScore('Orientación Espacial'),
+        memoriaInmediata: categorizeScore('Memoria Inmediata'),
+        atencionCalculo: categorizeScore('Atención y Cálculo'),
+        memoriaDiferida: categorizeScore('Memoria Diferida'),
+        lenguaje: categorizeScore('Lenguaje - Denominación') + categorizeScore('Lenguaje - Repetición') +
+                  categorizeScore('Lenguaje - Comprensión') + categorizeScore('Lenguaje - Lectura') +
+                  categorizeScore('Lenguaje - Escritura'),
+        construccion: categorizeScore('Construcción Visuoespacial'),
+      };
+    }
+
     // Boston: calcular subescalas SSS/FSS y enriquecer interpretación
     let bostonSubscores: EvaluationState['bostonSubscores'] = null;
     if (scale.id === 'boston') {
@@ -228,6 +259,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       interpretation,
       bostonSubscores,
       sf36Scores,
+      mmseScores,
     }));
   }, [scale.scoring, state.responses]);
 
@@ -445,17 +477,375 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 
         {/* Boston subscales breakdown */}
         {scale.id === 'boston' && state.bostonSubscores && (
-          <View style={styles.summaryContainer}>
-            <Text style={styles.summaryTitle}>Desglose por Subescalas</Text>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>SSS (Síntomas):</Text>
-              <Text style={styles.summaryValue}>{state.bostonSubscores.sssAvg} — {state.bostonSubscores.sssLevel}</Text>
+          <>
+            {/* Resumen por Subescalas */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Resultados por Subescala</Text>
+
+              {/* SSS - Severidad de Síntomas */}
+              <View style={styles.subscaleSection}>
+                <View style={styles.subscaleHeader}>
+                  <Text style={styles.subscaleTitle}>Escala de Severidad de Síntomas (SSS)</Text>
+                  <View style={styles.subscaleScoreBadge}>
+                    <Text style={styles.subscaleScoreValue}>{state.bostonSubscores.sssAvg}</Text>
+                    <Text style={styles.subscaleScoreMax}> / 5.0</Text>
+                  </View>
+                </View>
+                <View style={[
+                  styles.subscaleInterpretation,
+                  {
+                    borderLeftColor: state.bostonSubscores.sssAvg < 2 ? '#10B981' :
+                                    state.bostonSubscores.sssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                  }
+                ]}>
+                  <Text style={[
+                    styles.subscaleLevel,
+                    {
+                      color: state.bostonSubscores.sssAvg < 2 ? '#10B981' :
+                            state.bostonSubscores.sssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]}>
+                    {state.bostonSubscores.sssLevel}
+                  </Text>
+                  <Text style={styles.subscaleDescription}>
+                    {state.bostonSubscores.sssAvg < 2
+                      ? 'Los síntomas del túnel carpiano son leves. Continuar con seguimiento.'
+                      : state.bostonSubscores.sssAvg < 3.5
+                      ? 'Los síntomas son moderados. Considerar tratamiento conservador intensivo (férulas nocturnas, modificación de actividades, antiinflamatorios).'
+                      : 'Los síntomas son severos. Evaluar indicación quirúrgica. Considerar liberación del túnel carpiano.'
+                    }
+                  </Text>
+                </View>
+
+                {/* Barra de progreso SSS */}
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.bostonSubscores.sssAvg / 5) * 100}%`,
+                      backgroundColor: state.bostonSubscores.sssAvg < 2 ? '#10B981' :
+                                      state.bostonSubscores.sssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* FSS - Estado Funcional */}
+              <View style={styles.subscaleSection}>
+                <View style={styles.subscaleHeader}>
+                  <Text style={styles.subscaleTitle}>Escala de Estado Funcional (FSS)</Text>
+                  <View style={styles.subscaleScoreBadge}>
+                    <Text style={styles.subscaleScoreValue}>{state.bostonSubscores.fssAvg}</Text>
+                    <Text style={styles.subscaleScoreMax}> / 5.0</Text>
+                  </View>
+                </View>
+                <View style={[
+                  styles.subscaleInterpretation,
+                  {
+                    borderLeftColor: state.bostonSubscores.fssAvg < 2 ? '#10B981' :
+                                    state.bostonSubscores.fssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                  }
+                ]}>
+                  <Text style={[
+                    styles.subscaleLevel,
+                    {
+                      color: state.bostonSubscores.fssAvg < 2 ? '#10B981' :
+                            state.bostonSubscores.fssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]}>
+                    {state.bostonSubscores.fssLevel}
+                  </Text>
+                  <Text style={styles.subscaleDescription}>
+                    {state.bostonSubscores.fssAvg < 2
+                      ? 'El impacto funcional es mínimo. Las actividades de la vida diaria se realizan con normalidad.'
+                      : state.bostonSubscores.fssAvg < 3.5
+                      ? 'Existe dificultad moderada para realizar actividades manuales. Recomendar terapia ocupacional y adaptaciones.'
+                      : 'Limitación funcional severa. Evaluar cirugía y considerar terapia ocupacional intensiva post-operatoria.'
+                    }
+                  </Text>
+                </View>
+
+                {/* Barra de progreso FSS */}
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.bostonSubscores.fssAvg / 5) * 100}%`,
+                      backgroundColor: state.bostonSubscores.fssAvg < 2 ? '#10B981' :
+                                      state.bostonSubscores.fssAvg < 3.5 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
             </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>FSS (Funcional):</Text>
-              <Text style={styles.summaryValue}>{state.bostonSubscores.fssAvg} — {state.bostonSubscores.fssLevel}</Text>
+
+            {/* Respuestas Detalladas por Subescala */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Respuestas Detalladas</Text>
+
+              {/* SSS Preguntas */}
+              <View style={styles.categorySection}>
+                <View style={styles.categoryHeaderBoston}>
+                  <Text style={styles.categoryTitleBoston}>SEVERIDAD DE SÍNTOMAS (SSS)</Text>
+                </View>
+                {sortedQuestions
+                  .filter(q => q.category?.toUpperCase().includes('SSS'))
+                  .map((question, idx) => {
+                    const answer = state.responses[question.question_id];
+                    const option = question.options.find(opt => opt.option_value === answer);
+
+                    return (
+                      <View key={question.question_id} style={styles.detailRow}>
+                        <View style={styles.detailQuestionContainer}>
+                          <Text style={styles.detailQuestionNumber}>{idx + 1}.</Text>
+                          <Text style={styles.detailQuestionText}>{question.question_text}</Text>
+                        </View>
+                        <View style={styles.detailAnswerContainer}>
+                          <Text style={styles.detailAnswerText}>{option?.option_label || '-'}</Text>
+                          <View style={[
+                            styles.detailScoreBadge,
+                            {
+                              backgroundColor: Number(answer) <= 2 ? '#10B98120' :
+                                             Number(answer) <= 3 ? '#F59E0B20' : '#EF444420'
+                            }
+                          ]}>
+                            <Text style={[
+                              styles.detailScoreText,
+                              {
+                                color: Number(answer) <= 2 ? '#10B981' :
+                                      Number(answer) <= 3 ? '#F59E0B' : '#EF4444'
+                              }
+                            ]}>
+                              {answer} pts
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  })}
+              </View>
+
+              {/* FSS Preguntas */}
+              <View style={styles.categorySection}>
+                <View style={styles.categoryHeaderBoston}>
+                  <Text style={styles.categoryTitleBoston}>ESTADO FUNCIONAL (FSS)</Text>
+                </View>
+                {sortedQuestions
+                  .filter(q => q.category?.toUpperCase().includes('FSS'))
+                  .map((question, idx) => {
+                    const answer = state.responses[question.question_id];
+                    const option = question.options.find(opt => opt.option_value === answer);
+
+                    return (
+                      <View key={question.question_id} style={styles.detailRow}>
+                        <View style={styles.detailQuestionContainer}>
+                          <Text style={styles.detailQuestionNumber}>{idx + 1}.</Text>
+                          <Text style={styles.detailQuestionText}>{question.question_text}</Text>
+                        </View>
+                        <View style={styles.detailAnswerContainer}>
+                          <Text style={styles.detailAnswerText}>{option?.option_label || '-'}</Text>
+                          <View style={[
+                            styles.detailScoreBadge,
+                            {
+                              backgroundColor: Number(answer) <= 2 ? '#10B98120' :
+                                             Number(answer) <= 3 ? '#F59E0B20' : '#EF444420'
+                            }
+                          ]}>
+                            <Text style={[
+                              styles.detailScoreText,
+                              {
+                                color: Number(answer) <= 2 ? '#10B981' :
+                                      Number(answer) <= 3 ? '#F59E0B' : '#EF4444'
+                              }
+                            ]}>
+                              {answer} pts
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  })}
+              </View>
             </View>
-          </View>
+          </>
+        )}
+
+        {/* MMSE cognitive domains breakdown */}
+        {scale.id === 'mmse' && state.mmseScores && (
+          <>
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Dominios Cognitivos Evaluados</Text>
+
+              {/* Orientación Temporal */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Orientación Temporal</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.orientacionTemporal}/5
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.orientacionTemporal / 5) * 100}%`,
+                      backgroundColor: state.mmseScores.orientacionTemporal >= 4 ? '#10B981' :
+                                      state.mmseScores.orientacionTemporal >= 2 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Orientación Espacial */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Orientación Espacial</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.orientacionEspacial}/5
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.orientacionEspacial / 5) * 100}%`,
+                      backgroundColor: state.mmseScores.orientacionEspacial >= 4 ? '#10B981' :
+                                      state.mmseScores.orientacionEspacial >= 2 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Memoria Inmediata */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Memoria Inmediata (Registro)</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.memoriaInmediata}/3
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.memoriaInmediata / 3) * 100}%`,
+                      backgroundColor: state.mmseScores.memoriaInmediata >= 3 ? '#10B981' :
+                                      state.mmseScores.memoriaInmediata >= 2 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Atención y Cálculo */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Atención y Cálculo</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.atencionCalculo}/5
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.atencionCalculo / 5) * 100}%`,
+                      backgroundColor: state.mmseScores.atencionCalculo >= 4 ? '#10B981' :
+                                      state.mmseScores.atencionCalculo >= 2 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Memoria Diferida */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Memoria Diferida (Recuerdo)</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.memoriaDiferida}/3
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.memoriaDiferida / 3) * 100}%`,
+                      backgroundColor: state.mmseScores.memoriaDiferida >= 3 ? '#10B981' :
+                                      state.mmseScores.memoriaDiferida >= 2 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Lenguaje */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Lenguaje</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.lenguaje}/8
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.lenguaje / 8) * 100}%`,
+                      backgroundColor: state.mmseScores.lenguaje >= 6 ? '#10B981' :
+                                      state.mmseScores.lenguaje >= 4 ? '#F59E0B' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+
+              {/* Construcción Visuoespacial */}
+              <View style={styles.domainRow}>
+                <View style={styles.domainHeader}>
+                  <Text style={styles.domainLabel}>Construcción Visuoespacial</Text>
+                  <Text style={styles.domainScore}>
+                    {state.mmseScores.construccion}/1
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${(state.mmseScores.construccion / 1) * 100}%`,
+                      backgroundColor: state.mmseScores.construccion >= 1 ? '#10B981' : '#EF4444'
+                    }
+                  ]} />
+                </View>
+              </View>
+            </View>
+
+            {/* Detailed Answers */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Respuestas Detalladas</Text>
+              {sortedQuestions.map((question, idx) => {
+                const answer = state.responses[question.question_id];
+                const option = question.options.find(opt => opt.option_value === answer);
+                const isCorrect = Number(answer) === 1;
+
+                return (
+                  <View key={question.question_id} style={styles.answerDetailRow}>
+                    <View style={styles.answerQuestionContainer}>
+                      <Text style={styles.answerQuestionNumber}>{idx + 1}.</Text>
+                      <Text style={styles.answerQuestionText}>{question.question_text}</Text>
+                    </View>
+                    <View style={[
+                      styles.answerBadge,
+                      { backgroundColor: isCorrect ? '#10B98120' : '#EF444420' }
+                    ]}>
+                      <Text style={[
+                        styles.answerBadgeText,
+                        { color: isCorrect ? '#10B981' : '#EF4444' }
+                      ]}>
+                        {option?.option_label || answer}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </>
         )}
 
         {/* SF-36 dimensions breakdown */}
@@ -884,6 +1274,187 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     fontSize: 14,
     fontWeight: '500',
     color: colors.text,
+  },
+  // MMSE Domain Styles
+  domainRow: {
+    marginBottom: 20,
+  },
+  domainHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  domainLabel: {
+    fontSize: 14 * fontMultiplier,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+  },
+  domainScore: {
+    fontSize: 16 * fontMultiplier,
+    fontWeight: '700',
+    color: colors.primary,
+    marginLeft: 12,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: colors.surface,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  // MMSE Answer Details
+  answerDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border + '30',
+  },
+  answerQuestionContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    marginRight: 12,
+  },
+  answerQuestionNumber: {
+    fontSize: 13 * fontMultiplier,
+    fontWeight: '700',
+    color: colors.primary,
+    marginRight: 8,
+    minWidth: 24,
+  },
+  answerQuestionText: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.text,
+    flex: 1,
+  },
+  answerBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  answerBadgeText: {
+    fontSize: 12 * fontMultiplier,
+    fontWeight: '600',
+  },
+  // Boston Subscale Styles
+  subscaleSection: {
+    marginBottom: 24,
+  },
+  subscaleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  subscaleTitle: {
+    fontSize: 15 * fontMultiplier,
+    fontWeight: '700',
+    color: colors.text,
+    flex: 1,
+  },
+  subscaleScoreBadge: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    backgroundColor: colors.primary + '15',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  subscaleScoreValue: {
+    fontSize: 20 * fontMultiplier,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  subscaleScoreMax: {
+    fontSize: 14 * fontMultiplier,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  subscaleInterpretation: {
+    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    marginBottom: 12,
+  },
+  subscaleLevel: {
+    fontSize: 16 * fontMultiplier,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  subscaleDescription: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.textSecondary,
+    lineHeight: 20,
+  },
+  // Boston Detail Rows
+  categorySection: {
+    marginTop: 16,
+  },
+  categoryHeaderBoston: {
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginBottom: 12,
+  },
+  categoryTitleBoston: {
+    fontSize: 13 * fontMultiplier,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  detailRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border + '40',
+  },
+  detailQuestionContainer: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  detailQuestionNumber: {
+    fontSize: 13 * fontMultiplier,
+    fontWeight: '700',
+    color: colors.primary,
+    marginRight: 8,
+    minWidth: 28,
+  },
+  detailQuestionText: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.text,
+    flex: 1,
+    lineHeight: 19,
+  },
+  detailAnswerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 36,
+  },
+  detailAnswerText: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.textSecondary,
+    flex: 1,
+    fontWeight: '500',
+  },
+  detailScoreBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 12,
+  },
+  detailScoreText: {
+    fontSize: 12 * fontMultiplier,
+    fontWeight: '700',
   },
 });
 

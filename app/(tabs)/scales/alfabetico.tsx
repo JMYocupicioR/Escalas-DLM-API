@@ -4,7 +4,20 @@ import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { SearchWidget } from '@/components/SearchWidget';
-import { Star, ArrowRight, Clock } from 'lucide-react-native';
+import { ScaleCard, ScaleCardData } from '@/components/Card';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
+import { calculateGridConfig, shouldUseListView } from '@/utils/responsiveGrid';
+import { Star, ArrowRight, Clock, Activity, Brain, Heart, TrendingUp } from 'lucide-react-native';
+
+// Category icons and colors mapping
+const CATEGORY_STYLES = {
+  'Funcional': { icon: Activity, color: '#10b981' },
+  'Neurológica': { icon: Brain, color: '#8b5cf6' },
+  'Dolor': { icon: Heart, color: '#ef4444' },
+  'Cognitiva': { icon: Brain, color: '#f59e0b' },
+  'default': { icon: Activity, color: '#0891b2' },
+};
 
 const SCALES = [
   {
@@ -14,6 +27,9 @@ const SCALES = [
     description: 'Evaluación de actividades básicas de la vida diaria',
     popular: true,
     timeToComplete: '5-10 min',
+    category: 'Funcional',
+    rating: 4.8,
+    uses: 1247,
   },
   {
     id: 'gas',
@@ -22,6 +38,9 @@ const SCALES = [
     description: 'Evaluación centrada en objetivos personalizados (rehabilitación)',
     popular: true,
     timeToComplete: '10-20 min',
+    category: 'Funcional',
+    rating: 4.6,
+    uses: 892,
   },
   {
     id: 'glasgow',
@@ -30,6 +49,31 @@ const SCALES = [
     description: 'Evaluación del nivel de consciencia',
     popular: true,
     timeToComplete: '2 min',
+    category: 'Neurológica',
+    rating: 4.9,
+    uses: 982,
+  },
+  {
+    id: 'fim',
+    name: 'Escala de Independencia Funcional (FIM)',
+    acronym: 'FIM',
+    description: 'Evaluación de la discapacidad y carga de cuidados en rehabilitación',
+    popular: true,
+    timeToComplete: '20-30 min',
+    category: 'Funcional',
+    rating: 4.6,
+    uses: 654,
+  },
+  {
+    id: 'weefim',
+    name: 'WeeFIM (Medida de Independencia Funcional para Niños)',
+    acronym: 'WeeFIM',
+    description: 'Versión pediátrica de FIM: autocuidado, movilidad y cognición (18 ítems)',
+    popular: false,
+    timeToComplete: '15-30 min',
+    category: 'Funcional',
+    rating: 4.8,
+    uses: 1328,
   },
   {
     id: 'hine',
@@ -38,6 +82,9 @@ const SCALES = [
     description: 'Evaluación neurológica estandarizada para lactantes de 2 a 24 meses',
     popular: true,
     timeToComplete: '30-45 min',
+    category: 'Neurológica',
+    rating: 4.7,
+    uses: 523,
   },
   {
     id: 'mmse',
@@ -46,6 +93,9 @@ const SCALES = [
     description: 'Evaluación del estado cognitivo',
     popular: true,
     timeToComplete: '10 min',
+    category: 'Cognitiva',
+    rating: 4.7,
+    uses: 756,
   },
   {
     id: 'ogs',
@@ -54,6 +104,9 @@ const SCALES = [
     description: 'Evaluación cualitativa de parámetros de la marcha',
     popular: false,
     timeToComplete: '15 min',
+    category: 'Funcional',
+    rating: 4.3,
+    uses: 378,
   },
   {
     id: 'sf36',
@@ -62,6 +115,9 @@ const SCALES = [
     description: 'Cuestionario de calidad de vida relacionada con la salud que evalúa 8 dimensiones del estado de salud físico y mental',
     popular: true,
     timeToComplete: '10-15 min',
+    category: 'Funcional',
+    rating: 4.7,
+    uses: 892,
   },
   {
     id: 'berg',
@@ -70,6 +126,9 @@ const SCALES = [
     description: 'Evaluación funcional del equilibrio estático y dinámico a través de 14 tareas',
     popular: true,
     timeToComplete: '15-20 min',
+    category: 'Funcional',
+    rating: 4.8,
+    uses: 734,
   },
   {
     id: 'katz',
@@ -78,6 +137,9 @@ const SCALES = [
     description: 'Evaluación de la independencia funcional en actividades básicas de la vida diaria en adultos mayores',
     popular: true,
     timeToComplete: '5-10 min',
+    category: 'Funcional',
+    rating: 4.6,
+    uses: 612,
   },
   {
     id: 'lequesne-rodilla-es-v1',
@@ -86,6 +148,9 @@ const SCALES = [
     description: 'Cuestionario para cuantificar dolor/malestar, distancia máxima de marcha y dificultades en la vida diaria en osteoartritis de rodilla',
     popular: false,
     timeToComplete: '3-5 min',
+    category: 'Dolor',
+    rating: 4.5,
+    uses: 432,
   },
   {
     id: 'boston',
@@ -94,6 +159,9 @@ const SCALES = [
     description: 'Evaluación de síntomas y función en síndrome del túnel carpiano',
     popular: false,
     timeToComplete: '5-10 min',
+    category: 'Dolor',
+    rating: 4.4,
+    uses: 289,
   },
   {
     id: 'norton',
@@ -102,6 +170,9 @@ const SCALES = [
     description: 'Valoración del riesgo de úlceras por presión',
     popular: false,
     timeToComplete: '5 min',
+    category: 'Funcional',
+    rating: 4.2,
+    uses: 445,
   },
   {
     id: 'vas',
@@ -110,6 +181,9 @@ const SCALES = [
     description: 'Evaluación del dolor',
     popular: true,
     timeToComplete: '1 min',
+    category: 'Dolor',
+    rating: 4.8,
+    uses: 1156,
   },
   {
     id: 'borg',
@@ -118,6 +192,9 @@ const SCALES = [
     description: 'Evaluación de disnea',
     popular: false,
     timeToComplete: '2 min',
+    category: 'Funcional',
+    rating: 4.5,
+    uses: 567,
   },
   {
     id: '6mwt',
@@ -126,6 +203,9 @@ const SCALES = [
     description: 'Evaluación de la capacidad funcional y tolerancia al ejercicio mediante distancia recorrida',
     popular: true,
     timeToComplete: '15-20 min',
+    category: 'Funcional',
+    rating: 4.7,
+    uses: 823,
   },
   {
     id: 'tinetti',
@@ -134,6 +214,9 @@ const SCALES = [
     description: 'Evaluación del equilibrio y la marcha',
     popular: false,
     timeToComplete: '10-15 min',
+    category: 'Funcional',
+    rating: 4.6,
+    uses: 498,
   },
   // Add more scales...
 ].sort((a, b) => a.name.localeCompare(b.name));
@@ -141,7 +224,19 @@ const SCALES = [
 export default function AlphabeticalScalesScreen() {
   const { colors } = useScaleStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { width, isTablet, isDesktop, isLandscape } = useResponsiveLayout();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Responsive grid configuration
+  const gridConfig = useMemo(() => calculateGridConfig({
+    screenWidth: width,
+    isPhone: !isTablet && !isDesktop,
+    isTablet,
+    isDesktop,
+    isLandscape,
+  }), [width, isTablet, isDesktop, isLandscape]);
+
+  const useListView = shouldUseListView(width);
 
   const groupedScales = useMemo(() => {
     const filtered = SCALES.filter(scale =>
@@ -161,6 +256,22 @@ export default function AlphabeticalScalesScreen() {
   }, [searchQuery]);
 
   const letters = Object.keys(groupedScales).sort();
+
+  // Convert scale data to ScaleCardData format
+  const convertToCardData = (scale: typeof SCALES[0]): ScaleCardData => {
+    const categoryStyle = CATEGORY_STYLES[scale.category as keyof typeof CATEGORY_STYLES] || CATEGORY_STYLES.default;
+    return {
+      id: scale.id,
+      name: scale.name,
+      description: scale.description,
+      category: scale.category,
+      categoryColor: categoryStyle.color,
+      icon: categoryStyle.icon,
+      uses: scale.uses,
+      rating: scale.rating,
+      timeToComplete: scale.timeToComplete,
+    };
+  };
 
   const AlphabeticalIndex = () => (
     <View style={styles.alphabeticalIndex}>
@@ -183,6 +294,18 @@ export default function AlphabeticalScalesScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
+          headerLeft: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => router.push('/')}> 
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Inicio</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / </Text>
+              <TouchableOpacity onPress={() => router.push('/scales')}>
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Escalas</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / Por abecedario</Text>
+            </View>
+          ),
         }}
       />
       <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -198,33 +321,55 @@ export default function AlphabeticalScalesScreen() {
         <ScrollView style={styles.content}>
           {letters.map(letter => (
             <View key={letter} style={styles.section}>
-              <Text style={styles.sectionTitle}>{letter}</Text>
+              <View style={styles.sectionHeaderRow}>
+                <Text style={styles.sectionTitle}>{letter}</Text>
+                <Text style={styles.sectionCount}>{groupedScales[letter].length} escalas</Text>
+              </View>
               
-              {groupedScales[letter].map(scale => (
-                <TouchableOpacity
-                  key={scale.id}
-                  style={styles.scaleCard}
-                  onPress={() => router.push(`/scales/${scale.id}`)}
-                >
-                  <View style={styles.scaleContent}>
-                    <View style={styles.scaleHeader}>
-                      <View>
-                        <Text style={styles.scaleName}>{scale.name}</Text>
-                        <Text style={styles.scaleAcronym}>{scale.acronym}</Text>
-                      </View>
-                      {scale.popular && (
-                        <Star size={20} color={colors.scoreGood} fill={colors.scoreGood} />
-                      )}
+              <View style={[
+                styles.scalesGrid,
+                { 
+                  flexDirection: useListView ? 'column' : 'row',
+                  gap: gridConfig.gap,
+                }
+              ]}>
+                {groupedScales[letter].map(scale => {
+                  const scaleData = convertToCardData(scale);
+                  return (
+                    <View
+                      key={scale.id}
+                      style={[
+                        styles.scaleCardWrapper,
+                        useListView ? styles.scaleCardFull : styles.scaleCardGrid(gridConfig.columns)
+                      ]}
+                    >
+                      <ScaleCard
+                        scale={scaleData}
+                        layout={useListView ? 'list' : 'grid'}
+                        onPress={() => router.push(`/scales/${scale.id}`)}
+                        showStats={true}
+                        showCategory={true}
+                        rightElement={
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            {scale.id === 'weefim' && (
+                              <View style={styles.newBadge}>
+                                <Text style={styles.newBadgeText}>Nuevo</Text>
+                              </View>
+                            )}
+                            {scale.popular ? (
+                              <View style={styles.popularBadge}>
+                                <Star size={14} color={colors.scoreGood} fill={colors.scoreGood} />
+                              </View>
+                            ) : (
+                              <FavoriteButton scaleId={scale.id} size={16} />
+                            )}
+                          </View>
+                        }
+                      />
                     </View>
-                    <Text style={styles.scaleDescription}>{scale.description}</Text>
-                    <View style={styles.timeInfo}>
-                      <Clock size={16} color={colors.mutedText} />
-                      <Text style={styles.timeText}>{scale.timeToComplete}</Text>
-                    </View>
-                  </View>
-                  <ArrowRight size={20} color={colors.mutedText} />
-                </TouchableOpacity>
-              ))}
+                  );
+                })}
+              </View>
             </View>
           ))}
 
@@ -276,12 +421,58 @@ const createStyles = (colors: any) => StyleSheet.create({
   section: {
     marginTop: 24,
     paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 16,
+  },
+  sectionCount: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.mutedText,
+  },
+  scalesGrid: {
+    flexWrap: 'wrap',
+  },
+  scaleCardWrapper: {
+    marginBottom: 12,
+  },
+  scaleCardFull: {
+    width: '100%',
+  },
+  scaleCardGrid: (columns: number) => ({
+    width: columns === 3 ? 'calc(33.333% - 12px)' : columns === 2 ? 'calc(50% - 12px)' : '100%',
+    ...Platform.select({
+      default: {
+        width: columns === 3 ? '31%' : columns === 2 ? '47%' : '100%',
+      },
+    }),
+  }),
+  popularBadge: {
+    padding: 4,
+    borderRadius: 8,
+    backgroundColor: `${colors.scoreGood}15`,
+  },
+  newBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: `${colors.primary}15`,
+  },
+  newBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   scaleCard: {
     flexDirection: 'row',
@@ -339,5 +530,20 @@ const createStyles = (colors: any) => StyleSheet.create({
   lastUpdateText: {
     fontSize: 12,
     color: colors.mutedText,
+  },
+  newBadge: {
+    backgroundColor: `${colors.primary}15`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}40`,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+  },
+  newBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });

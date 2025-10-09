@@ -18,7 +18,7 @@ const renderHtmlForScale = (payload) => {
         // Dynamic import via direct file to keep tree-shaking predictable
         return require('./botulinum').generateHtml(payload);
     }
-    if (id === 'fim') {
+    if (id === 'fim' || id === 'weefim') {
         return require('./fim').generateHtml(payload);
     }
     if (id === 'barthel') {
@@ -34,6 +34,7 @@ exports.renderHtmlForScale = renderHtmlForScale;
 exports.TEMPLATE_MAP = {
     botulinum: (payload) => require('./botulinum').generateHtml(payload),
     fim: (payload) => require('./fim').generateHtml(payload),
+    weefim: (payload) => require('./fim').generateHtml(payload),
     barthel: (payload) => require('./barthel').generateHtml(payload),
     lequesne: (payload) => require('./lequesne').generateHtml(payload),
     'lequesne-rodilla-es-v1': (payload) => require('./lequesne').generateHtml(payload),

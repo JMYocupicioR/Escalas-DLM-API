@@ -24,6 +24,8 @@ import { lequesneQuestions, getLequesneInterpretation } from './lequesne';
 import { tinettiScale, tinettiQuestions, scoreInterpretation as tinettiScoreInterp } from './tinetti';
 import { sixMWT } from './6mwt';
 import { mocaScale, mocaQuestions } from './moca';
+import { mmseScale, mmseQuestions, scoreInterpretation as mmseScoreInterp } from './mmse';
+import { weefimScale as weefim, weefimQuestions, weefimOptions } from './weefim';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
 /**
@@ -200,6 +202,16 @@ export const scales: Scale[] = [
     specialty: 'Medicina Física y Rehabilitación',
     searchTerms: ['FIM', 'functional independence measure', 'independencia funcional', 'discapacidad', 'rehabilitación'],
     imageUrl: 'https://images.unsplash.com/photo-1571019614113-b8dcf0bf7e56?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'weefim',
+    name: 'WeeFIM (Medida de Independencia Funcional para Niños)',
+    description: 'Evaluación pediátrica (6m-18a) de independencia funcional en autocuidado, movilidad y cognición (18 ítems, 1–7 c/u).',
+    timeToComplete: '15-30 min',
+    category: 'Rehab',
+    specialty: 'Pediatría',
+    searchTerms: ['weefim', 'wee-fim', 'fim pediátrico', 'independencia funcional', 'rehabilitación', 'pediatría', 'niños'],
+    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center',
   },
   {
     id: 'lequesne-rodilla-es-v1',
@@ -1320,3 +1332,293 @@ if (existingMocaIndex !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['moca'] = mocaDetailed as any;
+
+// ========================================
+// MMSE (MINI-MENTAL STATE EXAMINATION)
+// ========================================
+
+/**
+ * Adapta el Mini-Mental State Examination (MMSE) al formato ScaleWithDetails.
+ *
+ * MMSE evalúa:
+ * - Orientación temporal (5 puntos)
+ * - Orientación espacial (5 puntos)
+ * - Memoria inmediata/Registro (3 puntos)
+ * - Atención y cálculo (5 puntos)
+ * - Memoria diferida/Recuerdo (3 puntos)
+ * - Lenguaje (8 puntos)
+ * - Construcción visuoespacial (1 punto)
+ *
+ * Scoring: Suma directa (0-30 puntos)
+ * - 24-30: Normal
+ * - 18-23: Deterioro leve
+ * - 0-17: Deterioro severo
+ */
+const buildMMSEDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'mmse';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = mmseQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: q.question_type === 'text_input' ? 'text' : 'single_choice',
+      order_index: q.order_index,
+      is_required: true,
+      category: q.category,
+      instructions: q.instructions,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = mmseScoreInterp.map((r, idx) => ({
+    id: `r_mmse_${idx+1}`,
+    scoring_id: 'scoring_mmse',
+    min_value: r.min,
+    max_value: r.max,
+    interpretation_level: r.level,
+    interpretation_text: r.interpretation,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: r.recommendations,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_mmse',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 30,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: mmseScale.name,
+    acronym: mmseScale.acronym,
+    description: mmseScale.description,
+    category: mmseScale.category,
+    specialty: mmseScale.specialty,
+    body_system: mmseScale.body_system,
+    tags: mmseScale.tags,
+    time_to_complete: mmseScale.timeToComplete,
+    popularity: 0,
+    popular: true,
+    image_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
+    instructions: mmseScale.information,
+    version: mmseScale.version,
+    language: mmseScale.language,
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: mmseScale.cross_references || [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: mmseScale.license,
+    questions,
+    scoring,
+    references: mmseScale.references?.map((ref, idx) => ({
+      id: `ref_mmse_${idx+1}`,
+      scale_id: scaleId,
+      title: ref.title,
+      authors: ref.authors,
+      year: ref.year,
+      journal: ref.journal,
+      volume: ref.volume,
+      issue: ref.issue,
+      pages: ref.pages,
+      pmid: ref.pmid,
+      is_primary: ref.is_primary,
+      reference_type: ref.reference_type,
+      created_at: now,
+    })) || [],
+    translations: [],
+  };
+  return detailed;
+};
+
+const mmseDetailed = buildMMSEDetailed();
+
+const existingMMSEIndex = scales.findIndex(s => s.id === 'mmse');
+if (existingMMSEIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingMMSEIndex] = { ...(scales[existingMMSEIndex] as any), ...mmseDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(mmseDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['mmse'] = mmseDetailed as any;
+
+// Adapt WeeFIM to generic evaluation shape expected by ScaleEvaluation
+const buildWeeFIMDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'weefim';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = weefimQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = weefimOptions.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx + 1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: q.category,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  // Scoring: suma 18–126; rangos clínicos alineados a FIM/WeeFIM
+  const ranges: ScoringRange[] = [
+    {
+      id: 'weefim_r1',
+      scoring_id: 'scoring_weefim',
+      min_value: 0,
+      max_value: 35.99,
+      interpretation_level: 'Dependencia completa',
+      interpretation_text: 'Requiere asistencia total en la mayoría de actividades evaluadas.',
+      order_index: 1,
+      created_at: now,
+      color_code: '#EF4444',
+      recommendations: undefined,
+    },
+    {
+      id: 'weefim_r2',
+      scoring_id: 'scoring_weefim',
+      min_value: 36,
+      max_value: 71.99,
+      interpretation_level: 'Dependencia severa',
+      interpretation_text: 'Asistencia significativa en múltiples actividades.',
+      order_index: 2,
+      created_at: now,
+      color_code: '#F59E0B',
+      recommendations: undefined,
+    },
+    {
+      id: 'weefim_r3',
+      scoring_id: 'scoring_weefim',
+      min_value: 72,
+      max_value: 107.99,
+      interpretation_level: 'Dependencia moderada',
+      interpretation_text: 'Requiere supervisión o asistencia parcial en diversas actividades.',
+      order_index: 3,
+      created_at: now,
+      color_code: '#84CC16',
+      recommendations: undefined,
+    },
+    {
+      id: 'weefim_r4',
+      scoring_id: 'scoring_weefim',
+      min_value: 108,
+      max_value: 126,
+      interpretation_level: 'Independencia completa o modificada',
+      interpretation_text: 'Alto grado de autonomía; puede requerir adaptaciones o más tiempo.',
+      order_index: 4,
+      created_at: now,
+      color_code: '#10B981',
+      recommendations: undefined,
+    },
+  ];
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_weefim',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 18,
+    max_score: 126,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: weefim.name,
+    acronym: weefim.acronym,
+    description: weefim.description,
+    category: weefim.category,
+    specialty: weefim.specialty,
+    body_system: undefined,
+    tags: [],
+    time_to_complete: weefim.timeToComplete,
+    popularity: 0,
+    popular: false,
+    image_url: undefined,
+    instructions: weefim.instructions,
+    version: '1.0',
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: undefined,
+    questions,
+    scoring,
+    references: [],
+    translations: [],
+  };
+  return detailed;
+};
+
+const weefimDetailed = buildWeeFIMDetailed();
+
+const existingWeeFIMIndex = scales.findIndex(s => s.id === 'weefim');
+if (existingWeeFIMIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingWeeFIMIndex] = { ...(scales[existingWeeFIMIndex] as any), ...weefimDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(weefimDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['weefim'] = weefimDetailed as any;

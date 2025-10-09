@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useState, useCallback, memo, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform } from 'react-native';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +28,8 @@ export default function FunctionalScalesScreen() {
   const { colors } = useScaleStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [searchQuery, setSearchQuery] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
+  const [sectionPositions, setSectionPositions] = useState<Record<string, number>>({});
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -38,7 +40,7 @@ export default function FunctionalScalesScreen() {
   }, []);
 
   // Componente ScaleCard memoizado
-  const ScaleCard = memo(({ scale }) => (
+  const ScaleCard = memo(({ scale, sectionTitle }: any) => (
     <TouchableOpacity
       style={styles.scaleCard}
       onPress={() => navigateToScale(scale.id)}
@@ -55,8 +57,15 @@ export default function FunctionalScalesScreen() {
             <Clock size={16} color={colors.mutedText} />
             <Text style={styles.timeText}>{scale.timeToComplete}</Text>
           </View>
-          <View style={styles.categoryTag}>
-            <Text style={styles.categoryText}>{scale.category}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {scale.id === 'weefim' && (
+              <View style={styles.newBadge}>
+                <Text style={styles.newBadgeText}>Nuevo</Text>
+              </View>
+            )}
+            <View style={styles.categoryTag}>
+              <Text style={styles.categoryText}>{sectionTitle}</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -69,10 +78,22 @@ export default function FunctionalScalesScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
+          headerLeft: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => router.push('/')}> 
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Inicio</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / </Text>
+              <TouchableOpacity onPress={() => router.push('/scales')}>
+                <Text style={{ color: colors.primary, fontWeight: '600' }}>Escalas</Text>
+              </TouchableOpacity>
+              <Text style={{ color: colors.mutedText }}> / Por función</Text>
+            </View>
+          ),
         }}
       />
       <SafeAreaView style={styles.container} edges={['bottom']}>
-        <ScrollView style={styles.content}>
+        <ScrollView style={styles.content} ref={scrollRef}>
           <View style={styles.searchContainer}>
             <SearchWidget
               onSearch={handleSearch}
@@ -80,22 +101,53 @@ export default function FunctionalScalesScreen() {
             />
           </View>
 
+          {/* Índice de categorías */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipsRow}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+          >
+            {Object.entries(functionalCategories).map(([key, section]) => (
+              <TouchableOpacity
+                key={key}
+                style={styles.chip}
+                onPress={() => {
+                  const y = sectionPositions[key];
+                  if (y !== undefined) {
+                    scrollRef.current?.scrollTo({ y: Math.max(0, y - 8), animated: true });
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={`Ir a ${section.title}`}
+              >
+                <Text style={styles.chipText}>{section.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
           {Object.entries(functionalCategories).map(([key, section]) => {
-            const filteredScales = section.scales
-              .map(id => scalesById[id])
-              .filter(
-                scale =>
-                  scale &&
-                  (scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    scale.description.toLowerCase().includes(searchQuery.toLowerCase()))
-              );
+            const q = searchQuery.trim().toLowerCase();
+            const allScales = section.scales.map(id => scalesById[id]).filter(Boolean);
+            const categoryMatches = q && (section.title.toLowerCase().includes(q) || section.description.toLowerCase().includes(q));
+            const filteredScales = (q.length === 0 || categoryMatches)
+              ? allScales
+              : allScales.filter(scale => (
+                  scale.name.toLowerCase().includes(q) ||
+                  (scale.description || '').toLowerCase().includes(q)
+                ));
+            filteredScales.sort((a, b) => a.name.localeCompare(b.name));
 
             if (filteredScales.length === 0) {
               return null;
             }
 
             return (
-              <View key={key} style={styles.section}>
+              <View
+                key={key}
+                style={styles.section}
+                onLayout={(e) => setSectionPositions(prev => ({ ...prev, [key]: e.nativeEvent.layout.y }))}
+              >
                 <View style={styles.sectionHeader}>
                   <ImageWithFallback
                     uri={section.image}
@@ -106,12 +158,15 @@ export default function FunctionalScalesScreen() {
                     <Text style={styles.sectionDescription}>
                       {section.description}
                     </Text>
+                    <Text style={[styles.sectionDescription, { marginTop: 4 }]}>
+                      {filteredScales.length} escala{filteredScales.length === 1 ? '' : 's'}
+                    </Text>
                   </View>
                 </View>
 
                 <View style={styles.scalesList}>
                   {filteredScales.map(scale => (
-                    <ScaleCard key={scale.id} scale={scale} />
+                    <ScaleCard key={scale.id} scale={scale} sectionTitle={section.title} />
                   ))}
                 </View>
               </View>
@@ -142,6 +197,26 @@ const createStyles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.card,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  chipsRow: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.card,
+  },
+  chip: {
+    backgroundColor: colors.sectionBackground,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+  },
+  chipText: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '500',
   },
   section: {
     marginTop: 24,
@@ -227,6 +302,21 @@ const createStyles = (colors: any) => StyleSheet.create({
   timeText: {
     fontSize: 14,
     color: colors.mutedText,
+  },
+  newBadge: {
+    backgroundColor: `${colors.primary}15`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}40`,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+  },
+  newBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   categoryTag: {
     backgroundColor: colors.tagBackground,
