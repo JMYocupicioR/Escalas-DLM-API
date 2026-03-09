@@ -47,8 +47,10 @@ const RETRY_DELAY = 1000; // ms
  * Security-sensitive values are loaded from environment variables.
  */
 export const supabaseConfig: SupabaseConfig = {
-  url: getEnvVariable('SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_URL'),
-  anonKey: getEnvVariable('SUPABASE_ANON_KEY', 'EXPO_PUBLIC_SUPABASE_ANON_KEY'),
+  // IMPORTANT: Expo/Metro only replaces process.env.EXPO_PUBLIC_* when accessed
+  // directly (statically). Dynamic access like process.env[key] does NOT work.
+  url: process.env.EXPO_PUBLIC_SUPABASE_URL || Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL || '',
+  anonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
   authSessionKey: 'deepLuxMed.auth.token',
   maxRetries: MAX_RETRIES,
   retryDelay: RETRY_DELAY,
