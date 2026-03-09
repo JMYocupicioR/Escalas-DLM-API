@@ -1,0 +1,220 @@
+{
+  "name": "Cuestionario de Boston para el Síndrome del Túnel Carpiano (Demo)",
+  "acronym": "BCTQ-Demo",
+  "description": "Versión demo con 8 ítems para validar la carga de dominios y scoring.",
+  "categories": [
+    "Ortopedia",
+    "Fisioterapia",
+    "Neurología"
+  ],
+  "current_version": {
+    "version_number": "2.1",
+    "status": "draft",
+    "config": {
+      "language": "es",
+      "original_author": "Levine et al.",
+      "estimated_time": 5,
+      "instructions": "Por favor, responda todas las preguntas basándose en sus síntomas durante las últimas dos semanas.",
+      "validation_info": "Versión demo para pruebas de sistema.",
+      "tags": [
+        "Túnel Carpiano",
+        "SSS",
+        "FSS"
+      ],
+      "bibliography": [
+        {
+          "title": "A self-administered questionnaire for the assessment of severity of symptoms and functional status in carpal tunnel syndrome",
+          "authors": ["Levine DW", "Simmons BP"],
+          "year": 1993,
+          "journal": "J Bone Joint Surg Am",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8486940/",
+          "reference_type": "original",
+          "is_primary": true
+        }
+      ]
+    },
+    "questions": [
+      {
+        "id": "sss_1_dolor_noche",
+        "type": "single_choice",
+        "order_index": 1,
+        "text": "¿Qué gravedad tiene el dolor de mano o muñeca por la noche?",
+        "description": "Sección: Severidad de Síntomas. ",
+        "image_url": "https://images.unsplash.com/photo-1623944889288-cd147dbb517c?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Ninguno", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Moderado", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Intenso", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "Muy intenso", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "sss_3_dolor_dia",
+        "type": "single_choice",
+        "order_index": 3,
+        "text": "¿Suele tener dolor en la mano o muñeca durante el día?",
+        "description": "",
+        "image_url": "https://images.unsplash.com/photo-1551009175-15bdf9dcb580?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Nunca", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Moderado", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Intenso", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "Muy intenso", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "sss_6_adormecimiento",
+        "type": "single_choice",
+        "order_index": 6,
+        "text": "¿Tiene adormecimiento (falta de sensibilidad) en la mano?",
+        "description": "",
+        "image_url": "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Ninguno", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Moderado", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Intenso", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "Muy intenso", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "sss_11_pinza",
+        "type": "single_choice",
+        "order_index": 11,
+        "text": "¿Tiene dificultad para agarrar y sujetar objetos pequeños?",
+        "description": "Ejemplo: llaves, monedas o un bolígrafo. ",
+        "image_url": "https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Ninguna dificultad", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Moderada", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Intensa", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "Muy intensa", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "fss_1_escribir",
+        "type": "single_choice",
+        "order_index": 12,
+        "text": "Dificultad para escribir",
+        "description": "Sección: Estado Funcional. ",
+        "image_url": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Sin dificultad", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Dificultad leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Dificultad moderada", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Dificultad intensa", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "No puede hacerlo", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "fss_4_telefono",
+        "type": "single_choice",
+        "order_index": 15,
+        "text": "Sujetar el auricular del teléfono",
+        "description": "",
+        "image_url": "https://images.unsplash.com/photo-1520923642038-b4259ace9789?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Sin dificultad", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Dificultad leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Dificultad moderada", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Dificultad intensa", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "No puede hacerlo", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "fss_5_frascos",
+        "type": "single_choice",
+        "order_index": 16,
+        "text": "Abrir frascos o botes de rosca",
+        "description": "",
+        "image_url": "https://images.unsplash.com/photo-1584263347416-85a18a482d99?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Sin dificultad", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Dificultad leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Dificultad moderada", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Dificultad intensa", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "No puede hacerlo", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      },
+      {
+        "id": "fss_7_bolsas",
+        "type": "single_choice",
+        "order_index": 18,
+        "text": "Llevar bolsas de la compra",
+        "description": "",
+        "image_url": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400",
+        "options": [
+          { "label": "Sin dificultad", "value": 1, "score": 1, "order_index": 0 },
+          { "label": "Dificultad leve", "value": 2, "score": 2, "order_index": 1 },
+          { "label": "Dificultad moderada", "value": 3, "score": 3, "order_index": 2 },
+          { "label": "Dificultad intensa", "value": 4, "score": 4, "order_index": 3 },
+          { "label": "No puede hacerlo", "value": 5, "score": 5, "order_index": 4 }
+        ],
+        "validation": { "required": true }
+      }
+    ],
+    "scoring": {
+      "engine": "average",
+      "ranges": [
+        {
+          "min": 1.0,
+          "max": 1.5,
+          "label": "Estado Normal",
+          "interpretation": "Sin síntomas significativos.",
+          "alert_level": "none",
+          "color": "#16a34a"
+        },
+        {
+          "min": 3.9,
+          "max": 5.0,
+          "label": "Severo",
+          "interpretation": "Disfunción grave.",
+          "alert_level": "critical",
+          "color": "#dc2626"
+        }
+      ],
+      "domains": [
+        {
+          "id": "sss",
+          "label": "Severidad de Síntomas",
+          "engine": "average",
+          "question_ids": [
+            "sss_1_dolor_noche",
+            "sss_3_dolor_dia",
+            "sss_6_adormecimiento",
+            "sss_11_pinza"
+          ],
+          "ranges": [
+             { "min": 1.0, "max": 1.5, "label": "Normal", "interpretation": "Sin síntomas.", "color": "#16a34a" },
+             { "min": 1.51, "max": 5.0, "label": "Sintomático", "interpretation": "Presencia de síntomas.", "color": "#f97316" }
+          ]
+        },
+        {
+          "id": "fss",
+          "label": "Estado Funcional",
+          "engine": "average",
+          "question_ids": [
+            "fss_1_escribir",
+            "fss_4_telefono",
+            "fss_5_frascos",
+            "fss_7_bolsas"
+          ],
+          "ranges": [
+             { "min": 1.0, "max": 1.5, "label": "Funcional", "interpretation": "Sin limitación.", "color": "#16a34a" },
+             { "min": 1.51, "max": 5.0, "label": "Disfuncional", "interpretation": "Con limitación.", "color": "#dc2626" }
+          ]
+        }
+      ]
+    }
+  }
+}

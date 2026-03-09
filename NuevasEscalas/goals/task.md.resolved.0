@@ -1,0 +1,14 @@
+# Documentation Tasks
+
+- [ ] Analyze Codebase <!-- id: 0 -->
+    - [ ] Analyze [types.ts](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/types.ts) and [medical-scale.schema.ts](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/medical-scale.schema.ts) for JSON structure <!-- id: 1 -->
+    - [ ] Analyze [ScaleBuilder.tsx](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleBuilder.tsx) for creation workflow <!-- id: 2 -->
+    - [ ] Analyze [ScaleRunner.tsx](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx) for execution logic <!-- id: 3 -->
+    - [ ] Analyze [ScaleService.ts](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/services/ScaleService.ts) and database migrations for data handling and sharing <!-- id: 4 -->
+- [ ] Draft Documentation <!-- id: 5 -->
+    - [ ] Section: Scale Generation Process <!-- id: 6 -->
+    - [ ] Section: JSON Structure & Converter <!-- id: 7 -->
+    - [ ] Section: Information Handling <!-- id: 8 -->
+    - [ ] Section: Scale Builder & Runner <!-- id: 9 -->
+    - [ ] Section: Sharing & Permissions <!-- id: 10 -->
+- [ ] Review and Verify <!-- id: 11 -->

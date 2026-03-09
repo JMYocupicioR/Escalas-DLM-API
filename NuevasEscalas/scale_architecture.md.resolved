@@ -1,0 +1,133 @@
+# Arquitectura de Renderizado y Scoring de Escalas
+
+Este documento detalla el flujo técnico de cómo **ScaleForge** procesa, renderiza y calcula los resultados de una escala médica, desde la base de datos hasta el resultado final entregado al usuario.
+
+## 1. Carga de Datos ([ScaleService](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/services/ScaleService.ts#6-593))
+
+El proceso comienza cuando la aplicación solicita una escala (por ejemplo, al abrir el [ScaleRunner](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#29-245)).
+
+### Fuente de Datos
+Los datos residen en Supabase distribuidos en varias tablas relacionales:
+*   `medical_scales`: Información base (nombre, descripción, config).
+*   `scale_questions`: Lista de preguntas, orden, tipo y opciones.
+*   `scale_scoring`: Configuración del motor de puntuación (global y dominios).
+*   `scoring_ranges`: Rangos de interpretación (ej: 0-10 = Leve).
+
+### Transformación ([getScaleById](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/services/ScaleService.ts#174-257))
+El servicio [ScaleService](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/services/ScaleService.ts#6-593) realiza una consulta compleja (Join) y **transforma** la respuesta plana de la base de datos en un objeto jerárquico [MedicalScale](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/medical-scale.schema.ts#117-118).
+
+**Punto Clave:** El backend reconstruye el objeto `current_version` en tiempo de ejecución, unificando la configuración de scoring global y los dominios específicos en una sola estructura:
+
+```typescript
+// Estructura simplificada en memoria
+const scoringSchema = {
+  engine: 'average', // Motor global (si aplica)
+  ranges: [...],     // Rangos globales
+  domains: [         // Array de sub-escalas
+    {
+      id: 'sss',
+      label: 'Severidad de Síntomas',
+      engine: 'average',
+      question_ids: ['q1', 'q2', ...],
+      ranges: [...]
+    }
+  ]
+};
+```
+
+---
+
+## 2. Renderizado ([ScaleRunner](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#29-245))
+
+El componente [ScaleRunner](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#29-245) recibe el objeto [MedicalScale](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/medical-scale.schema.ts#117-118) y orquesta la interfaz de usuario.
+
+### Ciclo de Renderizado
+1.  **Inicialización**: Se valida que exista una `current_version`.
+2.  **Gestión de Estado**: Se utiliza `react-hook-form` para manejar las respuestas del usuario. Esto permite un rendimiento óptimo al evitar re-renderizados innecesarios de todo el árbol.
+3.  **Iteración de Preguntas**:
+    *   El componente recorre `version.questions` ordenadas por `order_index`.
+    *   Cada pregunta se delega al componente [QuestionRenderer](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/QuestionRenderer.tsx#17-163), que decide qué input mostrar (Radio, Checkbox, Slider, etc.) basándose en `question.type`.
+
+### Interacción en Tiempo Real
+*   El hook `watch()` de `react-hook-form` observa todos los cambios en las respuestas (`allAnswers`).
+*   Cada vez que el usuario selecciona una opción, `allAnswers` se actualiza, disparando el recálculo de puntajes.
+
+---
+
+## 3. Motor de Cálculo (Scoring Engine)
+
+El cálculo de puntajes ocurre en tiempo real dentro de un `useMemo` en [ScaleRunner](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#29-245). Esto asegura que el usuario vea retroalimentación inmediata (si está configurado).
+
+### Algoritmo de Cálculo ([calculateScore](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#61-94))
+El sistema soporta múltiples motores (`engine`). La lógica básica para `sum` (suma) y `average` (promedio) es:
+
+1.  **Filtrado**: Se seleccionan las preguntas relevantes (todas para global, o subconjunto para dominios).
+2.  **Iteración**: Para cada pregunta respondida:
+    *   Si es opción múltiple: Se busca el `score` asociado a la opción seleccionada (`response.value === option.value`).
+    *   Si es numérico directo: Se usa el valor tal cual.
+3.  **Agregación**:
+    *   **Sum**: Acumula los puntos.
+    *   **Average**: Acumula los puntos y divide por el número de preguntas respondidas (excluyendo las no respondidas).
+
+### Cálculo Multi-Dominio
+El sistema realiza dos pasadas de cálculo:
+
+1.  **Puntaje Global**: 
+    *   Ejecuta [calculateScore](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#61-94) con **todas** las preguntas de la escala.
+    *   Busca la interpretación en `version.scoring.ranges`.
+
+2.  **Puntajes por Dominio**:
+    *   Itera sobre `version.scoring.domains`.
+    *   Para cada dominio, filtra **solo** las preguntas listadas en `domain.question_ids`.
+    *   Ejecuta [calculateScore](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#61-94) con ese subconjunto.
+    *   Busca la interpretación específica en `domain.ranges`.
+
+---
+
+## 4. Generación de Resultados (Output)
+
+Cuando el usuario finaliza la evaluación ([handleFormSubmit](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Escalas/Nuevas%20Escalas/components/ScaleRunner.tsx#131-144)), se genera un payload final consolidado con la siguiente estructura:
+
+```json
+{
+  "scale_id": "Cuestionario de Boston",
+  "version": "2.1",
+  "completed_at": "2023-10-27T10:00:00Z",
+  
+  // 1. Resultados Globales
+  "total_score": 3.4,
+  "interpretation": "Disfunción Leve",
+  
+  // 2. Resultados Detallados por Dominio
+  "domain_results": [
+    {
+      "id": "sss",
+      "label": "Severidad de Síntomas",
+      "score": 3.8,
+      "interpretation": {
+        "label": "Severo",
+        "color": "#dc2626",
+        "interpretation": "Síntomas intensos que afectan el sueño."
+      }
+    },
+    {
+      "id": "fss",
+      "label": "Estado Funcional",
+      "score": 1.2,
+      "interpretation": {
+        "label": "Normal",
+        "color": "#16a34a",
+        "interpretation": "Sin limitaciones funcionales."
+      }
+    }
+  ],
+
+  // 3. Respuestas Crudas (para auditoría)
+  "raw_responses": {
+    "sss_1_dolor_noche": 4,
+    "fss_1_escribir": 1
+  }
+}
+```
+
+Este objeto es el que finalmente se envía a la base de datos (o componente padre) para ser almacenado en el historial clínico del paciente.
