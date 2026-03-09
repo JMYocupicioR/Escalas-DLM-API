@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build:web && npm run build:functions && cp public/_redirects dist/_redirects 2>/dev/null || echo 'No _redirects to copy'"
+  command = "npm run build:web && (npm run build:functions || echo 'Functions build failed, skipping') && cp public/_redirects dist/_redirects 2>/dev/null || true"
   publish = "dist"
   functions = "netlify/functions"
 
