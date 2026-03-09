@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Escala de Lawton y Brody- www.DeepLuxMed.mx</title>
+
+  <style>
+    /* ===== Estilos Generales ===== */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .form-container {
+      max-width: 650px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h1, h2, h3, legend {
+      color: #00796b;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+
+    fieldset {
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    label {
+      font-weight: normal;
+    }
+
+    /* ===== Barra de progreso ===== */
+    #progress-bar {
+      background: #e0f2f1;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-weight: bold;
+      color: #00796b;
+      text-align: center;
+    }
+
+    /* ===== Preguntas y opciones ===== */
+    .w3-label {
+      display: block;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #e0f2f1;
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .w3-radio {
+      margin-right: 10px;
+      transform: scale(1.2);
+      vertical-align: middle;
+    }
+
+    /* ===== Botones ===== */
+    .buttons {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .w3-button {
+      display: inline-block;
+      margin: 5px;
+      background-color: #00796b;
+      color: #fff;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .w3-button:hover {
+      background-color: #005f55;
+    }
+
+    /* ===== Paneles (pantallas) ===== */
+    .panel {
+      display: none;
+      margin-bottom: 20px;
+    }
+    .panel.active {
+      display: block;
+    }
+
+    /* ===== Tabla de resumen final ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+      padding: 8px;
+      vertical-align: top;
+    }
+    th {
+      background-color: #e0f2f1;
+      color: #00796b;
+    }
+
+    /* ===== Sección de resultado final ===== */
+    #resultado {
+      margin-top: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    /* ===== Responsividad para pantallas pequeñas ===== */
+    @media (max-width: 600px) {
+      .form-container {
+        margin: 10px;
+        padding: 15px;
+      }
+      #progress-bar {
+        font-size: 12px;
+        padding: 8px;
+      }
+      .w3-button {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+    }
+
+    /* ===== Ajustes para impresión ===== */
+    @media print {
+      /* Ocultar barra de progreso y botones de navegación en la impresión */
+      #progress-bar,
+      .buttons {
+        display: none !important;
+      }
+
+      /* Quita sombras y márgenes del contenedor */
+      .form-container {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      /* Tamaño de página carta y márgenes reducidos */
+      @page {
+        size: letter;
+        margin: 1cm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container" id="printArea">
+  <h1>Lawton & Brody</h1>
+  <div id="progress-bar"></div>
+
+  <form id="lawtonBrodyForm">
+    <!-- ===== Panel 1: Datos Personales ===== -->
+    <fieldset class="panel active" id="panel1">
+      <legend>Datos de identificación</legend>
+
+      <label for="nombre">Nombre del Paciente:</label>
+      <input 
+        type="text" 
+        id="nombre" 
+        name="nombre" 
+        style="width:100%; margin-bottom:10px;" 
+        required
+      />
+
+      <label for="edad">Edad:</label>
+      <input 
+        type="number" 
+        id="edad" 
+        name="edad" 
+        style="width:100%; margin-bottom:10px;" 
+        required
+        min="1" 
+        max="120"
+      />
+
+      <label for="doctor">Nombre del Doctor:</label>
+      <input
+        type="text"
+        id="doctor"
+        name="doctor"
+        style="width:100%; margin-bottom:10px;"
+        required
+      />
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 2: Uso del teléfono ===== -->
+    <fieldset class="panel" id="panel2">
+      <legend>1. Capacidad para usar el teléfono</legend>
+      <label class="w3-label" for="telefono1">
+        <input class="w3-radio" type="radio" id="telefono1" name="telefono" value="1|Utiliza el teléfono por iniciativa propia" required>
+        Utiliza el teléfono por iniciativa propia
+      </label>
+      <label class="w3-label" for="telefono2">
+        <input class="w3-radio" type="radio" id="telefono2" name="telefono" value="1|Puede marcar algunos números familiares">
+        Puede marcar algunos números familiares
+      </label>
+      <label class="w3-label" for="telefono3">
+        <input class="w3-radio" type="radio" id="telefono3" name="telefono" value="1|Solo puede contestar, pero no marcar">
+        Solo puede contestar, pero no marcar
+      </label>
+      <label class="w3-label" for="telefono4">
+        <input class="w3-radio" type="radio" id="telefono4" name="telefono" value="0|No es capaz de usar el teléfono">
+        No es capaz de usar el teléfono
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 3: Compras ===== -->
+    <fieldset class="panel" id="panel3">
+      <legend>2. Hacer compras</legend>
+      <label class="w3-label" for="compras1">
+        <input class="w3-radio" type="radio" id="compras1" name="compras" value="1|Realiza todas las compras necesarias independientemente" required>
+        Realiza todas las compras necesarias independientemente
+      </label>
+      <label class="w3-label" for="compras2">
+        <input class="w3-radio" type="radio" id="compras2" name="compras" value="0|Realiza pequeñas compras independientemente">
+        Realiza pequeñas compras independientemente
+      </label>
+      <label class="w3-label" for="compras3">
+        <input class="w3-radio" type="radio" id="compras3" name="compras" value="0|Necesita compañía para hacer cualquier compra">
+        Necesita compañía para hacer cualquier compra
+      </label>
+      <label class="w3-label" for="compras4">
+        <input class="w3-radio" type="radio" id="compras4" name="compras" value="0|Incapaz de comprar">
+        Incapaz de comprar
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 4: Preparación de la comida ===== -->
+    <fieldset class="panel" id="panel4">
+      <legend>3. Preparación de la comida</legend>
+      <label class="w3-label" for="comida1">
+        <input class="w3-radio" type="radio" id="comida1" name="comida" value="1|Organiza, prepara y sirve adecuadamente" required>
+        Organiza, prepara y sirve adecuadamente
+      </label>
+      <label class="w3-label" for="comida2">
+        <input class="w3-radio" type="radio" id="comida2" name="comida" value="0|Prepara comidas si se le proporcionan los ingredientes">
+        Prepara comidas si se le proporcionan los ingredientes
+      </label>
+      <label class="w3-label" for="comida3">
+        <input class="w3-radio" type="radio" id="comida3" name="comida" value="0|Prepara, calienta y sirve comidas, pero no sigue una dieta adecuada">
+        Prepara, calienta y sirve comidas, pero no sigue una dieta adecuada
+      </label>
+      <label class="w3-label" for="comida4">
+        <input class="w3-radio" type="radio" id="comida4" name="comida" value="0|Necesita que le preparen y sirvan las comidas">
+        Necesita que le preparen y sirvan las comidas
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 5: Cuidado de la casa ===== -->
+    <fieldset class="panel" id="panel5">
+      <legend>4. Cuidado de la casa</legend>
+      <label class="w3-label" for="casa1">
+        <input class="w3-radio" type="radio" id="casa1" name="casa" value="1|Mantiene la casa solo o con ayuda ocasional" required>
+        Mantiene la casa solo o con ayuda ocasional
+      </label>
+      <label class="w3-label" for="casa2">
+        <input class="w3-radio" type="radio" id="casa2" name="casa" value="1|Realiza tareas ligeras como lavar platos o hacer camas">
+        Realiza tareas ligeras como lavar platos o hacer camas
+      </label>
+      <label class="w3-label" for="casa3">
+        <input class="w3-radio" type="radio" id="casa3" name="casa" value="0|No puede mantener un nivel adecuado de limpieza">
+        No puede mantener un nivel adecuado de limpieza
+      </label>
+      <label class="w3-label" for="casa4">
+        <input class="w3-radio" type="radio" id="casa4" name="casa" value="0|Necesita ayuda en todas las labores del hogar / No participa">
+        Necesita ayuda en todas las labores del hogar / No participa
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 6: Lavado de la ropa ===== -->
+    <fieldset class="panel" id="panel6">
+      <legend>5. Lavado de la ropa</legend>
+      <label class="w3-label" for="lavado1">
+        <input class="w3-radio" type="radio" id="lavado1" name="lavado" value="1|Lava toda su ropa" required>
+        Lava toda su ropa
+      </label>
+      <label class="w3-label" for="lavado2">
+        <input class="w3-radio" type="radio" id="lavado2" name="lavado" value="1|Lava pequeñas prendas">
+        Lava pequeñas prendas
+      </label>
+      <label class="w3-label" for="lavado3">
+        <input class="w3-radio" type="radio" id="lavado3" name="lavado" value="0|Todo el lavado es realizado por otros">
+        Todo el lavado es realizado por otros
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 7: Uso de medios de transporte ===== -->
+    <fieldset class="panel" id="panel7">
+      <legend>6. Uso de medios de transporte</legend>
+      <label class="w3-label" for="transporte1">
+        <input class="w3-radio" type="radio" id="transporte1" name="transporte" value="1|Viaja solo en transporte público o conduce" required>
+        Viaja solo en transporte público o conduce
+      </label>
+      <label class="w3-label" for="transporte2">
+        <input class="w3-radio" type="radio" id="transporte2" name="transporte" value="1|Usa taxi, pero no otro transporte">
+        Usa taxi, pero no otro transporte
+      </label>
+      <label class="w3-label" for="transporte3">
+        <input class="w3-radio" type="radio" id="transporte3" name="transporte" value="1|Viaja en transporte público acompañado">
+        Viaja en transporte público acompañado
+      </label>
+      <label class="w3-label" for="transporte4">
+        <input class="w3-radio" type="radio" id="transporte4" name="transporte" value="0|Solo usa transporte con ayuda / No viaja">
+        Solo usa transporte con ayuda / No viaja
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 8: Responsabilidad medicación ===== -->
+    <fieldset class="panel" id="panel8">
+      <legend>7. Responsabilidad respecto a la medicación</legend>
+      <label class="w3-label" for="medicacion1">
+        <input class="w3-radio" type="radio" id="medicacion1" name="medicacion" value="1|Toma la medicación correctamente" required>
+        Toma la medicación correctamente
+      </label>
+      <label class="w3-label" for="medicacion2">
+        <input class="w3-radio" type="radio" id="medicacion2" name="medicacion" value="0|Toma medicación preparada previamente">
+        Toma medicación preparada previamente
+      </label>
+      <label class="w3-label" for="medicacion3">
+        <input class="w3-radio" type="radio" id="medicacion3" name="medicacion" value="0|No es capaz de tomar medicación por sí mismo">
+        No es capaz de tomar medicación por sí mismo
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="nextPanel()">Siguiente</button>
+      </div>
+    </fieldset>
+
+    <!-- ===== Panel 9: Manejo de asuntos económicos ===== -->
+    <fieldset class="panel" id="panel9">
+      <legend>8. Manejo de asuntos económicos</legend>
+      <label class="w3-label" for="economicos1">
+        <input class="w3-radio" type="radio" id="economicos1" name="economicos" value="1|Se encarga de sus asuntos económicos" required>
+        Se encarga de sus asuntos económicos
+      </label>
+      <label class="w3-label" for="economicos2">
+        <input class="w3-radio" type="radio" id="economicos2" name="economicos" value="1|Realiza compras, pero necesita ayuda con asuntos mayores">
+        Realiza compras, pero necesita ayuda con asuntos mayores
+      </label>
+      <label class="w3-label" for="economicos3">
+        <input class="w3-radio" type="radio" id="economicos3" name="economicos" value="0|Incapaz de manejar dinero">
+        Incapaz de manejar dinero
+      </label>
+
+      <div class="buttons">
+        <button type="button" class="w3-button" onclick="prevPanel()">Regresar</button>
+        <button type="button" class="w3-button" onclick="mostrarResumen()">Calcular/Ver Resultado</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <!-- ===== Panel Final: Resumen de Respuestas ===== -->
+  <div class="panel" id="panelFinal">
+    <h2>Resumen de Respuestas</h2>
+
+    <table id="tablaDatos" style="margin-bottom: 10px;"></table>
+
+    <table id="tablaResumen"></table>
+
+    <div id="resultado"></div>
+    <p id="fechaResultado"></p>
+
+    <div class="buttons">
+      <button type="button" class="w3-button" onclick="window.print()" id="printBtn">Imprimir</button>
+    </div>
+  </div>
+</div> <!-- end .form-container -->
+
+<script>
+  let panelActual = 1;
+  const totalPaneles = 9;
+
+  // Actualiza la barra de progreso
+  function actualizarProgreso() {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.textContent = `Pregunta ${panelActual} de ${totalPaneles}`;
+  }
+  actualizarProgreso(); // Inicializa la barra de progreso
+
+  function showPanel(num) {
+    // Oculta todos los paneles
+    for (let i = 1; i <= totalPaneles; i++) {
+      document.getElementById('panel' + i).classList.remove('active');
+    }
+    // Muestra el panel solicitado
+    document.getElementById('panel' + num).classList.add('active');
+    actualizarProgreso();
+  }
+
+  function nextPanel() {
+    // Validar que, si el panel actual > 1, se haya seleccionado un radio (excepto panel 1)
+    if (panelActual > 1) {
+      if (!validarRespuesta(panelActual)) {
+        alert("Por favor, selecciona una opción antes de continuar.");
+        return;
+      }
+    }
+    if (panelActual < totalPaneles) {
+      panelActual++;
+      showPanel(panelActual);
+    }
+  }
+
+  function prevPanel() {
+    if (panelActual > 1) {
+      panelActual--;
+      showPanel(panelActual);
+    }
+  }
+
+  // Validar si se ha seleccionado al menos un radio en el panel actual (excepto panel 1)
+  function validarRespuesta(numPanel) {
+    const panel = document.getElementById('panel' + numPanel);
+    const radios = panel.querySelectorAll('input[type="radio"]');
+    // Si no hay radios (panel de datos personales), pasa de largo
+    if (radios.length === 0) return true;
+
+    // Verifica si alguno está seleccionado
+    for (let r of radios) {
+      if (r.checked) return true;
+    }
+    return false;
+  }
+
+  // Función para mostrar la pantalla final con el resumen
+  function mostrarResumen() {
+    // Validar última pregunta
+    if (!validarRespuesta(panelActual)) {
+      alert("Por favor, selecciona una opción antes de continuar.");
+      return;
+    }
+
+    // Oculta todos los paneles
+    for (let i = 1; i <= totalPaneles; i++) {
+      document.getElementById('panel' + i).classList.remove('active');
+    }
+
+    // Muestra el panel final
+    document.getElementById('panelFinal').classList.add('active');
+
+    // Cálculo y llenado de resultados
+    calcularPuntaje();
+  }
+
+  function calcularPuntaje() {
+    const form = document.getElementById('lawtonBrodyForm');
+    const formData = new FormData(form);
+    let puntajeTotal = 0;
+
+    // 1. Tomar los datos del paciente y doctor
+    const nombre = formData.get('nombre');
+    const edad = formData.get('edad');
+    const doctor = formData.get('doctor');
+
+    // 2. Mostrar los datos en una tabla #tablaDatos
+    const tablaDatos = document.getElementById('tablaDatos');
+    tablaDatos.innerHTML = `
+      <tr><th colspan="2" style="background:#e0f2f1; color:#00796b;">Datos del Paciente</th></tr>
+      <tr><td><strong>Nombre:</strong></td><td>${nombre}</td></tr>
+      <tr><td><strong>Edad:</strong></td><td>${edad} años</td></tr>
+      <tr><td><strong>Doctor:</strong></td><td>${doctor}</td></tr>
+    `;
+
+    // 3. Armar la tabla #tablaResumen
+    const tablaResumen = document.getElementById('tablaResumen');
+    tablaResumen.innerHTML = '';
+    const header = document.createElement('tr');
+    header.innerHTML = `<th>Pregunta</th><th>Respuesta Seleccionada</th>`;
+    tablaResumen.appendChild(header);
+
+    // Campos del cuestionario
+    const campos = [
+      { name: 'telefono',    enunciado: '1. Teléfono' },
+      { name: 'compras',     enunciado: '2. Compras' },
+      { name: 'comida',      enunciado: '3. Preparación Comida' },
+      { name: 'casa',        enunciado: '4. Cuidado de la casa' },
+      { name: 'lavado',      enunciado: '5. Lavado de la ropa' },
+      { name: 'transporte',  enunciado: '6. Transporte' },
+      { name: 'medicacion',  enunciado: '7. Medicación' },
+      { name: 'economicos',  enunciado: '8. Asuntos Económicos' }
+    ];
+
+    // Recorrer cada pregunta y sumar puntajes
+    campos.forEach(c => {
+      let val = formData.get(c.name);
+      if (val) {
+        const [score, texto] = val.split('|');
+        puntajeTotal += parseInt(score, 10);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${c.enunciado}</td>
+          <td>${texto}</td>
+        `;
+        tablaResumen.appendChild(row);
+      }
+    });
+
+    // Interpretación del puntaje
+    let interpretacion = '';
+    if (puntajeTotal === 8) {
+      interpretacion = 'Independencia total';
+    } else if (puntajeTotal === 0) {
+      interpretacion = 'Máxima dependencia';
+    } else {
+      interpretacion = 'Dependencia moderada';
+    }
+
+    // 4. Mostrar puntuación e interpretación
+    const resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.innerHTML = `
+      <p><strong>Puntaje Total:</strong> ${puntajeTotal}</p>
+      <p><strong>Interpretación:</strong> ${interpretacion}</p>
+    `;
+
+    // 5. Fecha del resultado (fecha actual)
+    const fechaResultado = document.getElementById('fechaResultado');
+    const hoy = new Date();
+    const fechaFormateada = hoy.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    fechaResultado.textContent = `Fecha del resultado: ${fechaFormateada}`;
+  }
+</script>
+</body>
+</html>
