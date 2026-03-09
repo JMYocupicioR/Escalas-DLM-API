@@ -3,21 +3,45 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { usePatientIntake } from '@/hooks/usePatientIntake';
 import { PatientPicker } from '@/components/PatientPicker';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { getProfile } from '@/api/profile';
+
+export interface PatientFormData {
+  id?: string;
+  name: string;
+  age: number;
+  gender: string;
+  doctorName: string;
+  notes: string;
+}
 
 interface PatientFormProps {
   scaleId?: string;
-  onContinue: () => void;
+  onContinue: (data?: PatientFormData) => void;
   allowSkip?: boolean;
+  onPatientSelected?: (patient: { id: string; name?: string | null; gender?: string | null; birth_date?: string | null }) => void;
 }
 
-export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, allowSkip = true }) => {
+export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, allowSkip = true, onPatientSelected }) => {
   const { colors } = useThemedStyles();
   const { intake, setField, prefillFromRemembered, saveAsCurrentPatient, ensureAnonymousIfMissing } = usePatientIntake(scaleId);
   const [showPicker, setShowPicker] = useState(false);
+  const { session } = useAuthSession();
 
   useEffect(() => {
     prefillFromRemembered();
   }, [prefillFromRemembered]);
+
+  // Prefill doctor/evaluator with current user's full name (profile) once
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || intake.doctorName) return;
+    getProfile(userId).then(({ data }) => {
+      if (data?.full_name) {
+        setField('doctorName', data.full_name);
+      }
+    }).catch(() => {});
+  }, [session?.user?.id, intake.doctorName, setField]);
 
   return (
     <View style={styles.container}>
@@ -28,7 +52,35 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
       </TouchableOpacity>
       {showPicker && (
         <View style={[styles.pickerContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <PatientPicker onSelected={() => setShowPicker(false)} />
+          <PatientPicker
+            onSelected={(patient) => {
+              setField('name', patient.name ?? '');
+              if (patient.birth_date) {
+                const age = Math.max(
+                  0,
+                  Math.floor(
+                    (Date.now() - new Date(patient.birth_date).getTime()) /
+                      (1000 * 60 * 60 * 24 * 365.25)
+                  )
+                );
+                setField('age', age);
+              } else {
+                setField('age', patient.age ?? 0);
+              }
+              setField('gender', patient.gender ?? 'No especificado');
+              setField('notes', patient.notes ?? '');
+              if (patient.id) setField('id', patient.id);
+              if (patient.id) {
+                onPatientSelected?.({
+                  id: patient.id,
+                  name: patient.name,
+                  gender: patient.gender,
+                  birth_date: patient.birth_date,
+                });
+              }
+              setShowPicker(false);
+            }}
+          />
         </View>
       )}
 
@@ -61,7 +113,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
         <TextInput
           style={[styles.input, { color: colors.text }]}
           placeholder="Médico/Evaluador"
-          value={intake.doctorName}
+          value={intake.doctorName ?? ''}
           onChangeText={(v) => setField('doctorName', v)}
         />
       </View>
@@ -69,7 +121,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
         <TextInput
           style={[styles.input, { color: colors.text }]}
           placeholder="Notas"
-          value={intake.notes}
+          value={intake.notes ?? ''}
           onChangeText={(v) => setField('notes', v)}
         />
       </View>
@@ -89,8 +141,18 @@ export const PatientForm: React.FC<PatientFormProps> = ({ scaleId, onContinue, a
 
         <TouchableOpacity
           onPress={() => {
+            console.log('PatientForm Continuar clicked, intake:', intake);
             saveAsCurrentPatient();
-            onContinue();
+            const formData = {
+              id: intake.id,
+              name: intake.name ?? '',
+              age: typeof intake.age === 'number' ? intake.age : Number(intake.age) || 0,
+              gender: intake.gender ?? '',
+              doctorName: intake.doctorName ?? '',
+              notes: intake.notes ?? '',
+            };
+            console.log('PatientForm sending formData:', formData);
+            onContinue(formData);
           }}
           style={[styles.button, { backgroundColor: colors.buttonPrimary }]}
         >

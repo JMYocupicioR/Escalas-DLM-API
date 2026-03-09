@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { PlexusBrachialisSVG } from '@/components/PlexusBrachialisSVG';
 import { DIAGNOSTIC_SVG_MAPPING } from '@/data/plexoBraquial';

@@ -143,7 +143,7 @@ export const generateHtml = (payload: GenericPayload): string => {
         ${detailsHTML || '<p class="muted">Sin detalle disponible.</p>'}
       </div>
       <div class="footer">
-        <p>Documento generado por DeepLuxMed.mx</p>
+        <p>Documento generado por Escalas DLM — DeepLux Med</p>
         <p>${options?.footerNote ?? 'Privacidad médico-paciente aplicada.'}</p>
       </div>
     </div>

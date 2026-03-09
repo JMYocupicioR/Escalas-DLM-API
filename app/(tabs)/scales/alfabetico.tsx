@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, router } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { SearchWidget } from '@/components/SearchWidget';
 import { ScaleCard, ScaleCardData } from '@/components/Card';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { calculateGridConfig, shouldUseListView } from '@/utils/responsiveGrid';
-import { Star, ArrowRight, Clock, Activity, Brain, Heart, TrendingUp } from 'lucide-react-native';
+import { Star, Activity, Brain, Heart } from 'lucide-react-native';
 
 // Category icons and colors mapping
 const CATEGORY_STYLES = {
@@ -226,6 +226,7 @@ export default function AlphabeticalScalesScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { width, isTablet, isDesktop, isLandscape } = useResponsiveLayout();
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   // Responsive grid configuration
   const gridConfig = useMemo(() => calculateGridConfig({
@@ -252,7 +253,7 @@ export default function AlphabeticalScalesScreen() {
       }
       acc[letter].push(scale);
       return acc;
-    }, {});
+    }, {} as Record<string, typeof SCALES>);
   }, [searchQuery]);
 
   const letters = Object.keys(groupedScales).sort();
@@ -340,7 +341,9 @@ export default function AlphabeticalScalesScreen() {
                       key={scale.id}
                       style={[
                         styles.scaleCardWrapper,
-                        useListView ? styles.scaleCardFull : styles.scaleCardGrid(gridConfig.columns)
+                        useListView ? styles.scaleCardFull : {
+                          width: gridConfig.columns === 3 ? '31%' : gridConfig.columns === 2 ? '47%' : '100%'
+                        }
                       ]}
                     >
                       <ScaleCard
@@ -448,31 +451,10 @@ const createStyles = (colors: any) => StyleSheet.create({
   scaleCardFull: {
     width: '100%',
   },
-  scaleCardGrid: (columns: number) => ({
-    width: columns === 3 ? 'calc(33.333% - 12px)' : columns === 2 ? 'calc(50% - 12px)' : '100%',
-    ...Platform.select({
-      default: {
-        width: columns === 3 ? '31%' : columns === 2 ? '47%' : '100%',
-      },
-    }),
-  }),
   popularBadge: {
     padding: 4,
     borderRadius: 8,
     backgroundColor: `${colors.scoreGood}15`,
-  },
-  newBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: `${colors.primary}15`,
-  },
-  newBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.primary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   scaleCard: {
     flexDirection: 'row',

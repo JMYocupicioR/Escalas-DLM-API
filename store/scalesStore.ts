@@ -178,13 +178,28 @@ export const useScalesStore = create<ScalesState>()(
           }
         },
       })),
-      version: 1,
+      version: 2,
       migrate: (persistedState: any, version) => {
         if (version < 1) {
           // Migration logic for version upgrades
           return {
             ...persistedState,
             recentlyCreated: persistedState.recentlyCreated || [],
+          };
+        }
+        if (version < 2) {
+          // v2: Merge any new scales from initialScales that aren't in persisted state
+          const persistedIds = new Set((persistedState.scales || []).map((s: any) => s.id));
+          const newScales = initialScales.filter(s => !persistedIds.has(s.id));
+          const mergedScales = [...(persistedState.scales || []), ...newScales];
+          const mergedById = mergedScales.reduce((acc: any, s: any) => {
+            acc[s.id] = s;
+            return acc;
+          }, {});
+          return {
+            ...persistedState,
+            scales: mergedScales,
+            scalesById: mergedById,
           };
         }
         return persistedState;

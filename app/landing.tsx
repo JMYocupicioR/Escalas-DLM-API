@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowRight, Shield, Clock, CheckCircle } from 'lucide-react-native';
-import { AppIcon } from '@/components/AppIcon';
+import { AppLogo } from '@/components/AppLogo';
 
 const { width, height } = Dimensions.get('window');
 
@@ -36,13 +36,9 @@ export default function LandingPage() {
     <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Header with logo */}
+      {/* Header con logo unificado */}
       <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <AppIcon size={48} />
-          <Text style={styles.logoText}>DeepLuxMed</Text>
-          <Text style={styles.logoSubtext}>Escalas</Text>
-        </View>
+        <AppLogo size="medium" showText={true} />
       </View>
 
       {/* Main content */}
@@ -129,22 +125,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 20,
   },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  logoText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#f8fafc',
-  },
-  logoSubtext: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#94a3b8',
-    marginLeft: -8,
-  },
+
   content: {
     flex: 1,
     justifyContent: 'center',

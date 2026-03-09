@@ -10,6 +10,10 @@ export default function ScalesLayout() {
         }}
       />
       <Stack.Screen
+        name="pick-patient"
+        options={{ title: 'Seleccionar paciente' }}
+      />
+      <Stack.Screen
         name="[id]"
         options={{
           title: 'Detalles',

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Platform, Alert } from 'react-native';
+import { Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, CheckCircle, Info, AlertCircle, Zap, ZapOff } from 'lucide-react-native';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
@@ -9,6 +9,8 @@ import { ResultsActions } from '@/components/ResultsActions';
 import { useKatzAssessment } from '@/hooks/useKatzAssessment';
 import { ScaleInfo, ScaleInfoData } from '@/components/ScaleInfo';
 import { useScalesStore } from '@/store/scales';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { createAssessment } from '@/api/assessments';
 
 const scaleInfo: ScaleInfoData = {
   id: 'katz',
@@ -104,10 +106,53 @@ export default function KatzScaleScreen() {
     updatePatientData,
     goToNextQuestion,
     goToPreviousQuestion,
-    resetAssessment,
+    resetAssessment: resetKatzAssessment,
     isAllQuestionsAnswered,
     isCurrentQuestionAnswered,
+    questions,
   } = useKatzAssessment();
+
+  const { session } = useAuthSession();
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sincronizar datos del paciente cuando se selecciona uno del store
+  useEffect(() => {
+    if (currentPatient) {
+      updatePatientData({
+        id: currentPatient.id,
+        name: currentPatient.name,
+        age: currentPatient.age ? currentPatient.age.toString() : '',
+        gender: currentPatient.gender,
+        doctorName: currentPatient.attendingPhysician
+      });
+    }
+  }, [currentPatient, updatePatientData]);
+
+  const handleSave = useCallback(async () => {
+    if (!patientData.id || !session?.user.id || !results) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await createAssessment(session.user.id, {
+        patient_id: patientData.id,
+        scale_slug: 'katz',
+        scale_id: undefined,
+        responses: results.responses as Record<string, number | string>,
+        total_score: results.totalScore,
+        interpretation: results.interpretation.description,
+        clinical_notes: null,
+        assessor_name: patientData.doctorName,
+      });
+
+      if (error) throw error;
+      Alert.alert('Éxito', 'Evaluación guardada correctamente en el historial.');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Error', 'No se pudo guardar la evaluación.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [patientData, session, results]);
 
   // Inicializar respuestas cuando se inicia la evaluación
   useEffect(() => {
@@ -123,9 +168,9 @@ export default function KatzScaleScreen() {
   }, [isAllQuestionsAnswered]);
 
   const handleReset = useCallback(() => {
-    resetAssessment();
+    resetKatzAssessment();
     setStep('info');
-  }, [resetAssessment]);
+  }, [resetKatzAssessment]);
 
   const handleAnswerSelect = useCallback((value: number) => {
     if (currentQuestion) {
@@ -210,7 +255,18 @@ export default function KatzScaleScreen() {
         <Text style={styles.title}>Datos del Paciente</Text>
         <PatientForm
           scaleId="katz"
-          onContinue={() => setStep('evaluation')}
+          onContinue={(data) => {
+            if (data) {
+                updatePatientData({
+                    id: data.id,
+                    name: data.name || '',
+                    age: data.age?.toString() || '',
+                    gender: data.gender || '',
+                    doctorName: data.doctorName || ''
+                });
+            }
+            setStep('evaluation');
+          }}
           allowSkip={false}
         />
       </View>
@@ -427,10 +483,7 @@ export default function KatzScaleScreen() {
           <View style={styles.breakdownCard}>
             <Text style={styles.sectionTitle}>Desglose por Actividad</Text>
             {Object.entries(responses).map(([questionId, score]) => {
-              const question = totalQuestions && [...Array(totalQuestions)].map((_, i) => {
-                const q = currentQuestion;
-                return q;
-              }).find(q => q?.id === questionId);
+              const question = questions.find(q => q.id === questionId);
               
               if (!question) return null;
               
@@ -458,15 +511,15 @@ export default function KatzScaleScreen() {
             <Text style={styles.sectionTitle}>Datos del Paciente</Text>
             <View style={styles.patientInfoRow}>
               <Text style={styles.patientInfoLabel}>Nombre:</Text>
-              <Text style={styles.patientInfoValue}>{currentPatient?.name || 'Paciente Anónimo'}</Text>
+              <Text style={styles.patientInfoValue}>{patientData.name || 'Paciente Anónimo'}</Text>
             </View>
             <View style={styles.patientInfoRow}>
               <Text style={styles.patientInfoLabel}>Edad:</Text>
-              <Text style={styles.patientInfoValue}>{currentPatient?.age || 'No especificada'}</Text>
+              <Text style={styles.patientInfoValue}>{patientData.age || 'No especificada'}</Text>
             </View>
             <View style={styles.patientInfoRow}>
               <Text style={styles.patientInfoLabel}>Género:</Text>
-              <Text style={styles.patientInfoValue}>{currentPatient?.gender || 'No especificado'}</Text>
+              <Text style={styles.patientInfoValue}>{patientData.gender || 'No especificado'}</Text>
             </View>
             {currentPatient?.medicalRecordNumber && (
               <View style={styles.patientInfoRow}>
@@ -480,21 +533,34 @@ export default function KatzScaleScreen() {
           <ResultsActions
             assessment={{
               patientData: {
-                id: currentPatient?.id,
-                name: currentPatient?.name || 'Paciente Anónimo',
-                age: currentPatient?.age,
-                gender: currentPatient?.gender,
-                doctorName: currentPatient?.attendingPhysician,
+                id: patientData.id,
+                name: patientData.name || 'Paciente Anónimo',
+                age: Number(patientData.age),
+                gender: patientData.gender,
+                doctorName: patientData.doctorName,
               },
               score: totalScore,
-              interpretation: interpretation,
-              answers: responses,
+              interpretation: interpretation.description,
+              answers: Object.entries(responses).map(([id, value]) => {
+                 const q = questions.find(q => q.id === id);
+                 const opt = q?.options.find(o => o.value === value);
+                 return {
+                     id,
+                     question: q?.question || '',
+                     value,
+                     label: opt?.label,
+                     points: value
+                 };
+              }),
             }}
             scale={{ 
               id: 'katz', 
               name: 'Índice de Katz de Independencia en AVD' 
             }}
             containerStyle={{ marginTop: 16 }}
+            onSave={handleSave}
+            canSave={!!patientData.id}
+            saving={isSaving}
           />
 
           {/* Botón de nueva evaluación */}

@@ -65,6 +65,9 @@ export default function RootLayout() {
             <ThemeProvider value={navTheme}>
               <BottomSheetModalProvider>
                 <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="login" options={{ title: 'Iniciar sesión' }} />
+                  <Stack.Screen name="register" options={{ title: 'Registro' }} />
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
                 </Stack>

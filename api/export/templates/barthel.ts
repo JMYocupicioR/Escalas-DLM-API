@@ -500,7 +500,7 @@ export const generateHtml = (payload: BarthelPayload): string => {
           <div class="disclaimer">
             Documento generado automáticamente el ${fecha} a las ${hora}. Este reporte es un registro de evaluación clínica y debe ser interpretado por un profesional de la salud cualificado. Los resultados deben considerarse en el contexto clínico completo del paciente.
             <br><br>
-            Generado por DeepLuxMed.mx - Sistema de Escalas Médicas
+            Generado por Escalas DLM — DeepLux Med | escalas.deeplux.org
             ${options?.footerNote ? `<br>${options.footerNote}` : ''}
           </div>
         </div>

@@ -1,6 +1,17 @@
 import React from 'react';
 import { View } from 'react-native';
-import Svg, { Defs, LinearGradient, Stop, Filter, FeDropShadow, G, Circle, Path } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Stop, Rect, Path, Circle } from 'react-native-svg';
+
+/**
+ * AppIcon — Ícono canónico de DeepLux / Escalas DLM
+ *
+ * Reproduce fielmente el icon.svg raíz:
+ *  - Cuadrado redondeado con gradiente azul (#0ea5e9 → #1e3a5f)
+ *  - Letras estilizadas "D" y "L" en blanco
+ *  - Punto de acento "lux" con gradiente celeste
+ *
+ * Mantiene los exports AppIcon y AppIconSimple para compatibilidad.
+ */
 
 interface AppIconProps {
   size?: number;
@@ -10,110 +21,53 @@ interface AppIconProps {
 export const AppIcon: React.FC<AppIconProps> = ({ size = 100, style }) => {
   return (
     <View style={style}>
-      <Svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 100 100"
+      <Svg
+        width={size}
+        height={size}
+        viewBox="0 0 512 512"
+        fill="none"
       >
         <Defs>
-          {/* Gradiente principal para el ícono */}
-          <LinearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#0891b2" />
-            <Stop offset="100%" stopColor="#06b6d4" />
+          {/* Gradiente principal del fondo */}
+          <LinearGradient id="dl-bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+            <Stop offset="0%" stopColor="#0ea5e9" />
+            <Stop offset="100%" stopColor="#1e3a5f" />
           </LinearGradient>
-
-          {/* Filtro para una sombra sutil */}
-          <Filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <FeDropShadow 
-              dx="2" 
-              dy="3" 
-              stdDeviation="2" 
-              floodColor="#000000" 
-              floodOpacity="0.2"
-            />
-          </Filter>
+          {/* Gradiente del punto de acento "lux" */}
+          <LinearGradient id="dl-dot" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+            <Stop offset="0%" stopColor="#38bdf8" />
+            <Stop offset="100%" stopColor="#0ea5e9" />
+          </LinearGradient>
         </Defs>
 
-        <G filter="url(#softShadow)">
-          {/* Círculo principal (Diafragma del estetoscopio) */}
-          <Circle 
-            cx="50" 
-            cy="50" 
-            r="40" 
-            fill="url(#iconGradient)"
-          />
-          
-          {/* Anillo interior para dar profundidad */}
-          <Circle 
-            cx="50" 
-            cy="50" 
-            r="35" 
-            fill="none" 
-            stroke="white" 
-            strokeOpacity="0.2" 
-            strokeWidth="1.5"
-          />
+        {/* Fondo cuadrado redondeado */}
+        <Rect width="512" height="512" rx="108" fill="url(#dl-bg)" />
 
-          {/* Marca de Verificación (Checkmark) */}
-          <Path 
-            d="M32 50 L45 63 L68 40" 
-            fill="none" 
-            stroke="#FFFFFF" 
-            strokeWidth="8" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          />
-        </G>
+        {/* Letra D */}
+        <Path
+          d="M120 112h80c88 0 140 52 140 144s-52 144-140 144h-80V112zm56 48v192h24c60 0 96-36 96-96s-36-96-96-96h-24z"
+          fill="white"
+          fillOpacity={0.95}
+        />
+
+        {/* Letra L */}
+        <Path
+          d="M296 112h56v232h80v56H296V112z"
+          fill="white"
+          fillOpacity={0.85}
+        />
+
+        {/* Punto de acento — "lux" (luz) */}
+        <Circle cx="416" cy="136" r="20" fill="url(#dl-dot)" fillOpacity={0.9} />
       </Svg>
     </View>
   );
 };
 
-// Versión simplificada sin sombra para casos donde el rendimiento es crítico
-export const AppIconSimple: React.FC<AppIconProps> = ({ size = 100, style }) => {
-  return (
-    <View style={style}>
-      <Svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 100 100"
-      >
-        <Defs>
-          <LinearGradient id="iconGradientSimple" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#0891b2" />
-            <Stop offset="100%" stopColor="#06b6d4" />
-          </LinearGradient>
-        </Defs>
-
-        {/* Círculo principal */}
-        <Circle 
-          cx="50" 
-          cy="50" 
-          r="40" 
-          fill="url(#iconGradientSimple)"
-        />
-        
-        {/* Anillo interior */}
-        <Circle 
-          cx="50" 
-          cy="50" 
-          r="35" 
-          fill="none" 
-          stroke="white" 
-          strokeOpacity="0.2" 
-          strokeWidth="1.5"
-        />
-
-        {/* Marca de Verificación */}
-        <Path 
-          d="M32 50 L45 63 L68 40" 
-          fill="none" 
-          stroke="#FFFFFF" 
-          strokeWidth="8" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-      </Svg>
-    </View>
-  );
+/**
+ * AppIconSimple — Alias de AppIcon (sin sombra separada).
+ * Mantenido para compatibilidad con importaciones existentes.
+ */
+export const AppIconSimple: React.FC<AppIconProps> = (props) => {
+  return <AppIcon {...props} />;
 };

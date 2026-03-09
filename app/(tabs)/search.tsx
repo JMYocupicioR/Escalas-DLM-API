@@ -15,6 +15,8 @@ import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { useScalesStore } from '@/store/scalesStore';
 import { calculateGridConfig, shouldUseListView } from '@/utils/responsiveGrid';
 import type { Scale } from '@/types/scale';
+import { useTaxonomyFilters, TaxonomyFilterState } from '@/hooks/useTaxonomyFilters';
+import { TaxonomyFilterBar } from '@/components/TaxonomyFilterBar';
 
 // Interfaces para mejorar el tipado
 interface CategoryOption {
@@ -134,6 +136,16 @@ export default function SearchScreen() {
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [scales, setScales] = useState(allScales);
+  const [taxonomyFilters, setTaxonomyFilters] = useState<TaxonomyFilterState>({
+    categoryId: null,
+    specialtyId: null,
+    scaleTypeId: null,
+    populationId: null,
+    bodySystemId: null,
+  });
+
+  // Load real taxonomy data from Supabase
+  const taxonomyData = useTaxonomyFilters();
 
   // Enhanced grid configuration
   const gridConfig = useMemo(() => calculateGridConfig({
@@ -245,7 +257,15 @@ export default function SearchScreen() {
     if (useAdvancedSearch) {
       return scales; // Advanced search handles its own filtering
     }
-    
+
+    // Resolve taxonomy category name for string-based matching
+    const activeTaxCategory = taxonomyFilters.categoryId
+      ? taxonomyData.categories.find(c => c.id === taxonomyFilters.categoryId)
+      : null;
+    const activeTaxSpecialty = taxonomyFilters.specialtyId
+      ? taxonomyData.specialties.find(s => s.id === taxonomyFilters.specialtyId)
+      : null;
+
     return scales.filter(scale => {
       const query = searchQuery.toLowerCase();
       const matchesSearch =
@@ -261,14 +281,29 @@ export default function SearchScreen() {
       const matchesCategory = selectedCategory === 'all' ||
         scale.category.toLowerCase() === selectedCategory.toLowerCase();
 
-      return matchesSearch && matchesCategory;
+      // Taxonomy filter: match against the category name (es or en)
+      const matchesTaxCategory = !activeTaxCategory || (
+        scale.category.toLowerCase().includes(activeTaxCategory.name_es.toLowerCase()) ||
+        scale.category.toLowerCase().includes(activeTaxCategory.name_en.toLowerCase()) ||
+        (scale.specialty && scale.specialty.toLowerCase().includes(activeTaxCategory.name_es.toLowerCase()))
+      );
+
+      // Taxonomy filter: match by specialty field
+      const matchesTaxSpecialty = !activeTaxSpecialty || (
+        (scale.specialty && (
+          scale.specialty.toLowerCase().includes(activeTaxSpecialty.name_es.toLowerCase()) ||
+          scale.specialty.toLowerCase().includes(activeTaxSpecialty.name_en.toLowerCase())
+        )) ||
+        scale.category.toLowerCase().includes(activeTaxSpecialty.name_es.toLowerCase())
+      );
+
+      return matchesSearch && matchesCategory && matchesTaxCategory && matchesTaxSpecialty;
     }).sort((a, b) => {
       if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
       if (sortBy === 'popularity') return (b.popularity || 0) - (a.popularity || 0);
-      // Para 'recent', podríamos usar una fecha de actualización si estuviera disponible
       return 0;
     });
-  }, [searchQuery, selectedCategory, sortBy, scales, useAdvancedSearch]);
+  }, [searchQuery, selectedCategory, sortBy, scales, useAdvancedSearch, taxonomyFilters, taxonomyData]);
 
   // Convert scale to ScaleCardData format
   const convertToCardData = useCallback((scale: Scale): ScaleCardData => {
@@ -301,7 +336,7 @@ export default function SearchScreen() {
         <ScaleCard
           scale={scaleData}
           layout={useListView ? 'list' : 'grid'}
-          onPress={() => router.push(`/scales/${item.id}`)}
+          onPress={() => router.push(`/new-scales/${item.id}` as any)}
           showStats={true}
           showCategory={true}
           rightElement={
@@ -437,63 +472,72 @@ export default function SearchScreen() {
             layout={Layout}
             style={[styles.filtersContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
           >
-            <Text style={[styles.filterTitle, { color: colors.text }]}>Categories</Text>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoryScroll}
-            data={CATEGORIES}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <Pressable
-                style={[
-                  styles.categoryChip,
-                  selectedCategory === item.id && styles.categoryChipSelected
-                ]}
-                onPress={() => handleCategoryChange(item.id)}
-                accessible={true}
-                accessibilityLabel={`Categoría ${item.name}`}
-                accessibilityState={{ selected: selectedCategory === item.id }}
-                accessibilityRole="button"
-              >
-                <Text
-                  style={[
-                    styles.categoryChipText,
-                    selectedCategory === item.id && styles.categoryChipTextSelected
-                  ]}
-                >
-                  {item.name}
-                </Text>
-              </Pressable>
-            )}
-          />
+            {/* Taxonomy filter bar with real Supabase data */}
+            <TaxonomyFilterBar
+              filters={taxonomyFilters}
+              onFilterChange={setTaxonomyFilters}
+              taxonomyData={taxonomyData}
+            />
 
-          <Text style={[styles.filterTitle, { color: colors.text }]}>Sort By</Text>
-          <View style={styles.sortOptions}>
-            {SORT_OPTIONS.map(option => (
-              <Pressable
-                key={option.id}
-                style={[
-                  styles.sortChip,
-                  sortBy === option.id && styles.sortChipSelected
-                ]}
-                onPress={() => handleSortChange(option.id)}
-                accessible={true}
-                accessibilityLabel={`Ordenar por ${option.name}`}
-                accessibilityState={{ selected: sortBy === option.id }}
-                accessibilityRole="button"
-              >
-                <Text
-                  style={[
-                    styles.sortChipText,
-                    sortBy === option.id && styles.sortChipTextSelected
-                  ]}
-                >
-                  {option.name}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+            <View style={{ padding: 16 }}>
+              <Text style={[styles.filterTitle, { color: colors.text }]}>Categorías</Text>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoryScroll}
+                data={CATEGORIES}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => (
+                  <Pressable
+                    style={[
+                      styles.categoryChip,
+                      selectedCategory === item.id && styles.categoryChipSelected
+                    ]}
+                    onPress={() => handleCategoryChange(item.id)}
+                    accessible={true}
+                    accessibilityLabel={`Categoría ${item.name}`}
+                    accessibilityState={{ selected: selectedCategory === item.id }}
+                    accessibilityRole="button"
+                  >
+                    <Text
+                      style={[
+                        styles.categoryChipText,
+                        selectedCategory === item.id && styles.categoryChipTextSelected
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                  </Pressable>
+                )}
+              />
+
+              <Text style={[styles.filterTitle, { color: colors.text }]}>Ordenar</Text>
+              <View style={styles.sortOptions}>
+                {SORT_OPTIONS.map(option => (
+                  <Pressable
+                    key={option.id}
+                    style={[
+                      styles.sortChip,
+                      sortBy === option.id && styles.sortChipSelected
+                    ]}
+                    onPress={() => handleSortChange(option.id)}
+                    accessible={true}
+                    accessibilityLabel={`Ordenar por ${option.name}`}
+                    accessibilityState={{ selected: sortBy === option.id }}
+                    accessibilityRole="button"
+                  >
+                    <Text
+                      style={[
+                        styles.sortChipText,
+                        sortBy === option.id && styles.sortChipTextSelected
+                      ]}
+                    >
+                      {option.name}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
           </Animated.View>
         </ResponsiveContainer>
       )}

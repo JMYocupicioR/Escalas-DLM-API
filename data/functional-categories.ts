@@ -15,7 +15,7 @@ export const functionalCategories = {
     title: 'Nivel funcional / AVD',
     description: 'Independencia funcional en actividades de la vida diaria.',
     image: 'https://images.unsplash.com/photo-1584516150909-c43483ee7932?w=800&auto=format&fit=crop&q=60',
-    scales: ['barthel', 'katz', 'fim', 'weefim'],
+    scales: ['barthel', 'katz', 'lawton-brody', 'fim', 'weefim'],
   },
   equilibrio_caidas: {
     title: 'Equilibrio y caídas',

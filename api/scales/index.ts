@@ -8,56 +8,29 @@
  * @license CC BY-NC 4.0
  */
 
-// TODO: Implement these functions when scales module is created
-// import {
-//   getScales,
-//   getScaleById,
-//   getScaleCategories,
-//   getScaleSpecialties,
-//   getPopularScales,
-//   createScaleAssessment,
-//   getScaleStatistics,
-//   addToFavorites,
-//   removeFromFavorites,
-//   getUserFavorites
-// } from './scales';
-
 import {
-  GetScalesParams,
-  ScalesResponse,
-  ScaleResponse,
-  ScaleAssessmentRequest,
-  ScaleAssessmentResponse
-} from './types';
+  getScales,
+  getScaleById,
+  createScaleAssessment,
+} from './service';
 
-// Export all scale-related types
 export {
-  // Type Definitions
-  GetScalesParams,
-  ScalesResponse,
-  ScaleResponse,
-  ScaleAssessmentRequest,
-  ScaleAssessmentResponse
-};
+  // Scale Management Functions
+  getScales,
+  getScaleById,
+  // getScaleCategories,
+  // getScaleSpecialties,
+  // getPopularScales,
 
-// TODO: Export functions when implemented
-// export {
-//   // Scale Management Functions
-//   getScales,
-//   getScaleById,
-//   getScaleCategories,
-//   getScaleSpecialties,
-//   getPopularScales,
-//
-//   // Assessment Functions
-//   createScaleAssessment,
-//   getScaleStatistics,
-//
-//   // User Interaction Functions
-//   addToFavorites,
-//   removeFromFavorites,
-//   getUserFavorites
-// };
+  // Assessment Functions
+  createScaleAssessment,
+  // getScaleStatistics,
+
+  // User Interaction Functions
+  // addToFavorites,
+  // removeFromFavorites,
+  // getUserFavorites
+};
 
 /**
  * Medical Scales Repository API
@@ -378,23 +351,24 @@ export const SCORING_METHODS = [
   'percentile'    // Percentile-based scoring
 ] as const;
 
-export default {
-  // Core Functions
-  getScales,
-  getScaleById,
-  getScaleCategories,
-  getScaleSpecialties,
-  getPopularScales,
-  createScaleAssessment,
-  getScaleStatistics,
-  addToFavorites,
-  removeFromFavorites,
-  getUserFavorites,
-  
-  // Configuration
-  API_CONFIG,
-  SCALE_CATEGORIES,
-  MEDICAL_SPECIALTIES,
-  QUESTION_TYPES,
-  SCORING_METHODS
-};
+// TODO: Export default object when core functions are implemented
+// export default {
+//   // Core Functions
+//   getScales,
+//   getScaleById,
+//   getScaleCategories,
+//   getScaleSpecialties,
+//   getPopularScales,
+//   createScaleAssessment,
+//   getScaleStatistics,
+//   addToFavorites,
+//   removeFromFavorites,
+//   getUserFavorites,
+//
+//   // Configuration
+//   API_CONFIG,
+//   SCALE_CATEGORIES,
+//   MEDICAL_SPECIALTIES,
+//   QUESTION_TYPES,
+//   SCORING_METHODS
+// };

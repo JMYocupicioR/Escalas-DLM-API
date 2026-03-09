@@ -25,10 +25,18 @@ import {
 } from 'lucide-react-native';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import { HeaderLogo } from '@/components/AppLogo';
+import { LogOut } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { colors, isDark, themeMode, contrastLevel, fontSize } = useThemedStyles();
+  const { signOut, session } = useAuthSession();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/login');
+  };
   
   // Configuraciones del store
   const {
@@ -38,6 +46,7 @@ export default function SettingsScreen() {
     contrastLevel: currentContrast,
     fontSize: currentFontSize,
     autoAdvanceQuestions,
+    oneQuestionAtATime,
     showDetailedScores,
     enableHapticFeedback,
     reduceMotion,
@@ -52,6 +61,7 @@ export default function SettingsScreen() {
     setContrastLevel,
     setFontSize,
     toggleAutoAdvance,
+    toggleOneQuestionAtATime,
     toggleDetailedScores,
     toggleHapticFeedback,
     toggleReduceMotion,
@@ -162,19 +172,20 @@ export default function SettingsScreen() {
   const SettingItem = ({ 
     icon: Icon, 
     title, 
-    value, 
+    value = undefined, 
     onPress, 
-    showToggle, 
-    isToggled, 
+    showToggle = false, 
+    isToggled = false, 
     showChevron = true,
     isLast = false,
-    description
-  }) => (
+    description = undefined
+  }: any) => (
     <TouchableOpacity 
       style={[themedStyles.settingItem, isLast && themedStyles.settingItemLast]} 
-      onPress={onPress}
+      onPress={showToggle ? undefined : onPress}
+      activeOpacity={showToggle ? 1 : 0.7}
       accessible={true}
-      accessibilityRole="button"
+      accessibilityRole={showToggle ? 'switch' : 'button'}
       accessibilityLabel={title}
       accessibilityHint={description}
       accessibilityState={showToggle ? { checked: isToggled } : undefined}
@@ -299,6 +310,14 @@ export default function SettingsScreen() {
                 description="Avanzar automáticamente a la siguiente pregunta"
               />
               <SettingItem
+                icon={Eye}
+                title="Una pregunta por panel"
+                showToggle
+                isToggled={oneQuestionAtATime}
+                onPress={toggleOneQuestionAtATime}
+                description="Mostrar solo una pregunta a la vez"
+              />
+              <SettingItem
                 icon={Settings}
                 title="Puntuaciones detalladas"
                 showToggle
@@ -382,6 +401,30 @@ export default function SettingsScreen() {
             </View>
           </View>
 
+          {/* Cuenta */}
+          <View style={themedStyles.section}>
+            <Text style={themedStyles.sectionTitle}>Cuenta</Text>
+            <View style={themedStyles.sectionContent}>
+              {session?.user?.email && (
+                <SettingItem
+                  icon={User}
+                  title="Sesión"
+                  value={session.user.email}
+                  showChevron={false}
+                  onPress={() => {}}
+                  isLast={false}
+                />
+              )}
+              <SettingItem
+                icon={LogOut}
+                title="Cerrar sesión"
+                onPress={handleSignOut}
+                description="Salir de tu cuenta"
+                isLast
+              />
+            </View>
+          </View>
+
           {/* Privacidad y datos */}
           <View style={themedStyles.section}>
             <Text style={themedStyles.sectionTitle}>Privacidad</Text>
@@ -419,7 +462,7 @@ export default function SettingsScreen() {
                 value="1.0.0"
                 showChevron={false}
                 onPress={() => {}}
-                description="Build 100 - DeepLuxMed.mx"
+                description="Build 100 — escalas.deeplux.org"
               />
               <SettingItem
                 icon={FileText}
@@ -441,8 +484,8 @@ export default function SettingsScreen() {
           </View>
 
           <View style={themedStyles.footer}>
-            <Text style={themedStyles.footerText}>DeepLuxMed.mx © 2024</Text>
-            <Text style={themedStyles.footerVersion}>Aplicación médica profesional</Text>
+            <Text style={themedStyles.footerText}>Escalas DLM — DeepLux Med © 2025</Text>
+            <Text style={themedStyles.footerVersion}>escalas.deeplux.org</Text>
           </View>
         </ScrollView>
       </SafeAreaView>

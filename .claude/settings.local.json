@@ -48,7 +48,8 @@
       "Bash(timeout:*)",
       "Bash(npm:*)",
       "Bash(taskkill:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []

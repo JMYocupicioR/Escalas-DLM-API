@@ -152,7 +152,7 @@ export default function TermsSettings() {
           <View style={styles.header}>
             <Text style={styles.title}>Términos y Condiciones</Text>
             <Text style={styles.subtitle}>
-              Condiciones de uso de la aplicación de escalas médicas DeepLuxMed.
+              Condiciones de uso de la aplicación de escalas médicas Escalas DLM.
             </Text>
           </View>
 
@@ -175,7 +175,7 @@ export default function TermsSettings() {
               no debe utilizar la aplicación.
             </Text>
             <Text style={styles.paragraph}>
-              DeepLuxMed se reserva el derecho de modificar estos términos en cualquier momento. 
+              DeepLux Med se reserva el derecho de modificar estos términos en cualquier momento. 
               Los cambios entrarán en vigor inmediatamente después de su publicación.
             </Text>
           </View>
@@ -252,7 +252,7 @@ export default function TermsSettings() {
               guías clínicas reconocidas internacionalmente.
             </Text>
             <Text style={styles.paragraph}>
-              <Text style={styles.importantText}>Sin embargo:</Text> DeepLuxMed no garantiza la precisión absoluta 
+              <Text style={styles.importantText}>Sin embargo:</Text> DeepLux Med no garantiza la precisión absoluta 
               de los resultados y recomienda siempre validar con fuentes primarias.
             </Text>
             <View style={styles.bulletPoint}>
@@ -277,7 +277,7 @@ export default function TermsSettings() {
               <Text style={styles.sectionTitle}>Disponibilidad del Servicio</Text>
             </View>
             <Text style={styles.paragraph}>
-              DeepLuxMed se esfuerza por mantener la aplicación disponible 24/7, pero no garantiza 
+              DeepLux Med se esfuerza por mantener la aplicación disponible 24/7, pero no garantiza 
               disponibilidad ininterrumpida.
             </Text>
             <Text style={styles.paragraph}>

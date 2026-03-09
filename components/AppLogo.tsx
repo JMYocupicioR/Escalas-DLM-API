@@ -1,7 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Linking } from 'react-native';
 import { AppIcon, AppIconSimple } from './AppIcon';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+
+/**
+ * AppLogo — Componente de marca de Escalas DLM
+ *
+ * Jerarquía visual:
+ *   DeepLux.org  →  MED  →  Escalas DLM
+ */
 
 interface AppLogoProps {
   size?: 'small' | 'medium' | 'large';
@@ -10,28 +17,32 @@ interface AppLogoProps {
   style?: any;
 }
 
-export const AppLogo: React.FC<AppLogoProps> = ({ 
-  size = 'medium', 
-  showText = true, 
+export const AppLogo: React.FC<AppLogoProps> = ({
+  size = 'medium',
+  showText = true,
   variant = 'default',
-  style 
+  style,
 }) => {
   const { colors } = useThemedStyles();
 
   const getSizes = () => {
     switch (size) {
       case 'small':
-        return { iconSize: 32, fontSize: 16, spacing: 8 };
+        return { iconSize: 32, brandSize: 13, subBrandSize: 9, productSize: 14, spacing: 8 };
       case 'large':
-        return { iconSize: 64, fontSize: 24, spacing: 12 };
+        return { iconSize: 64, brandSize: 18, subBrandSize: 11, productSize: 20, spacing: 12 };
       case 'medium':
       default:
-        return { iconSize: 48, fontSize: 20, spacing: 10 };
+        return { iconSize: 48, brandSize: 15, subBrandSize: 10, productSize: 17, spacing: 10 };
     }
   };
 
-  const { iconSize, fontSize, spacing } = getSizes();
+  const { iconSize, brandSize, subBrandSize, productSize, spacing } = getSizes();
   const IconComponent = variant === 'simple' ? AppIconSimple : AppIcon;
+
+  const handlePress = () => {
+    Linking.openURL('https://deeplux.org');
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -41,75 +52,177 @@ export const AppLogo: React.FC<AppLogoProps> = ({
     },
     textContainer: {
       flexDirection: 'column',
+      gap: 1,
     },
-    primaryText: {
-      fontSize: fontSize,
+    // Fila 1: DeepLux.org
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 0,
+    },
+    brandText: {
+      fontSize: brandSize,
+      fontWeight: '700',
+      color: colors.text,
+      letterSpacing: 0.2,
+    },
+    orgText: {
+      fontSize: brandSize - 2,
+      fontWeight: '600',
+      color: '#0ea5e9',
+      letterSpacing: 0,
+    },
+    // Fila 2: MED badge
+    medBadge: {
+      alignSelf: 'flex-start',
+      backgroundColor: 'rgba(14,165,233,0.12)',
+      borderRadius: 3,
+      paddingHorizontal: 4,
+      paddingVertical: 1,
+    },
+    medText: {
+      fontSize: subBrandSize,
+      fontWeight: '800',
+      color: '#0ea5e9',
+      letterSpacing: 1.5,
+    },
+    // Fila 3: Escalas DLM (producto)
+    productRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 4,
+    },
+    productText: {
+      fontSize: productSize,
       fontWeight: '700',
       color: colors.primary,
-      letterSpacing: 0.5,
+      letterSpacing: 0.3,
     },
-    secondaryText: {
-      fontSize: fontSize * 0.7,
-      fontWeight: '500',
-      color: colors.mutedText,
-      marginTop: -2,
+    dlmBadge: {
+      fontSize: subBrandSize + 1,
+      fontWeight: '800',
+      color: '#0ea5e9',
+      letterSpacing: 1,
     },
   });
 
   return (
-    <View style={[styles.container, style]}>
+    <Pressable onPress={handlePress} style={[styles.container, style]}>
       <IconComponent size={iconSize} />
       {showText && (
         <View style={styles.textContainer}>
-          <Text style={styles.primaryText}>DeepLuxMed</Text>
-          <Text style={styles.secondaryText}>Escalas</Text>
+          {/* DeepLux.org */}
+          <View style={styles.brandRow}>
+            <Text style={styles.brandText}>DeepLux</Text>
+            <Text style={styles.orgText}>.org</Text>
+          </View>
+          {/* MED */}
+          <View style={styles.medBadge}>
+            <Text style={styles.medText}>MED</Text>
+          </View>
         </View>
       )}
-    </View>
+    </Pressable>
   );
 };
 
 // Componente específico para headers
 export const HeaderLogo: React.FC<{ size?: 'small' | 'medium' }> = ({ size = 'medium' }) => {
   return (
-    <AppLogo 
-      size={size} 
-      showText={true} 
+    <AppLogo
+      size={size}
+      showText={true}
       variant="simple"
       style={{ marginVertical: 8 }}
     />
   );
 };
 
-// Componente para splash screen o pantallas de carga
+// Componente para splash screen, login y registro
 export const SplashLogo: React.FC = () => {
   const { colors } = useThemedStyles();
-  
+  const handlePress = () => Linking.openURL('https://deeplux.org');
+
   const styles = StyleSheet.create({
     container: {
       alignItems: 'center',
       justifyContent: 'center',
+      gap: 12,
     },
-    text: {
-      fontSize: 32,
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+    },
+    brand: {
+      fontSize: 30,
+      fontWeight: '800',
+      color: colors.text,
+      letterSpacing: 0.5,
+    },
+    org: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: '#0ea5e9',
+    },
+    medRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    divider: {
+      height: 1,
+      width: 24,
+      backgroundColor: 'rgba(14,165,233,0.4)',
+    },
+    med: {
+      fontSize: 11,
+      fontWeight: '900',
+      color: '#0ea5e9',
+      letterSpacing: 3,
+    },
+    productRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 6,
+      marginTop: 4,
+    },
+    product: {
+      fontSize: 22,
       fontWeight: '800',
       color: colors.primary,
-      marginTop: 16,
-      letterSpacing: 1,
+      letterSpacing: 0.5,
     },
-    subtitle: {
-      fontSize: 18,
-      fontWeight: '500',
-      color: colors.mutedText,
-      marginTop: 8,
+    dlm: {
+      fontSize: 13,
+      fontWeight: '900',
+      color: '#0ea5e9',
+      letterSpacing: 2,
+      backgroundColor: 'rgba(14,165,233,0.12)',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 4,
     },
   });
 
   return (
-    <View style={styles.container}>
-      <AppIcon size={120} />
-      <Text style={styles.text}>DeepLuxMed</Text>
-      <Text style={styles.subtitle}>Escalas Médicas</Text>
-    </View>
+    <Pressable onPress={handlePress} style={styles.container}>
+      <AppIcon size={96} />
+      {/* DeepLux.org */}
+      <View style={styles.brandRow}>
+        <Text style={styles.brand}>DeepLux</Text>
+        <Text style={styles.org}>.org</Text>
+      </View>
+      {/* MED */}
+      <View style={styles.medRow}>
+        <View style={styles.divider} />
+        <Text style={styles.med}>MED</Text>
+        <View style={styles.divider} />
+      </View>
+      {/* Escalas DLM */}
+      <View style={styles.productRow}>
+        <Text style={styles.product}>Escalas</Text>
+        <Text style={styles.dlm}>DLM</Text>
+      </View>
+    </Pressable>
   );
 };

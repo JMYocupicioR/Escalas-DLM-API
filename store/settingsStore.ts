@@ -31,6 +31,7 @@ export interface SettingsState {
   
   // Comportamiento de la app
   autoAdvanceQuestions: boolean;
+  oneQuestionAtATime: boolean;
   showDetailedScores: boolean;
   enableHapticFeedback: boolean;
   defaultView: 'grid' | 'list';
@@ -66,6 +67,7 @@ export interface SettingsState {
   
   // Acciones de comportamiento
   toggleAutoAdvance: () => void;
+  toggleOneQuestionAtATime: () => void;
   toggleDetailedScores: () => void;
   toggleHapticFeedback: () => void;
   setDefaultView: (view: 'grid' | 'list') => void;
@@ -106,6 +108,7 @@ const defaultSettings = {
   
   // Comportamiento
   autoAdvanceQuestions: true,
+  oneQuestionAtATime: false,
   showDetailedScores: true,
   enableHapticFeedback: true,
   defaultView: 'grid' as const,
@@ -181,6 +184,7 @@ export const useSettingsStore = create<SettingsState>()(
       
       // Acciones de comportamiento
       toggleAutoAdvance: () => set((state) => ({ autoAdvanceQuestions: !state.autoAdvanceQuestions })),
+      toggleOneQuestionAtATime: () => set((state) => ({ oneQuestionAtATime: !state.oneQuestionAtATime })),
       toggleDetailedScores: () => set((state) => ({ showDetailedScores: !state.showDetailedScores })),
       toggleHapticFeedback: () => set((state) => ({ enableHapticFeedback: !state.enableHapticFeedback })),
       setDefaultView: (defaultView) => set({ defaultView }),

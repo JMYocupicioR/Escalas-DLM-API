@@ -86,8 +86,8 @@ export function useOgsAssessment() {
 
   // Obtener interpretación basada en puntuación
   const getInterpretation = useCallback((score: number) => {
-    const range = ogsScale.scoring.ranges.find(r => score >= r.min_value && score <= r.max_value);
-    return range || ogsScale.scoring.ranges[ogsScale.scoring.ranges.length - 1];
+    const range = ogsScale.scoring?.ranges?.find(r => score >= r.min_value && score <= r.max_value);
+    return range || ogsScale.scoring?.ranges?.[ogsScale.scoring.ranges.length - 1];
   }, []);
 
   // Calcular resultados completos

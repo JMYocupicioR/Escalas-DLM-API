@@ -1,115 +1,25 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ArrowRight } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { PatientForm } from '@/components/PatientForm';
 import { questions, options, fimCategories } from '@/data/fim';
 import { useScalesStore } from '@/store/scales';
-import * as Print from 'expo-print';
-import { shareAsync } from 'expo-sharing';
-
-function useFimAssessment() {
-  const [currentStep, setCurrentStep] = useState<'form' | 'questions' | 'results'>('form');
-  const [patientData, setPatientData] = useState({ name: '', age: '' });
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const addRecentlyViewed = useScalesStore(state => state.addRecentlyViewed);
-
-  const handleAnswer = useCallback((questionId: string, value: number) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
-  }, []);
-
-  const nextQuestion = useCallback(() => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setCurrentStep('results');
-      addRecentlyViewed('fim');
-    }
-  }, [currentQuestion, addRecentlyViewed]);
-
-  const prevQuestion = useCallback(() => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  }, [currentQuestion]);
-
-  const { totalScore, motorScore, cognitiveScore } = useMemo(() => {
-    const motorItems = ['alimentacion', 'arreglo', 'bano', 'vestido_superior', 'vestido_inferior', 'aseo_perineal', 'miccion', 'defecacion', 'traslado_cama', 'traslado_bano', 'traslado_ducha', 'marcha', 'escaleras'];
-    
-    let motor = 0;
-    let cognitive = 0;
-
-    for (const q of questions) {
-        const score = answers[q.id] || 0;
-        if (motorItems.includes(q.id)) {
-            motor += score;
-        } else {
-            cognitive += score;
-        }
-    }
-    return { totalScore: motor + cognitive, motorScore: motor, cognitiveScore: cognitive };
-  }, [answers]);
-
-  const getInterpretation = useCallback(() => {
-    if (totalScore >= 108) return { level: 'Independencia completa o modificada', colorKey: 'scoreOptimal' };
-    if (totalScore >= 72) return { level: 'Dependencia moderada', colorKey: 'scoreGood' };
-    if (totalScore >= 36) return { level: 'Dependencia severa', colorKey: 'scoreMedium' };
-    return { level: 'Dependencia completa', colorKey: 'scoreLow' };
-  }, [totalScore]);
-
-  const resetAssessment = useCallback(() => {
-    setAnswers({});
-    setCurrentQuestion(0);
-    setCurrentStep('form');
-  }, []);
-
-  return { currentStep, setCurrentStep, patientData, setPatientData, currentQuestion, answers, handleAnswer, nextQuestion, prevQuestion, totalScore, motorScore, cognitiveScore, getInterpretation, resetAssessment };
-}
-
-
-// Componente para los botones de puntuación
-const ScoreButton = ({ score, selectedScore, onSelect, colors }: any) => {
-  const isSelected = score.value === selectedScore;
-  
-  const getButtonColor = () => {
-    if (!isSelected) return colors.card;
-    if (score.value <= 2) return colors.scoreLow;
-    if (score.value <= 4) return colors.scoreMedium;
-    if (score.value <= 6) return colors.scoreGood;
-    return colors.scoreOptimal;
-  };
-
-  const getTextColor = () => {
-      if (!isSelected) return colors.text;
-      return colors.card;
-  }
-
-  return (
-    <TouchableOpacity
-      style={[
-        styles.scoreButton,
-        { 
-          backgroundColor: getButtonColor(),
-          borderColor: isSelected ? getButtonColor() : colors.border 
-        },
-      ]}
-      onPress={() => onSelect(score.value)}
-    >
-      <Text style={[styles.scoreButtonText, { color: getTextColor() }]}>
-        {score.value}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { createAssessment } from '@/api/assessments';
+import { ResultsActions } from '@/components/ResultsActions';
+import { useFimAssessment } from '@/hooks/useFimAssessment';
 
 export default function FimScaleScreen() {
   const router = useRouter();
   const { colors } = useScaleStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
+
+  // Obtener datos del paciente del store si existe
+  const getCurrentPatient = useScalesStore((state) => state.getCurrentPatient);
+  const currentPatient = getCurrentPatient();
 
   const {
     currentStep,
@@ -125,16 +35,51 @@ export default function FimScaleScreen() {
     motorScore,
     cognitiveScore,
     getInterpretation,
-    resetAssessment,
+    // resetAssessment, // Unused
   } = useFimAssessment();
 
-  const handleExport = async () => {
-    Alert.alert(
-      'Función en desarrollo', 
-      'La exportación PDF para esta escala está siendo actualizada. Estará disponible pronto.'
-    );
-  };
-  
+  const { session } = useAuthSession();
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sincronizar datos del paciente
+  React.useEffect(() => {
+    if (currentPatient) {
+      setPatientData({
+        id: currentPatient.id,
+        name: currentPatient.name,
+        age: currentPatient.age ? currentPatient.age.toString() : '',
+        gender: currentPatient.gender,
+        doctorName: currentPatient.attendingPhysician || ''
+      });
+    }
+  }, [currentPatient, setPatientData]);
+
+  const handleSave = useCallback(async () => {
+    if (!patientData.id || !session?.user.id) return;
+    setIsSaving(true);
+    try {
+      const interpretation = getInterpretation();
+      const { error } = await createAssessment(session.user.id, {
+        patient_id: patientData.id,
+        scale_slug: 'fim',
+        scale_id: undefined,
+        responses: answers,
+        total_score: totalScore,
+        interpretation: interpretation.level,
+        clinical_notes: null,
+        assessor_name: patientData.doctorName,
+      });
+
+      if (error) throw error;
+      Alert.alert('Éxito', 'Evaluación guardada correctamente en el historial.');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Error', 'No se pudo guardar la evaluación.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [patientData, session, answers, totalScore, getInterpretation]);
+
   const goToHome = useCallback(() => {
     router.push('/');
   }, [router]);
@@ -146,10 +91,18 @@ export default function FimScaleScreen() {
         <PatientForm
           scaleId="fim"
           onContinue={(data) => {
-            setPatientData(data);
+            if (data) {
+                setPatientData({
+                    id: data.id,
+                    name: data.name || '',
+                    age: data.age?.toString() || '',
+                    gender: data.gender || '',
+                    doctorName: data.doctorName || ''
+                });
+            }
             setCurrentStep('questions');
           }}
-          allowSkip
+          allowSkip={false}
         />
       </View>
     </ScrollView>
@@ -212,9 +165,37 @@ export default function FimScaleScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.resultsContainer}>
           <Text style={styles.title}>Resultados de la Escala FIM</Text>
+
+          <View style={styles.patientInfoCard}>
+            <Text style={styles.sectionTitle}>Datos del Paciente</Text>
+            <View style={styles.patientInfoRow}>
+              <Text style={styles.patientInfoLabel}>Nombre:</Text>
+              <Text style={styles.patientInfoValue}>{patientData.name || 'Paciente Anónimo'}</Text>
+            </View>
+            <View style={styles.patientInfoRow}>
+              <Text style={styles.patientInfoLabel}>Edad:</Text>
+              <Text style={styles.patientInfoValue}>{patientData.age || 'No especificada'}</Text>
+            </View>
+            <View style={styles.patientInfoRow}>
+              <Text style={styles.patientInfoLabel}>Género:</Text>
+              <Text style={styles.patientInfoValue}>{patientData.gender || 'No especificado'}</Text>
+            </View>
+            {currentPatient?.medicalRecordNumber && (
+              <View style={styles.patientInfoRow}>
+                <Text style={styles.patientInfoLabel}>Registro médico:</Text>
+                <Text style={styles.patientInfoValue}>{currentPatient.medicalRecordNumber}</Text>
+              </View>
+            )}
+            {patientData.doctorName ? (
+              <View style={styles.patientInfoRow}>
+                <Text style={styles.patientInfoLabel}>Médico:</Text>
+                <Text style={styles.patientInfoValue}>{patientData.doctorName}</Text>
+              </View>
+            ) : null}
+          </View>
           <View style={styles.resultSection}>
             <Text style={styles.sectionTitle}>Puntuación General</Text>
-            <Text style={[styles.scoreText, { color: colors[interpretation.colorKey] }]}>
+            <Text style={[styles.scoreText, { color: (colors[interpretation.colorKey as keyof typeof colors] as string) || colors.text }]}>
               {totalScore} / 126
             </Text>
             <Text style={styles.interpretationText}>{interpretation.level}</Text>
@@ -231,29 +212,40 @@ export default function FimScaleScreen() {
             </View>
           </View>
         </View>
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
-            onPress={resetAssessment}
-            accessibilityLabel="Reiniciar cuestionario"
-            accessibilityRole="button"
-          >
-            <Text style={[styles.actionButtonText, { color: colors.text }]}>
-              Reiniciar Cuestionario
-            </Text>
-          </TouchableOpacity>
+        <ResultsActions
+            assessment={{
+              patientData: {
+                id: patientData.id,
+                name: patientData.name || 'Paciente Anónimo',
+                age: Number(patientData.age),
+                gender: patientData.gender,
+                doctorName: patientData.doctorName,
+              },
+              score: totalScore,
+              interpretation: interpretation.level,
+              answers: Object.entries(answers).map(([id, value]) => {
+                 const q = questions.find(q => q.id === id);
+                 const opt = options.find(o => o.value === value);
+                 return {
+                     id,
+                     question: q?.question || '',
+                     value,
+                     label: opt?.label,
+                     points: value
+                 };
+              }),
+            }}
+            scale={{ 
+              id: 'fim', 
+              name: 'Indice FIM' 
+            }}
+            containerStyle={{ marginTop: 16 }}
+            onSave={handleSave}
+            canSave={!!patientData.id}
+            saving={isSaving}
+          />
           
-          <TouchableOpacity
-            style={[styles.actionButton, styles.exportButton]}
-            onPress={handleExport}
-            accessibilityLabel="Exportar PDF"
-            accessibilityRole="button"
-          >
-            <Text style={[styles.actionButtonText, { color: colors.card }]}>
-              Exportar PDF
-            </Text>
-          </TouchableOpacity>
-          
+          <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={[styles.actionButton, styles.homeButton]}
             onPress={goToHome}
@@ -490,5 +482,29 @@ const createStyles = (colors: any) =>
     actionButtonText: {
         fontSize: 16,
         fontWeight: '600',
+    },
+    patientInfoCard: {
+        padding: 16,
+        backgroundColor: colors.card,
+        borderRadius: 8,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    patientInfoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    patientInfoLabel: {
+        fontSize: 14,
+        color: colors.mutedText,
+    },
+    patientInfoValue: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: colors.text,
     },
   });

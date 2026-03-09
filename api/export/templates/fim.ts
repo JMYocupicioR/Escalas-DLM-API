@@ -147,7 +147,7 @@ export const generateHtml = (payload: FimPayload): string => {
               <tbody>${tableRows}</tbody>
           </table>
           <div class="footer">
-              <p>Generado por DeepLuxMed.mx | ${formattedDate} ${formattedTime}</p>
+              <p>Generado por Escalas DLM — DeepLux Med | ${formattedDate} ${formattedTime}</p>
           </div>
       </div>
   </body>

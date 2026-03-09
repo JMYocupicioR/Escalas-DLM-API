@@ -7,12 +7,14 @@ import { AppIcon } from '@/components/AppIcon';
 import { SearchWidget } from '@/components/SearchWidget';
 import { QuickActions } from '@/components/QuickActions';
 import { FavoriteButton } from '@/components/FavoriteButton';
+import ScalesCategoriesHome from '@/components/home/SupabaseCategoriesHome';
 import { ScaleCard, ScaleCardData } from '@/components/Card';
 import { ScaleGridSkeleton, EmptyState } from '@/components/LoadingStates';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useScalesStore } from '@/store/scales';
 import { scalesById, scales as allScales } from '@/data/_scales';
+import { getScales } from '@/api/scales';
 import { calculateGridConfig, getLayoutMode, shouldUseListView } from '@/utils/responsiveGrid';
 import { Activity, Brain, Star, Calculator, Compass, Heart, TrendingUp, Users, Clock, Zap, Search as SearchIcon } from 'lucide-react-native';
 
@@ -78,32 +80,45 @@ const SCALE_STATS = {
   'hine': { uses: 523, rating: 4.7, category: 'Neurológica', icon: Brain, color: '#3b82f6' },
 };
 
-export default function HomeScreen() {
+function HomeScreen() {
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { isTablet, isDesktop, width, isLandscape } = useResponsiveLayout();
   const recentlyViewed = useScalesStore((s) => s.recentlyViewed);
   const router = useRouter();
   
-  // Simulate loading state (in production, this would be from actual data fetching)
+  // Load popular scales from Supabase (dynamic data)
   const [isLoading, setIsLoading] = useState(true);
+  const [supabaseScales, setSupabaseScales] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate initial load
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getScales({ limit: 12, sortBy: 'popularity' });
+        if (!cancelled && res.data && res.data.length > 0) {
+          setSupabaseScales(res.data);
+        }
+      } catch (e) {
+        console.warn('[Home] Failed to load Supabase scales, using fallback');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
+  // Use Supabase data if available, fallback to hardcoded
   const popularScales = useMemo(() => {
+    if (supabaseScales.length > 0) return supabaseScales;
+    // Fallback to hardcoded local data
     const list = POPULAR_IDS.map(id => scalesById[id]).filter(Boolean) as typeof allScales;
     if (list.length < 6) {
       const extras = allScales.filter(s => !POPULAR_IDS.includes(s.id)).slice(0, 6 - list.length);
       return [...list, ...extras];
     }
     return list;
-  }, []);
+  }, [supabaseScales]);
 
   // Enhanced grid configuration
   const gridConfig = useMemo(() => calculateGridConfig({
@@ -120,18 +135,20 @@ export default function HomeScreen() {
 
   // Convert scales to ScaleCardData format
   const popularScalesData: ScaleCardData[] = useMemo(() => {
-    return popularScales.map(scale => {
+    return popularScales.map((scale: any) => {
       const stats = SCALE_STATS[scale.id as keyof typeof SCALE_STATS];
+      // Supabase scales have 'category' field, local scales have stats mapping
+      const category = scale.category || stats?.category || 'General';
       return {
         id: scale.id,
-        name: scale.name,
+        name: scale.name || scale.acronym || 'Escala',
         description: scale.description,
-        category: stats?.category,
-        categoryColor: stats?.color,
+        category,
+        categoryColor: stats?.color || '#0891b2',
         icon: stats?.icon || Activity,
         uses: stats?.uses,
         rating: stats?.rating,
-        timeToComplete: '5-10 min', // Default, could be enhanced with actual data
+        timeToComplete: scale.time_to_complete ? `${scale.time_to_complete} min` : '5-10 min',
       };
     });
   }, [popularScales]);
@@ -211,7 +228,7 @@ export default function HomeScreen() {
                 const s = scalesById[id];
                 if (!s) return null;
                 return (
-                  <TouchableOpacity key={id} style={styles.chip} onPress={() => router.push(`/scales/${id}`)}>
+                  <TouchableOpacity key={id} style={styles.chip} onPress={() => router.push(`/new-scales/${id}` as any)}>
                     <Text style={styles.chipText}>{s.name}</Text>
                   </TouchableOpacity>
                 );
@@ -264,7 +281,7 @@ export default function HomeScreen() {
                   <ScaleCard
                     scale={scaleData}
                     layout={useListView ? 'list' : 'grid'}
-                    onPress={() => router.push(`/scales/${scaleData.id}`)}
+                    onPress={() => router.push(`/new-scales/${scaleData.id}` as any)}
                     showStats={true}
                     showCategory={true}
                     rightElement={
@@ -364,6 +381,10 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   heroContent: {
     gap: Platform.select({ default: 16, web: 20 }),
+    // On web: lay hero icon+text and action pills side-by-side
+    ...(Platform.OS === 'web'
+      ? { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const }
+      : {}),
   },
   heroLeft: { 
     flexDirection: 'row', 
@@ -532,6 +553,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: -4,
+    alignItems: 'flex-start',
   },
   gridItem: {
     marginBottom: Platform.select({ default: 16, web: 20 }),
@@ -675,3 +697,5 @@ const createStyles = (colors: any) => StyleSheet.create({
 
   devNote: { color: colors.mutedText, fontStyle: 'italic', textAlign: 'center' },
 });
+
+export default HomeScreen;

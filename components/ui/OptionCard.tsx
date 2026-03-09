@@ -100,7 +100,7 @@ export const OptionCard: React.FC<OptionCardProps> = ({
                   { color: colors.text, fontSize: 12 * fontSizeMultiplier },
                 ]}
               >
-                {value} pt{typeof value === 'number' && value !== 1 ? 's' : ''}
+                {`${value} pt${typeof value === 'number' && value !== 1 ? 's' : ''}`}
               </Text>
             </View>
           )}
@@ -123,10 +123,11 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 10,
+    minHeight: 56, // Accessibility: min 48dp touch target + padding
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 2,
     elevation: 1,
   },
@@ -134,7 +135,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    minHeight: 52,
   },
   textContainer: {
     flex: 1,
@@ -142,11 +145,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 2,
     lineHeight: 22,
   },
   description: {
     lineHeight: 20,
+    marginTop: 2,
   },
   indicators: {
     flexDirection: 'row',
@@ -156,15 +160,15 @@ const styles = StyleSheet.create({
   valueBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   valueText: {
     fontWeight: '600',
   },
   checkContainer: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
   },

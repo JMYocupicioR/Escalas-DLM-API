@@ -1,6 +1,6 @@
 // hooks/useHineAssessment.ts
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { hineQuestionsData, hineScale, hineMotorMilestones, hineBehaviorItems } from '@/data/hine';
+import { hineQuestionsData, hineMotorMilestones, hineBehaviorItems } from '@/data/hine';
 
 export interface HineResponse {
   questionId: string;
@@ -60,7 +60,17 @@ export function useHineAssessment() {
   const [motorMilestones, setMotorMilestones] = useState<HineMotorMilestone[]>([]);
   const [behaviors, setBehaviors] = useState<HineBehavior[]>([]);
   const [comments, setComments] = useState('');
-  const [patientData, setPatientData] = useState({
+  const [patientData, setPatientData] = useState<{
+    name: string;
+    birthDate: string;
+    gestationalAge: string;
+    examDate: string;
+    headCircumference: string;
+    examiner: string;
+    chronologicalAge: string;
+    correctedAge: string;
+    correctedAgeMonths: number | null;
+  }>({
     name: '',
     birthDate: '',
     gestationalAge: '',

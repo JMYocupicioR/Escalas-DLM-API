@@ -61,7 +61,7 @@ export function QuickActions({ onActionPress }: QuickActionsProps) {
         ['#dcfce7', '#10b981'],
         ['#064e3b', '#10b981']
       ),
-      route: '/scales'
+      route: '/new-scales'
     },
     {
       id: 'calculators',

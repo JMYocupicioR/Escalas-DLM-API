@@ -487,7 +487,7 @@ export const generateHtml = (payload: BotulinumPayload): string => {
         <div class="puntos-motores-page">
           <header class="reporte-header">
             <div class="header-content">
-              <div class="clinica-logo">DeepLuxMed</div>
+              <div class="clinica-logo">Escalas DLM</div>
             </div>
             <div class="reporte-titulo">Puntos Motores de Referencia</div>
             <div class="fecha-reporte">${fecha}</div>

@@ -12,9 +12,12 @@ interface ResultsActionsProps {
   assessment: GenericAssessmentForPDF;
   scale: Pick<Scale, 'id' | 'name'>;
   containerStyle?: ViewStyle;
+  onSave?: () => Promise<void>;
+  canSave?: boolean;
+  saving?: boolean;
 }
 
-export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scale, containerStyle }) => {
+export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scale, containerStyle, onSave, canSave = true, saving = false }) => {
   const { colors, isDark } = useThemedStyles();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -112,8 +115,10 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
     };
     try {
       if (Platform.OS === 'web') {
-        const dbg = __DEV__ ? '&debug=1' : '';
-        const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
+        // const dbg = __DEV__ ? '&debug=1' : '';
+        const dbg = '';
+        // const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
+        const base = '';
         // Include additional data for botulinum scale
         const additionalData = scale.id === 'botulinum' ? {
           puntosMotoresData: (assessment as any).puntosMotoresData,
@@ -309,13 +314,41 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
   };
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[{ gap: 12, marginTop: 12 }, containerStyle]}>
+      {/* Guardar en historial - full width */}
+      <TouchableOpacity
+        style={[
+          styles.saveButton,
+          { backgroundColor: colors.primary, opacity: onSave ? (saving ? 0.7 : canSave ? 1 : 0.5) : 0.5 },
+        ]}
+        onPress={async () => {
+          if (!onSave) {
+            Alert.alert('Inicia sesión', 'Debes iniciar sesión para guardar en el historial.');
+            return;
+          }
+          if (saving || !canSave) return;
+          try {
+            await onSave();
+          } catch (e) {
+            Alert.alert('Error', e instanceof Error ? e.message : 'No se pudo guardar en el historial.');
+          }
+        }}
+        accessibilityLabel="Guardar en historial del paciente"
+      >
+        {saving ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={[styles.buttonText, { color: '#fff' }]}>Guardar en historial del paciente</Text>
+        )}
+      </TouchableOpacity>
+
+      {/* Export row */}
+      <View style={styles.container}>
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors.buttonSecondary }]}
         onPress={handlePdfGeneration}
         disabled={isGeneratingPdf}
         accessibilityLabel="Exportar resultados como PDF"
-        accessibilityRole="button"
       >
         {isGeneratingPdf ? (
           <ActivityIndicator size="small" color={colors.buttonSecondaryText} />
@@ -328,7 +361,6 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
         style={[styles.button, { backgroundColor: colors.buttonPrimary }]}
         onPress={handleExcelExport}
         accessibilityLabel="Exportar resultados como Excel (CSV)"
-        accessibilityRole="button"
       >
         <Text style={[styles.buttonText, { color: colors.buttonPrimaryText }]}>Exportar Excel</Text>
       </TouchableOpacity>
@@ -357,10 +389,10 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
           }
         }}
         accessibilityLabel="Exportar resultados como JSON"
-        accessibilityRole="button"
       >
         <Text style={[styles.buttonText, { color: colors.buttonSecondaryText }]}>Exportar JSON</Text>
       </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -369,7 +401,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 12,
+  },
+  saveButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
   },
   button: {
     flex: 1,

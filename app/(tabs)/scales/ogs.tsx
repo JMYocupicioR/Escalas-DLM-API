@@ -1,7 +1,7 @@
 // app/(tabs)/scales/ogs.tsx
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ArrowRight, CheckCircle, Circle, User, Calendar, Stethoscope } from 'lucide-react-native';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
@@ -9,10 +9,8 @@ import { PatientForm } from '@/components/PatientForm';
 import { ResultsActions } from '@/components/ResultsActions';
 import { ogsScale, ogsQuestions } from '@/data/ogs';
 import { useOgsAssessment } from '@/hooks/useOgsAssessment';
-import { ScaleInfo, ScaleInfoData } from '@/components/ScaleInfo';
 
 export default function OgsScaleScreen() {
-  const router = useRouter();
   const { colors } = useScaleStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -20,10 +18,8 @@ export default function OgsScaleScreen() {
   const [selectedSide, setSelectedSide] = useState<'left' | 'right'>('left');
 
   const {
-    responses,
     patientData,
     currentQuestionIndex,
-    isComplete,
     currentQuestion,
     progress,
     results,
@@ -71,6 +67,7 @@ export default function OgsScaleScreen() {
     setStep('form');
   }, [resetAssessment]);
 
+  // Helper para obtener color según puntuación
   const renderForm = () => (
     <ScrollView contentContainerStyle={styles.content}>
       <View style={styles.card}>
@@ -292,17 +289,83 @@ export default function OgsScaleScreen() {
           </View>
 
         <View style={styles.detailedResults}>
-          <Text style={styles.detailedTitle}>Puntuación Detallada por Ítem</Text>
+          <Text style={styles.detailedTitle}>Evaluación Detallada por Parámetro</Text>
           {ogsQuestions.map((question, index) => {
             const response = getResponse(question.id);
+            const rightOption = question.options.find(opt => opt.option_value === response.rightScore);
+            const leftOption = question.options.find(opt => opt.option_value === response.leftScore);
+
+            const getRightColor = (score: number) => {
+              if (score === 3) return '#10B981';
+              if (score === 2) return '#F59E0B';
+              if (score === 1) return '#F97316';
+              return '#EF4444';
+            };
+
+            const getLeftColor = (score: number) => {
+              if (score === 3) return '#10B981';
+              if (score === 2) return '#F59E0B';
+              if (score === 1) return '#F97316';
+              return '#EF4444';
+            };
+
             return (
-              <View key={question.id} style={styles.detailedItem}>
-                <Text style={styles.detailedQuestion}>{question.question}</Text>
-                <View style={styles.detailedScores}>
-                  <Text style={styles.detailedScore}>
-                    D: {response.rightScore} | I: {response.leftScore}
-                  </Text>
+              <View key={question.id} style={styles.parameterCard}>
+                <View style={styles.parameterHeader}>
+                  <Text style={styles.parameterNumber}>{index + 1}.</Text>
+                  <Text style={styles.parameterTitle}>{question.question}</Text>
                 </View>
+
+                {question.description && (
+                  <Text style={styles.parameterDescription}>{question.description}</Text>
+                )}
+
+                {/* Pierna Derecha */}
+                <View style={styles.sideResult}>
+                  <Text style={styles.sideLabel}>Pierna Derecha</Text>
+                  <View style={styles.resultRow}>
+                    <Text style={styles.optionText}>{rightOption?.option_label || 'No evaluada'}</Text>
+                    <View style={[styles.scoreBadge, { backgroundColor: getRightColor(response.rightScore) + '20' }]}>
+                      <Text style={[styles.scoreText, { color: getRightColor(response.rightScore) }]}>
+                        {response.rightScore} pts
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.progressBarContainer}>
+                    <View style={[styles.progressBarFill, {
+                      width: `${(response.rightScore / 3) * 100}%`,
+                      backgroundColor: getRightColor(response.rightScore)
+                    }]} />
+                  </View>
+                </View>
+
+                {/* Pierna Izquierda */}
+                <View style={styles.sideResult}>
+                  <Text style={styles.sideLabel}>Pierna Izquierda</Text>
+                  <View style={styles.resultRow}>
+                    <Text style={styles.optionText}>{leftOption?.option_label || 'No evaluada'}</Text>
+                    <View style={[styles.scoreBadge, { backgroundColor: getLeftColor(response.leftScore) + '20' }]}>
+                      <Text style={[styles.scoreText, { color: getLeftColor(response.leftScore) }]}>
+                        {response.leftScore} pts
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.progressBarContainer}>
+                    <View style={[styles.progressBarFill, {
+                      width: `${(response.leftScore / 3) * 100}%`,
+                      backgroundColor: getLeftColor(response.leftScore)
+                    }]} />
+                  </View>
+                </View>
+
+                {/* Alert de asimetría */}
+                {Math.abs(response.rightScore - response.leftScore) >= 2 && (
+                  <View style={styles.asymmetryAlert}>
+                    <Text style={styles.asymmetryText}>
+                      ⚠️ Asimetría significativa detectada ({Math.abs(response.rightScore - response.leftScore)} puntos)
+                    </Text>
+                  </View>
+                )}
               </View>
             );
           })}
@@ -632,6 +695,86 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   interpretationBold: {
     fontWeight: 'bold',
+  },
+  // Nuevos estilos para detalles mejorados
+  parameterCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  parameterHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  parameterNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.primary,
+    marginRight: 8,
+    minWidth: 24,
+  },
+  parameterTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+  },
+  parameterDescription: {
+    fontSize: 13,
+    color: colors.mutedText,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  sideResult: {
+    marginBottom: 12,
+  },
+  sideLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  resultRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  scoreBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  scoreText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: colors.border + '40',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  asymmetryAlert: {
+    backgroundColor: '#FEF3C7',
+    borderLeftWidth: 3,
+    borderLeftColor: '#F59E0B',
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 12,
+  },
+  asymmetryText: {
+    fontSize: 13,
+    color: '#92400E',
+    fontWeight: '500',
   },
   resetButton: {
     backgroundColor: colors.surface,

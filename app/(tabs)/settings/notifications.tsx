@@ -230,7 +230,7 @@ export default function NotificationsSettings() {
               <View style={styles.content}>
                 <Text style={styles.title}>Configuración del sistema</Text>
                 <Text style={styles.description}>
-                  Para modificar los permisos de notificaciones, accede a la configuración del sistema en Ajustes → Aplicaciones → DeepLuxMed → Notificaciones.
+                   Para modificar los permisos de notificaciones, accede a la configuración del sistema en Ajustes → Aplicaciones → Escalas DLM → Notificaciones.
                 </Text>
               </View>
             </View>

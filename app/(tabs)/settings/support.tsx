@@ -107,7 +107,7 @@ export default function SupportScreen() {
 
   // Función para enviar un email directo
   const sendSupportEmail = () => {
-    const mailUrl = `mailto:${SUPPORT_CONTACT.email}?subject=Soporte DeepLuxMed App&body=`;
+    const mailUrl = `mailto:${SUPPORT_CONTACT.email}?subject=Soporte Escalas DLM&body=`;
     Linking.openURL(mailUrl).catch(() => {
       Alert.alert(
         'Error',

@@ -243,7 +243,7 @@ export default function HelpSettings() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Centro de ayuda</Text>
           <Text style={styles.headerSubtitle}>
-            Encuentra respuestas a tus preguntas sobre DeepLuxMed y las escalas médicas.
+            Encuentra respuestas a tus preguntas sobre Escalas DLM y las escalas médicas.
           </Text>
         </View>
 

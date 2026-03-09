@@ -11,66 +11,58 @@ export const generatePdfFromService = async (
   options?: PdfOptions,
   questions?: any[]
 ): Promise<string> => {
+  // Prepare the request payload
+  const additionalData = scale.id === 'botulinum' ? {
+    puntosMotoresData: (assessment as any).puntosMotoresData,
+    dosisDataComplete: (assessment as any).dosisDataComplete,
+  } : {};
+
+  const payload: any = {
+    assessment,
+    scale,
+    options: options || {},
+    ...additionalData
+  };
+  if (questions) payload.questions = questions;
+
   try {
     const dbg = __DEV__ ? '?debug=1' : '';
-    // Prepare the request payload with additional data for botulinum scale
-    const additionalData = scale.id === 'botulinum' ? {
-      puntosMotoresData: (assessment as any).puntosMotoresData,
-      dosisDataComplete: (assessment as any).dosisDataComplete,
-    } : {};
-    
-    const payload: any = {
-      assessment,
-      scale,
-      options: options || {},
-      ...additionalData
-    };
-    if (questions) payload.questions = questions;
 
-    // Make the API call to our Netlify Function first
-    const response = await fetch(`/api/pdf/export${dbg}` as any, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    // URL fallback logic without using process.env directly to avoid Metro resolution issues
+    const endpoints = [
+      `/api/pdf/export${dbg}`,
+      // Fallback endpoints could be added here as hardcoded strings if needed for dev
+    ];
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
+    let lastError: Error | null = null;
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint as any, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.base64) {
+            return result.base64;
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          lastError = new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+      } catch (e) {
+        lastError = e instanceof Error ? e : new Error(String(e));
+      }
     }
 
-    const result = await response.json();
-    if (!result.base64) {
-      throw new Error('No PDF data received from service');
-    }
-    return result.base64;
+    throw lastError || new Error('PDF generation failed');
   } catch (error) {
-    console.error('Error calling Netlify PDF function:', error);
-    // Fallback: try direct PDF service if available via EXPO_PUBLIC_PDF_SERVICE_URL
-    try {
-      const base = (process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '').replace(/\/$/, '');
-      if (!base) throw new Error('Direct PDF service URL not configured');
-
-      const res = await fetch(`${base}/api/pdf/export`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (!data?.base64) throw new Error('No PDF data in fallback response');
-      return data.base64 as string;
-    } catch (fallbackError) {
-      console.error('Direct PDF service fallback failed:', fallbackError);
-      throw new Error(
-        fallbackError instanceof Error
-          ? `PDF generation failed: ${fallbackError.message}`
-          : 'PDF generation failed: Unknown error'
-      );
-    }
+    console.error('PDF service error:', error);
+    throw error;
   }
 };

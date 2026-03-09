@@ -1,11 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { useRouter, Stack } from 'expo-router';
 import { RadioButton } from 'react-native-paper';
-import * as Print from 'expo-print';
-import { shareAsync } from 'expo-sharing';
-import { Stack, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { CircleAlert as AlertCircle, ArrowLeft, ArrowRight, FileText, User } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useScalesStore } from '@/store/scales';
 import { useScaleStyles } from '@/hooks/useScaleStyles';
 import { PatientForm } from '@/components/PatientForm';
@@ -14,10 +11,13 @@ import { OptionRow } from '@/components/OptionRow';
 
 // Importar las preguntas desde un archivo separado
 import { questions } from '@/data/barthel';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { createAssessment } from '@/api/assessments';
 
 // Hook personalizado para manejar la evaluación de Barthel
 function useBarthelAssessment() {
   const [patientData, setPatientData] = useState({
+    id: undefined as string | undefined, // Add ID field
     name: '',
     age: '',
     gender: '',
@@ -28,9 +28,7 @@ function useBarthelAssessment() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const addRecentlyViewed = useScalesStore(state => state.addRecentlyViewed);
 
-  const handlePatientDataChange = useCallback((field: keyof typeof patientData) => (value: string) => {
-    setPatientData(prev => ({ ...prev, [field]: value }));
-  }, []);
+
 
   const handleAnswer = useCallback((questionId: string, value: number) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -79,9 +77,7 @@ function useBarthelAssessment() {
     };
   }, []);
 
-  const validateForm = useCallback(() => {
-    return Object.values(patientData).every(value => value.trim() !== '');
-  }, [patientData]);
+
 
   const nextQuestion = useCallback(() => {
     if (currentQuestion < questions.length - 1) {
@@ -98,147 +94,74 @@ function useBarthelAssessment() {
     }
   }, [currentQuestion]);
 
-  const resetAssessment = useCallback(() => {
-    setPatientData({ name: '', age: '', gender: '', doctorName: '' });
-    setAnswers({});
-    setCurrentQuestion(0);
-    setCurrentStep('form');
-  }, []);
+
 
   return {
     patientData,
     currentStep,
     currentQuestion,
     answers,
-    handlePatientDataChange,
     handleAnswer,
+    setPatientData,
     calculateTotal,
     getInterpretation,
-    validateForm,
     nextQuestion,
     prevQuestion,
-    setCurrentStep,
-    resetAssessment
+    setCurrentStep
   };
 }
 
 export default function BarthelScale() {
   const router = useRouter();
-  const { colors, getScoreColor } = useScaleStyles();
+  const { colors } = useScaleStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const {
     patientData,
     currentStep,
     currentQuestion,
     answers,
-    handlePatientDataChange,
     handleAnswer,
     calculateTotal,
+    setPatientData,
     getInterpretation,
-    validateForm,
     nextQuestion,
     prevQuestion,
     setCurrentStep,
-    resetAssessment
   } = useBarthelAssessment();
 
 
-  // Crear estilos dinámicos
-  const dynamicStyles = useMemo(() => StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    content: {
-      padding: 20,
-    },
-    formContainer: {
-      backgroundColor: colors.card,
-      borderRadius: 12,
-      padding: 20,
-      shadowColor: colors.shadowColor,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 20,
-      textAlign: 'center',
-    },
-    inputGroup: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.tagBackground,
-      borderRadius: 8,
-      marginBottom: 16,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-    },
-    input: {
-      flex: 1,
-      fontSize: 16,
-      color: colors.text,
-      marginLeft: 12,
-    },
-    button: {
-      backgroundColor: colors.buttonPrimary,
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    buttonSecondary: {
-      backgroundColor: colors.buttonSecondary,
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    buttonSecondaryText: {
-      color: colors.buttonSecondaryText,
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    resultSection: {
-      backgroundColor: colors.sectionBackground,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
-      shadowColor: colors.shadowColor,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 1,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 12,
-    },
-    resultText: {
-      fontSize: 16,
-      color: colors.text,
-      marginBottom: 8,
-      lineHeight: 22,
-    },
-    bold: {
-      fontWeight: '600',
-    },
-  }), [colors]);
+
+  const { session } = useAuthSession();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!patientData.id || !session?.user.id) return;
+    setIsSaving(true);
+    try {
+      const total = calculateTotal();
+      const interpretation = getInterpretation(total);
+      
+      const { error } = await createAssessment(session.user.id, {
+        patient_id: patientData.id,
+        scale_slug: 'barthel',
+        scale_id: undefined, // scale_id is optional/null if not linked to medical_scales table yet
+        responses: answers,
+        total_score: total,
+        interpretation: interpretation.result,
+        clinical_notes: null,
+        assessor_name: patientData.doctorName,
+      });
+
+      if (error) throw error;
+      Alert.alert('Éxito', 'Evaluación guardada correctamente en el historial.');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Error', 'No se pudo guardar la evaluación.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
 
   // Memoizar el componente de resultados para evitar renderizados innecesarios
   const ResultsContent = useMemo(() => {
@@ -246,42 +169,42 @@ export default function BarthelScale() {
     const interpretation = getInterpretation(total);
     
     return (
-      <View style={dynamicStyles.container}>
-          <Text style={[dynamicStyles.title, { color: colors.text }]}>Resultados Escala de Barthel</Text>
-        <View style={dynamicStyles.resultSection}>
-          <Text style={dynamicStyles.sectionTitle}>Datos del Paciente</Text>
-          <Text style={dynamicStyles.resultText}>
-            <Text style={dynamicStyles.bold}>Nombre:</Text> {patientData.name}
+      <View style={styles.container}>
+          <Text style={styles.title}>Resultados Escala de Barthel</Text>
+        <View style={styles.resultSection}>
+          <Text style={styles.sectionTitle}>Datos del Paciente</Text>
+          <Text style={styles.resultText}>
+            <Text style={styles.bold}>Nombre:</Text> {patientData.name}
           </Text>
-          <Text style={dynamicStyles.resultText}>
-            <Text style={dynamicStyles.bold}>Edad:</Text> {patientData.age}
+          <Text style={styles.resultText}>
+            <Text style={styles.bold}>Edad:</Text> {patientData.age}
           </Text>
-          <Text style={dynamicStyles.resultText}>
-            <Text style={dynamicStyles.bold}>Género:</Text> {patientData.gender}
+          <Text style={styles.resultText}>
+            <Text style={styles.bold}>Género:</Text> {patientData.gender}
           </Text>
-          <Text style={dynamicStyles.resultText}>
-            <Text style={dynamicStyles.bold}>Médico:</Text> {patientData.doctorName}
+          <Text style={styles.resultText}>
+            <Text style={styles.bold}>Médico:</Text> {patientData.doctorName}
           </Text>
         </View>
-        <View style={dynamicStyles.resultSection}>
-          <Text style={[dynamicStyles.sectionTitle, { color: colors.text }]}>Puntuación</Text>
-          <Text style={[dynamicStyles.resultText, { color: colors.text }] }>
-            <Text style={dynamicStyles.bold}>Total:</Text> {total}/100
+        <View style={styles.resultSection}>
+          <Text style={styles.sectionTitle}>Puntuación</Text>
+          <Text style={styles.resultText}>
+            <Text style={styles.bold}>Total:</Text> {total}/100
           </Text>
-          <Text style={[styles.interpretationText, { color: colors[interpretation.colorKey] }]}>
+          <Text style={[styles.interpretationText, { color: (colors[interpretation.colorKey as keyof typeof colors] as string) || colors.text }]}>
             {interpretation.result}
           </Text>
-          <Text style={[dynamicStyles.resultText, { color: colors.mutedText }]}>{interpretation.explanation}</Text>
+          <Text style={[styles.resultText, { color: colors.mutedText }]}>{interpretation.explanation}</Text>
         </View>
-        <View style={dynamicStyles.resultSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Detalle de Respuestas</Text>
+        <View style={styles.resultSection}>
+          <Text style={styles.sectionTitle}>Detalle de Respuestas</Text>
           {questions.map(q => {
             const answer = answers[q.id];
             if (answer !== undefined) {
               const selectedOption = q.options.find(opt => opt.value === answer);
               return (
                 <View key={q.id} style={styles.detailItem}>
-                  <Text style={[styles.bold, { color: colors.text }]}>{q.question}</Text>
+                  <Text style={[styles.bold, { marginBottom: 4 }]}>{q.question}</Text>
                   {selectedOption && (
                     <Text style={{ color: colors.mutedText }}>
                       {selectedOption.label} ({selectedOption.value} puntos)
@@ -295,7 +218,7 @@ export default function BarthelScale() {
         </View>
       </View>
     );
-  }, [answers, calculateTotal, getInterpretation, patientData, colors, dynamicStyles, styles, questions]);
+  }, [answers, calculateTotal, getInterpretation, patientData, colors, styles]);
 
   return (
     <>
@@ -317,13 +240,25 @@ export default function BarthelScale() {
       />
       <SafeAreaView style={styles.container}>
         {currentStep === 'form' && (
-          <ScrollView contentContainerStyle={dynamicStyles.content}>
-            <View style={dynamicStyles.formContainer}>
-              <Text style={dynamicStyles.title}>Datos del Paciente</Text>
+          <ScrollView contentContainerStyle={styles.content}>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Datos del Paciente</Text>
               <PatientForm
                 scaleId="barthel"
                 allowSkip
-                onContinue={() => setCurrentStep('questions')}
+                onContinue={(data) => {
+                  if (data) {
+                    setPatientData(prev => ({
+                      ...prev,
+                      id: data.id,
+                      name: data.name || prev.name,
+                      age: data.age?.toString() || prev.age,
+                      gender: data.gender || prev.gender,
+                      doctorName: data.doctorName || prev.doctorName,
+                    }));
+                  }
+                  setCurrentStep('questions');
+                }}
               />
             </View>
           </ScrollView>
@@ -414,6 +349,9 @@ export default function BarthelScale() {
               }}
               scale={{ id: 'barthel', name: 'Escala de Barthel' } as any}
               containerStyle={{ marginTop: 12 }}
+              onSave={handleSave}
+              canSave={!!patientData.id}
+              saving={isSaving}
             />
           </ScrollView>
         )}
@@ -530,13 +468,21 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   navButtonText: {
     color: '#fff',
-    fontSize: 16,
-    marginHorizontal: 5,
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: 8,
   },
   progressText: {
     marginTop: 15,
     textAlign: 'center',
     color: colors.mutedText,
+    fontSize: 16,
+  },
+  interpretationText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 4,
   },
   resultsContainer: {
     backgroundColor: colors.card,
@@ -549,23 +495,33 @@ const createStyles = (colors: any) => StyleSheet.create({
     elevation: 2,
   },
   resultSection: {
-    marginBottom: 20,
+    backgroundColor: colors.sectionBackground || colors.card,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border || '#e0e0e0',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   resultText: {
     fontSize: 16,
     color: colors.text,
-    marginBottom: 5,
+    marginBottom: 8,
+    lineHeight: 22,
   },
   bold: {
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: colors.text,
   },
   detailItem: {
     marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border || '#eee',
   },
 });

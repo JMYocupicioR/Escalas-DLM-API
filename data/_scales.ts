@@ -20,12 +20,12 @@ import { boston, scoreInterpretation as bostonScoreInterp } from './boston';
 import { bergScale, questions as bergQuestions, scoreInterpretation as bergScoreInterp } from './berg';
 import { katzScale, questions as katzQuestions, scoreInterpretation as katzScoreInterp } from './katz';
 import { sf36Scale, questions as sf36Questions, scoreInterpretation as sf36ScoreInterp } from './sf36';
-import { lequesneQuestions, getLequesneInterpretation } from './lequesne';
+import { lequesneQuestions } from './lequesne';
 import { tinettiScale, tinettiQuestions, scoreInterpretation as tinettiScoreInterp } from './tinetti';
-import { sixMWT } from './6mwt';
 import { mocaScale, mocaQuestions } from './moca';
 import { mmseScale, mmseQuestions, scoreInterpretation as mmseScoreInterp } from './mmse';
 import { weefimScale as weefim, weefimQuestions, weefimOptions } from './weefim';
+import { lawtonScale, questions as lawtonQuestions, scoreInterpretation as lawtonScoreInterp, areaInterpretations as lawtonAreaInterp } from './lawton';
 import type { ScaleWithDetails, ScaleQuestion, QuestionOption, ScaleScoring, ScoringRange } from '@/api/scales/types';
 
 /**
@@ -112,6 +112,16 @@ export const scales: Scale[] = [
     category: 'Risk',
     searchTerms: ['norton', 'úlceras presión', 'UPP', 'escaras', 'decúbito', 'lesiones piel', 'riesgo úlceras'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'lawton-brody',
+    name: 'Escala de Lawton y Brody',
+    description: 'Evaluación de actividades instrumentales de la vida diaria (AIVD)',
+    timeToComplete: '5-10 min',
+    category: 'ADL',
+    specialty: 'Geriatría',
+    searchTerms: ['lawton', 'brody', 'AIVD', 'actividades instrumentales', 'AVD instrumentales', 'IADL', 'independencia', 'funcional', 'adulto mayor', 'geriatría'],
+    imageUrl: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?w=400&h=300&fit=crop&crop=center',
   },
   {
     id: 'vas',
@@ -312,6 +322,22 @@ export const scales: Scale[] = [
     specialty: 'Medicina General',
     searchTerms: ['sf-36', 'sf36', 'calidad de vida', 'CVRS', 'salud general', 'función física', 'salud mental', 'dolor', 'vitalidad', 'función social', 'quality of life', 'health survey'],
     imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop&crop=center',
+  },
+  {
+    id: 'plexo-braquial',
+    name: 'Calculadora Diagnóstica de Plexopatía Braquial',
+    description: 'Herramienta diagnóstica interactiva para identificar el nivel y patrón de lesión del plexo braquial mediante evaluación de músculos clave, sensibilidad, reflejos y síntomas clínicos',
+    timeToComplete: '10-20 min',
+    category: 'Neurology',
+    specialty: 'Neurología',
+    searchTerms: [
+      'plexo braquial', 'plexopatía', 'plexopathy', 'brachial plexus', 'erb-duchenne', 'klumpke',
+      'parálisis braquial obstétrica', 'PBO', 'neuropatía', 'lesión nerviosa', 'C5', 'C6', 'C7', 'C8', 'T1',
+      'raíz cervical', 'tronco superior', 'tronco inferior', 'fascículo lateral', 'fascículo medial',
+      'signo de horner', 'tracción', 'avulsión', 'trauma', 'diagnóstico plexo', 'calculadora neurológica',
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop&crop=center',
+    tags: ['plexo braquial', 'diagnóstico', 'neurología', 'calculadora', 'trauma'],
   },
 ];
 
@@ -581,7 +607,6 @@ const buildBergDetailed = (): ScaleWithDetails => {
         year: 1995,
         journal: 'Scand J Rehabil Med',
         volume: '27',
-        issue: '1',
         pages: '27-36',
         is_primary: true,
         reference_type: 'validation',
@@ -717,7 +742,6 @@ const buildKatzDetailed = (): ScaleWithDetails => {
         year: 1970,
         journal: 'Gerontologist',
         volume: '10',
-        issue: '1',
         pages: '20-30',
         is_primary: true,
         reference_type: 'validation',
@@ -843,7 +867,6 @@ const buildSF36Detailed = (): ScaleWithDetails => {
       year: ref.year,
       journal: ref.journal,
       volume: ref.volume,
-      issue: ref.issue,
       pages: ref.pages,
       doi: ref.doi,
       is_primary: true,
@@ -1018,7 +1041,6 @@ const buildLequesneDetailed = (): ScaleWithDetails => {
         year: 1987,
         journal: 'J Rheumatol',
         volume: '14',
-        issue: '1',
         pages: '3-6',
         is_primary: true,
         reference_type: 'original',
@@ -1161,7 +1183,6 @@ const buildTinettiDetailed = (): ScaleWithDetails => {
         year: 1986,
         journal: 'J Am Geriatr Soc',
         volume: '34',
-        issue: '2',
         pages: '119-126',
         is_primary: true,
         reference_type: 'original',
@@ -1175,7 +1196,6 @@ const buildTinettiDetailed = (): ScaleWithDetails => {
         year: 1986,
         journal: 'Am J Med',
         volume: '80',
-        issue: '3',
         pages: '429-434',
         is_primary: true,
         reference_type: 'validation',
@@ -1264,12 +1284,7 @@ const buildMocaDetailed = (): ScaleWithDetails => {
     scoring_method: mocaScale.scoring?.scoring_method || 'sum',
     min_score: mocaScale.scoring?.min_score || 0,
     max_score: mocaScale.scoring?.max_score || 30,
-    passing_score: 26,
-    custom_calculation: undefined,
-    reverse_scored_items: undefined,
-    weighted_items: undefined,
     created_at: now,
-    updated_at: now,
     ranges,
   };
 
@@ -1288,12 +1303,11 @@ const buildMocaDetailed = (): ScaleWithDetails => {
     language: mocaScale.language || 'es',
     license: mocaScale.license || 'Uso clínico permitido con certificación',
     cross_references: mocaScale.cross_references || [],
-    requires_certification: false,
     scoring,
     questions,
+    references: [],
     created_at: now,
     updated_at: now,
-    imageUrl: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=300&fit=crop&crop=center',
   };
 
   if (mocaScale.references) {
@@ -1450,11 +1464,10 @@ const buildMMSEDetailed = (): ScaleWithDetails => {
       year: ref.year,
       journal: ref.journal,
       volume: ref.volume,
-      issue: ref.issue,
       pages: ref.pages,
       pmid: ref.pmid,
       is_primary: ref.is_primary,
-      reference_type: ref.reference_type,
+      reference_type: ref.reference_type as 'original' | 'validation' | 'review' | 'meta-analysis',
       created_at: now,
     })) || [],
     translations: [],
@@ -1622,3 +1635,147 @@ if (existingWeeFIMIndex !== -1) {
 
 // @ts-ignore attach detailed to map
 scalesById['weefim'] = weefimDetailed as any;
+
+// ============================================================================
+// LAWTON & BRODY: Escala de Actividades Instrumentales de la Vida Diaria
+// ============================================================================
+
+/**
+ * Adapta la Escala de Lawton y Brody al formato ScaleWithDetails.
+ *
+ * Lawton & Brody evalúa:
+ * - Uso del teléfono (0-1)
+ * - Hacer compras (0-1)
+ * - Preparación de la comida (0-1)
+ * - Cuidado de la casa (0-1)
+ * - Lavado de la ropa (0-1)
+ * - Uso de medios de transporte (0-1)
+ * - Responsabilidad respecto a la medicación (0-1)
+ * - Manejo de asuntos económicos (0-1)
+ *
+ * Scoring: Suma directa (0-8 puntos)
+ * - 8: Independencia total
+ * - 1-7: Dependencia moderada
+ * - 0: Máxima dependencia
+ */
+const buildLawtonDetailed = (): ScaleWithDetails => {
+  const now = new Date().toISOString();
+  const scaleId = 'lawton-brody';
+
+  let order = 0;
+  const questions: ScaleQuestion[] = lawtonQuestions.map((q) => {
+    const questionId = q.id;
+    const opts: QuestionOption[] = q.options.map((opt, idx) => ({
+      id: `${questionId}_opt_${idx+1}`,
+      question_id: questionId,
+      option_value: Number(opt.value),
+      option_label: String(opt.label),
+      option_description: opt.description,
+      order_index: idx + 1,
+      is_default: false,
+      created_at: now,
+    }));
+
+    order += 1;
+    const dq: ScaleQuestion = {
+      id: `q_${order}`,
+      scale_id: scaleId,
+      question_id: questionId,
+      question_text: String(q.question),
+      description: q.description,
+      question_type: 'single_choice',
+      order_index: order,
+      is_required: true,
+      category: q.category,
+      instructions: undefined,
+      options: opts,
+      created_at: now,
+      updated_at: now,
+    };
+    return dq;
+  });
+
+  const ranges: ScoringRange[] = lawtonScoreInterp.map((r, idx) => ({
+    id: `r_lawton_${idx+1}`,
+    scoring_id: 'scoring_lawton',
+    min_value: r.min,
+    max_value: r.max,
+    interpretation_level: r.level,
+    interpretation_text: r.interpretation,
+    order_index: idx + 1,
+    created_at: now,
+    color_code: r.color,
+    recommendations: r.recommendations,
+  }));
+
+  const scoring: ScaleScoring = {
+    id: 'scoring_lawton',
+    scale_id: scaleId,
+    scoring_method: 'sum',
+    min_score: 0,
+    max_score: 8,
+    ranges,
+    created_at: now,
+  };
+
+  const detailed: ScaleWithDetails = {
+    id: scaleId,
+    name: lawtonScale.name,
+    acronym: lawtonScale.acronym,
+    description: lawtonScale.description,
+    category: lawtonScale.category,
+    specialty: lawtonScale.specialty,
+    body_system: lawtonScale.bodySystem || 'Sistema Funcional',
+    tags: lawtonScale.tags || [],
+    time_to_complete: lawtonScale.timeToComplete,
+    popularity: 0,
+    popular: true,
+    image_url: lawtonScale.imageUrl,
+    instructions: lawtonScale.information,
+    version: lawtonScale.version,
+    language: 'es',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+    created_by: undefined,
+    validated_by: undefined,
+    validation_date: undefined,
+    cross_references: [],
+    doi: undefined,
+    copyright_info: undefined,
+    license: 'Public Domain',
+    questions,
+    scoring,
+    references: lawtonScale.references?.map((ref, idx) => ({
+      id: `ref_lawton_${idx+1}`,
+      scale_id: scaleId,
+      title: ref.title,
+      authors: ref.authors,
+      year: ref.year,
+      journal: ref.journal,
+      volume: ref.volume,
+      pages: ref.pages,
+      is_primary: true,
+      reference_type: 'original',
+      created_at: now,
+    })) || [],
+    translations: [],
+    // @ts-ignore - Custom metadata for area-specific interpretations
+    areaInterpretations: lawtonAreaInterp,
+  };
+  return detailed;
+};
+
+const lawtonDetailed = buildLawtonDetailed();
+
+const existingLawtonIndex = scales.findIndex(s => s.id === 'lawton-brody');
+if (existingLawtonIndex !== -1) {
+  // @ts-ignore add detailed fields for evaluation
+  scales[existingLawtonIndex] = { ...(scales[existingLawtonIndex] as any), ...lawtonDetailed } as any;
+} else {
+  // @ts-ignore add as new
+  scales.push(lawtonDetailed as any);
+}
+
+// @ts-ignore attach detailed to map
+scalesById['lawton-brody'] = lawtonDetailed as any;

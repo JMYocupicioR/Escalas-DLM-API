@@ -1,9 +1,18 @@
 import { View, TextInput, StyleSheet, Pressable } from 'react-native';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 
-export function SearchBar() {
+export interface SearchBarProps {
+  value?: string;
+  onChangeText?: (text: string) => void;
+  placeholder?: string;
+  onClear?: () => void;
+  onFocus?: () => void;
+}
+
+export function SearchBar({ value, onChangeText, placeholder, onClear, onFocus }: SearchBarProps) {
+  const router = useRouter();
   const { colors } = useThemedStyles();
   return (
     <View style={[styles.container]}>
@@ -11,10 +20,17 @@ export function SearchBar() {
         <Search size={20} color={colors.iconMuted} style={styles.searchIcon} />
         <TextInput
           style={[styles.input, { color: colors.text }]}
-          placeholder="Search medical scales..."
+          placeholder={placeholder || "Search medical scales..."}
           placeholderTextColor={colors.placeholderText}
-          onFocus={() => router.push('/search')}
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={onFocus}
         />
+        {value ? (
+           <Pressable onPress={onClear}>
+             <Search size={16} color={colors.iconMuted} style={{ transform: [{ rotate: '45deg' }] }} />
+           </Pressable>
+        ) : null}
       </View>
       <Pressable style={[styles.filterButton, { backgroundColor: colors.card, shadowColor: colors.shadowColor }]} onPress={() => router.push('/search?filter=true')}>
         <SlidersHorizontal size={20} color={colors.iconMuted} />

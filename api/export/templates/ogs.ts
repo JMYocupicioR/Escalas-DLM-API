@@ -59,33 +59,64 @@ export const generateHtml = (payload: OgsPayload): string => {
   const { assessment, scale, questions = [], options } = payload;
   const { patientData, leftTotalScore, rightTotalScore, leftInterpretation, rightInterpretation, responses = [] } = assessment;
 
+  const getScoreColor = (score: number) => {
+    if (score === 3) return '#10B981';
+    if (score === 2) return '#F59E0B';
+    if (score === 1) return '#F97316';
+    return '#EF4444';
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score === 3) return '#D1FAE5';
+    if (score === 2) return '#FEF3C7';
+    if (score === 1) return '#FFEDD5';
+    return '#FEE2E2';
+  };
+
   let detailHTML = '';
   if (questions && responses) {
-    questions.forEach(q => {
+    questions.forEach((q, idx) => {
       const response = responses.find(r => r.questionId === q.id);
       const leftScore = response?.leftScore || 0;
       const rightScore = response?.rightScore || 0;
-      
+
       const leftOption = q.options.find(opt => opt.option_value === leftScore);
       const rightOption = q.options.find(opt => opt.option_value === rightScore);
-      
+
+      const asymmetry = Math.abs(leftScore - rightScore) >= 2;
+
       detailHTML += `
-        <tr>
-          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">
-            <strong>${q.question}</strong><br>
-            ${q.description ? `<em style="color: #666; font-size: 12px;">${q.description}</em>` : ''}
-          </td>
-          <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center; background-color: #f8f9fa;">
-            <div style="margin-bottom: 8px;">
-              <strong>Derecha:</strong><br>
-              ${rightOption ? `${rightOption.option_label} (${rightScore} pts)` : 'No evaluada'}
+        <tr style="${asymmetry ? 'background-color: #FEF3C7;' : ''}">
+          <td style="padding: 14px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top; width: 40%;">
+            <div style="margin-bottom: 4px;">
+              <strong style="color: #00796B; font-size: 14px;">${idx + 1}. ${q.question}</strong>
             </div>
-            <div>
-              <strong>Izquierda:</strong><br>
-              ${leftOption ? `${leftOption.option_label} (${leftScore} pts)` : 'No evaluada'}
+            ${q.description ? `<div style="color: #666; font-size: 11px; font-style: italic; margin-top: 4px;">${q.description}</div>` : ''}
+          </td>
+          <td style="padding: 14px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; width: 30%; background-color: ${getScoreBgColor(rightScore)}; border-left: 3px solid ${getScoreColor(rightScore)};">
+            <div style="font-size: 13px; margin-bottom: 6px;">
+              ${rightOption ? rightOption.option_label : 'No evaluada'}
+            </div>
+            <div style="display: inline-block; background-color: ${getScoreColor(rightScore)}; color: white; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;">
+              ${rightScore} pts
             </div>
           </td>
-        </tr>`;
+          <td style="padding: 14px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; width: 30%; background-color: ${getScoreBgColor(leftScore)}; border-left: 3px solid ${getScoreColor(leftScore)};">
+            <div style="font-size: 13px; margin-bottom: 6px;">
+              ${leftOption ? leftOption.option_label : 'No evaluada'}
+            </div>
+            <div style="display: inline-block; background-color: ${getScoreColor(leftScore)}; color: white; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold;">
+              ${leftScore} pts
+            </div>
+          </td>
+        </tr>
+        ${asymmetry ? `
+        <tr style="background-color: #FEF3C7;">
+          <td colspan="3" style="padding: 8px 12px; border-bottom: 2px solid #F59E0B; font-size: 12px;">
+            <strong style="color: #92400E;">⚠️ Asimetría significativa:</strong>
+            <span style="color: #92400E;"> Diferencia de ${Math.abs(leftScore - rightScore)} puntos entre extremidades</span>
+          </td>
+        </tr>` : ''}`;
     });
   }
 
@@ -98,7 +129,7 @@ export const generateHtml = (payload: OgsPayload): string => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reporte OGS - DeepLuxMed</title>
+  <title>Reporte OGS - Escalas DLM</title>
   <style>
     @page { size: A4; margin: 18mm; }
     html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -167,14 +198,14 @@ export const generateHtml = (payload: OgsPayload): string => {
       <div class="score-card right">
         <div class="score-title">Pierna Derecha</div>
         <div class="score-value" style="color: #3b82f6;">${rightTotalScore}</div>
-        <div class="score-range">de 22 puntos</div>
+        <div class="score-range">de 21 puntos</div>
         <div class="score-badge" style="background-color: ${rightInterpretation.color_code};">${rightInterpretation.interpretation_level}</div>
         <div class="score-description">${rightInterpretation.interpretation_text}</div>
       </div>
       <div class="score-card left">
         <div class="score-title">Pierna Izquierda</div>
         <div class="score-value" style="color: #10b981;">${leftTotalScore}</div>
-        <div class="score-range">de 22 puntos</div>
+        <div class="score-range">de 21 puntos</div>
         <div class="score-badge" style="background-color: ${leftInterpretation.color_code};">${leftInterpretation.interpretation_level}</div>
         <div class="score-description">${leftInterpretation.interpretation_text}</div>
       </div>
@@ -187,12 +218,13 @@ export const generateHtml = (payload: OgsPayload): string => {
   </div>
 
   <div class="results-table">
-    <h3>Evaluación Detallada por Ítem</h3>
+    <h3>Evaluación Detallada por Parámetro</h3>
     <table>
       <thead>
         <tr>
-          <th style="width: 60%">Parámetro de Marcha</th>
-          <th style="width: 40%">Puntuación por Extremidad</th>
+          <th style="width: 40%; text-align: left;">Parámetro de Marcha</th>
+          <th style="width: 30%; text-align: center; background-color: #DBEAFE;">Pierna Derecha</th>
+          <th style="width: 30%; text-align: center; background-color: #D1FAE5;">Pierna Izquierda</th>
         </tr>
       </thead>
       <tbody>${detailHTML}</tbody>
@@ -215,11 +247,78 @@ export const generateHtml = (payload: OgsPayload): string => {
     </div>
   </div>
 
+  ${(() => {
+    // Generar recomendaciones basadas en hallazgos
+    const totalAsymmetries = responses.filter(r => Math.abs(r.leftScore - r.rightScore) >= 2).length;
+    const criticalRight = responses.filter(r => r.rightScore <= 1).length;
+    const criticalLeft = responses.filter(r => r.leftScore <= 1).length;
+    const avgRight = rightTotalScore / 7;
+    const avgLeft = leftTotalScore / 7;
+
+    return `
+    <div class="clinical-note" style="background: #EFF6FF; border: 1px solid #3B82F6; margin-top: 20px;">
+      <h3 style="color: #1E40AF; margin-top: 0; border-bottom: 2px solid #3B82F6; padding-bottom: 10px;">
+        📋 Recomendaciones Terapéuticas
+      </h3>
+
+      ${totalAsymmetries > 0 ? `
+        <div style="background: #FEF3C7; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #F59E0B;">
+          <h4 style="color: #92400E; margin: 0 0 8px 0;">⚠️ Asimetría Bilateral Detectada</h4>
+          <p style="color: #92400E; margin: 0;">
+            <strong>${totalAsymmetries} parámetro(s)</strong> muestran diferencias significativas entre extremidades (≥2 puntos).
+            Esto sugiere afectación asimétrica que requiere atención especializada.
+          </p>
+        </div>
+      ` : ''}
+
+      <div style="margin-bottom: 15px;">
+        <h4 style="color: #1E40AF; margin-bottom: 8px;">Sugerencias de Manejo:</h4>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+          ${avgLeft < 1.5 || avgRight < 1.5 ? `
+            <li><strong>Fisioterapia intensiva:</strong> 4-5 sesiones semanales enfocadas en marcha y equilibrio</li>
+            <li><strong>Evaluación ortopédica:</strong> Considerar férulas AFO (ankle-foot orthosis) para estabilización</li>
+            <li><strong>Valoración para toxina botulínica:</strong> Si hay espasticidad asociada</li>
+          ` : avgLeft < 2.5 || avgRight < 2.5 ? `
+            <li><strong>Fisioterapia regular:</strong> 3-4 sesiones semanales con énfasis en corrección de marcha</li>
+            <li><strong>Evaluación de ortesis:</strong> Considerar dispositivos de asistencia según necesidad</li>
+            <li><strong>Entrenamiento funcional:</strong> Ejercicios de marcha en diferentes superficies</li>
+          ` : `
+            <li><strong>Mantenimiento:</strong> Fisioterapia 2-3 veces por semana</li>
+            <li><strong>Ejercicios en casa:</strong> Programa de fortalecimiento y estiramiento</li>
+            <li><strong>Seguimiento periódico:</strong> Reevaluación cada 3-6 meses</li>
+          `}
+        </ul>
+      </div>
+
+      ${criticalLeft > 0 || criticalRight > 0 ? `
+        <div style="background: #FEE2E2; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #EF4444;">
+          <h4 style="color: #991B1B; margin: 0 0 8px 0;">🔴 Áreas Críticas Identificadas</h4>
+          <p style="color: #991B1B; margin: 0;">
+            ${criticalRight > 0 ? `<strong>Derecha:</strong> ${criticalRight} parámetro(s) severamente afectado(s). ` : ''}
+            ${criticalLeft > 0 ? `<strong>Izquierda:</strong> ${criticalLeft} parámetro(s) severamente afectado(s).` : ''}
+            <br>Se recomienda evaluación multidisciplinaria urgente.
+          </p>
+        </div>
+      ` : ''}
+
+      <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #BFDBFE;">
+        <h4 style="color: #1E40AF; margin-bottom: 8px;">Próximos Pasos:</h4>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+          <li>Correlacionar hallazgos con nivel GMFCS si aplica</li>
+          <li>Evaluación de espasticidad (escala Ashworth modificada)</li>
+          <li>Análisis de marcha instrumentado si está disponible</li>
+          <li>Reevaluación con OGS en 3-6 meses para monitorear progreso</li>
+        </ol>
+      </div>
+    </div>
+    `;
+  })()}
+
   <div class="footer">
-    <div class="logo">DeepLuxMed.mx</div>
+    <div class="logo">escalas.deeplux.org</div>
     <p>Escalas Médicas Digitales</p>
     <p>Reporte generado el ${formattedDate} a las ${formattedTime}</p>
-    <p style="font-size: 12px; margin-top: 15px;">Este reporte ha sido generado automáticamente por el sistema de evaluación OGS de DeepLuxMed. <br />Para uso clínico profesional únicamente.</p>
+    <p style="font-size: 12px; margin-top: 15px;">Este reporte ha sido generado automáticamente por Escalas DLM — DeepLux Med. <br />Para uso clínico profesional únicamente.</p>
   </div>
 </body>
 </html>`;

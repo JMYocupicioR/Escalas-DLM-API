@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router/tabs';
-import { Search, Chrome as Home, BookMarked as BookMedical, Settings } from 'lucide-react-native';
+import { Chrome as Home, Settings, Users } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
 import { Calculator } from 'lucide-react-native';
 
@@ -11,9 +11,20 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          borderTopWidth: 1,
+          height: 64,
+          paddingTop: 6,
+          paddingBottom: 8,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: '#94a3b8',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
+        tabBarItemStyle: {
+          paddingVertical: 2,
+        },
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -26,15 +37,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Buscar',
-          tabBarIcon: ({ size, color }: { size: number; color: string }) => <Search size={size} color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen
         name="scales"
         options={{
-          title: 'Escalas',
-          tabBarIcon: ({ size, color }: { size: number; color: string }) => <BookMedical size={size} color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -45,10 +54,29 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="patients"
+        options={{
+          title: 'Pacientes',
+          tabBarIcon: ({ size, color }: { size: number; color: string }) => <Users size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Configuración',
           tabBarIcon: ({ size, color }: { size: number; color: string }) => <Settings size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="new-scales/index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="new-scales/[id]"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

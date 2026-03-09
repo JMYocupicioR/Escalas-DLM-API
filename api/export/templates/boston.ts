@@ -123,7 +123,7 @@ export const generateHtml = (assessment: BostonAssessment): string => {
       <body>
         <div class="reporte-impresion">
           <header class="reporte-header">
-            <div class="clinica-logo">DeepLuxMed</div>
+            <div class="clinica-logo">Escalas DLM</div>
             <div class="reporte-titulo">Cuestionario del Túnel Carpiano de Boston (BCTSQ)</div>
             <div class="fecha-reporte">${currentDate}</div>
           </header>

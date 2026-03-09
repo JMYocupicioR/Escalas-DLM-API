@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { questions, scoreInterpretation } from '@/data/katz';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -143,6 +143,7 @@ export const useKatzAssessment = () => {
     setResponses({});
     setCurrentQuestionIndex(0);
     setPatientData({
+      id: undefined,
       name: '',
       age: '',
       gender: '',

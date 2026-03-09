@@ -301,7 +301,8 @@ export const LESIONES: Lesion[] = [
     areasSensibilidad: ["Zona Lateral Antebrazo (Musculocutáneo)", "Mano Lateral (Mediano)", "Dermatoma C6"],
     sintomasClave: ["Parestesias"],
     reflejosClave: { bicipital: "disminuido", braquiorradial: "disminuido", tricipital: "normal" },
-    exclusivos: false
+    exclusivos: false,
+    categoria: 'radicular'
   },
   {
     nombre: "Lesión de Raíz C7",
@@ -318,7 +319,8 @@ export const LESIONES: Lesion[] = [
     areasSensibilidad: ["Zona Posterior Brazo/Antebrazo (Radial)", "Dermatoma C7"],
     sintomasClave: ["Dolor Neurítico"],
     reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "disminuido" },
-    exclusivos: false
+    exclusivos: false,
+    categoria: 'radicular'
   },
   {
     nombre: "Lesión de Raíz C8",
@@ -336,7 +338,8 @@ export const LESIONES: Lesion[] = [
     areasSensibilidad: ["Mano Medial (Cubital)", "Zona Medial Antebrazo (Cut. Med. Antebrazo)", "Dermatoma C8"],
     sintomasClave: ["Parestesias"],
     reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
-    exclusivos: false
+    exclusivos: false,
+    categoria: 'radicular'
   },
   {
     nombre: "Lesión de Raíz T1",
@@ -353,7 +356,8 @@ export const LESIONES: Lesion[] = [
     areasSensibilidad: ["Zona Medial Brazo (Cut. Med. Brazo)", "Dermatoma T1"],
     sintomasClave: ["Dolor Neurítico", "Signo de Horner"],
     reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
-    exclusivos: false
+    exclusivos: false,
+    categoria: 'radicular'
   },
   
   // Lesiones de Troncos
@@ -490,7 +494,8 @@ export const LESIONES: Lesion[] = [
     sintomasClave: ["Dolor Neurítico"],
     reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
     exclusivos: true,
-    umbralMinimo: 0.8
+    umbralMinimo: 0.8,
+    categoria: 'nervio_periferico'
   },
   {
     nombre: "Neuropatía del Nervio Musculocutáneo",
@@ -503,7 +508,8 @@ export const LESIONES: Lesion[] = [
     sintomasClave: ["Parestesias"],
     reflejosClave: { bicipital: "disminuido", braquiorradial: "normal", tricipital: "normal" },
     exclusivos: true,
-    umbralMinimo: 0.8
+    umbralMinimo: 0.8,
+    categoria: 'nervio_periferico'
   },
   {
     nombre: "Neuropatía del Nervio Radial (Proximal)",
@@ -520,7 +526,8 @@ export const LESIONES: Lesion[] = [
     sintomasClave: ["Dolor Neurítico"],
     reflejosClave: { bicipital: "normal", braquiorradial: "disminuido", tricipital: "disminuido" },
     exclusivos: true,
-    umbralMinimo: 0.7
+    umbralMinimo: 0.7,
+    categoria: 'nervio_periferico'
   },
   {
     nombre: "Neuropatía del Nervio Mediano (Proximal)",
@@ -535,7 +542,8 @@ export const LESIONES: Lesion[] = [
     sintomasClave: ["Parestesias"],
     reflejosClave: { bicipital: "normal", braquiorradial: "normal", tricipital: "normal" },
     exclusivos: true,
-    umbralMinimo: 0.7
+    umbralMinimo: 0.7,
+    categoria: 'nervio_periferico'
   },
   {
     nombre: "Neuropatía del Nervio Ulnar (Proximal)",

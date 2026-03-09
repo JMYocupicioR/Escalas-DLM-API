@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
+  Image,
+  Pressable,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,17 +21,36 @@ import { ResultsActions } from '@/components/ResultsActions';
 import LoadingState from '@/components/errors/LoadingState';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { useSettingsStore } from '@/store/settingsStore';
-import { ArrowLeft, ArrowRight, X } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, X, Share2, Clock, CheckCircle2, AlertCircle, Save, ZoomIn } from 'lucide-react-native';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { OptionCard } from '@/components/ui/OptionCard';
-import { ScoreCircle } from '@/components/ui/ScoreCircle';
+import { OptionsGrid } from '@/components/ui/OptionsGrid';
+import { ImageZoomModal } from '@/components/ui/ImageZoomModal';
 import { calculateSF36, getSF36Interpretation, getSF36DetailedResults, SF36Scores } from '@/utils/sf36Calculator';
+import { getProfile } from '@/api/profile';
+import { getPatient as fetchPatientFromDB } from '@/api/patients';
+import { useAuthSession } from '@/hooks/useAuthSession';
+
+export interface SaveToHistoryPayload {
+  patient_id: string;
+  scale_slug: string;
+  responses: Record<string, number | string>;
+  total_score?: number;
+  interpretation?: string;
+  subscale_scores?: Record<string, unknown>;
+}
 
 interface ScaleEvaluationProps {
   scale: ScaleWithDetails;
   onCancel: () => void;
   onComplete?: (assessment: { scale_id: string; responses: Record<string, number | string> }) => void;
   patientRequired?: boolean;
+  /** When set, patient and clinic are shown in results and "Guardar en historial" is available */
+  patientId?: string;
+  patient?: { name?: string | null; institution_id?: string | null; gender?: string | null; birth_date?: string | null };
+  onSaveToHistory?: (payload: SaveToHistoryPayload) => Promise<any>;
+  /** Notify parent when user picks a patient from the form (inline picker) */
+  onPatientSelected?: (patient: { id: string; name?: string | null; gender?: string | null; birth_date?: string | null }) => void;
 }
 
 type Interpretation = {
@@ -67,15 +90,20 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
   scale,
   onCancel,
   onComplete,
-  patientRequired = false,
+  patientId,
+  patient,
+  onSaveToHistory,
+  onPatientSelected,
 }) => {
   const { colors, fontSizeMultiplier } = useThemedStyles();
   const { isDesktop, isTablet } = useResponsiveLayout();
   const autoAdvanceQuestions = useSettingsStore((state) => state.autoAdvanceQuestions);
   const styles = useMemo(() => createStyles(colors, isDesktop || isTablet, fontSizeMultiplier), [colors, isDesktop, isTablet, fontSizeMultiplier]);
-  
+  const { session } = useAuthSession();
+
   const [state, setState] = useState<EvaluationState>({
-    currentStep: patientRequired ? 'patient' : 'evaluation',
+    // Always show patient step first so user can pick/create a patient
+    currentStep: 'patient',
     currentQuestionIndex: 0,
     responses: {},
     startTime: new Date(),
@@ -83,7 +111,19 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 
   const [animatedValue] = useState(new Animated.Value(0));
   const lastSelectionRef = useRef<{ id: string; value: number | string } | null>(null);
-  // const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveToHistoryLoading, setSaveToHistoryLoading] = useState(false);
+  const [saveToHistoryDone, setSaveToHistoryDone] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>(patientId);
+  const [selectedPatient, setSelectedPatient] = useState<{ name?: string | null; gender?: string | null; birth_date?: string | null } | null>(
+    patient ? { name: patient.name, gender: patient.gender, birth_date: patient.birth_date } : null
+  );
+  const effectivePatientId = patientId || selectedPatientId;
+  const [patientSummary, setPatientSummary] = useState<{ name?: string | null; gender?: string | null; birth_date?: string | null }>({
+    name: patient?.name,
+    gender: patient?.gender,
+    birth_date: patient?.birth_date,
+  });
+  const [doctorName, setDoctorName] = useState<string>('');
 
   const sortedQuestions = useMemo(() => {
     return [...scale.questions].sort((a, b) => a.order_index - b.order_index);
@@ -134,6 +174,46 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       }));
     }
   }, [state.currentQuestionIndex]);
+
+  // Keyboard shortcuts for desktop (number keys 0-9 for option selection, arrows for navigation)
+  useEffect(() => {
+    if (Platform.OS !== 'web' || state.currentStep !== 'evaluation') return;
+    const currentQ = sortedQuestions[state.currentQuestionIndex];
+    if (!currentQ) return;
+
+    const handler = (e: KeyboardEvent) => {
+      // Arrow navigation
+      if (e.key === 'ArrowLeft' && state.currentQuestionIndex > 0) {
+        e.preventDefault();
+        handlePrevious();
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        const val = state.responses[currentQ.question_id];
+        if (val != null) {
+          e.preventDefault();
+          handleNext();
+        }
+        return;
+      }
+      // Number keys for option selection
+      const num = parseInt(e.key);
+      if (!isNaN(num) && currentQ.options) {
+        const sorted = [...currentQ.options].sort((a, b) => a.order_index - b.order_index);
+        const match = sorted.find(opt => Number(opt.option_value) === num);
+        if (match) {
+          e.preventDefault();
+          handleAnswerSelect(match.option_value);
+          if (autoAdvanceQuestions) {
+            setTimeout(() => handleNext(), 300);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [state.currentStep, state.currentQuestionIndex, state.responses, sortedQuestions, handlePrevious, handleNext, handleAnswerSelect, autoAdvanceQuestions]);
 
   const calculateResults = useCallback(() => {
     if (!scale.scoring) {
@@ -287,6 +367,50 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
     } as Interpretation) : null;
   };
 
+  const calcAgeFromBirthDate = (birth?: string | null) => {
+    if (!birth) return undefined;
+    const bd = new Date(birth);
+    if (Number.isNaN(bd.getTime())) return undefined;
+    return Math.max(0, Math.floor((Date.now() - bd.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
+  };
+
+  // Load patient from props OR from Supabase when we have an id
+  useEffect(() => {
+    if (patient?.name) {
+      setPatientSummary({
+        name: patient.name,
+        gender: patient.gender,
+        birth_date: patient.birth_date,
+      });
+      return;
+    }
+    // If we have a patientId but no patient prop data, fetch from DB
+    const pid = patientId || selectedPatientId;
+    if (!pid) return;
+    fetchPatientFromDB(pid)
+      .then(({ data }) => {
+        if (data) {
+          setPatientSummary({
+            name: data.name,
+            gender: data.gender,
+            birth_date: data.birth_date,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [patient?.name, patient?.gender, patient?.birth_date, patientId, selectedPatientId]);
+
+  // Prefill doctor from profile
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || doctorName) return;
+    getProfile(userId)
+      .then(({ data }) => {
+        if (data?.full_name) setDoctorName(data.full_name);
+      })
+      .catch(() => {});
+  }, [session?.user?.id, doctorName]);
+
   // En esta pantalla no se envía aún al backend de evaluaciones; se puede implementar según API
 
   const renderPatientStep = () => (
@@ -294,11 +418,41 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
       <Text style={styles.stepTitle}>Información del Paciente</Text>
       <PatientForm
         scaleId={scale.id}
-        onContinue={() => setState(prev => ({ ...prev, currentStep: 'evaluation' }))}
-        allowSkip={!patientRequired}
+        onContinue={(formData) => {
+          console.log('ScaleEvaluation received form data:', formData);
+          // Populate patientSummary from the form data when user clicks "Continuar"
+          if (formData) {
+            const newSummary = {
+              name: formData.name || patientSummary.name,
+              gender: formData.gender || patientSummary.gender,
+              birth_date: patientSummary.birth_date, // keep birth_date from picker selection
+            };
+            console.log('Setting patientSummary:', newSummary);
+            setPatientSummary(newSummary);
+            if (formData.doctorName) {
+              console.log('Setting doctorName:', formData.doctorName);
+              setDoctorName(formData.doctorName);
+            }
+            if (formData.id) {
+              console.log('Setting selectedPatientId:', formData.id);
+              setSelectedPatientId(formData.id);
+            }
+          }
+          setState(prev => ({ ...prev, currentStep: 'evaluation' }));
+        }}
+        allowSkip={true}
+        onPatientSelected={(p) => {
+          setSelectedPatientId(p.id);
+          setSelectedPatient({ name: p.name, gender: p.gender, birth_date: p.birth_date });
+          setPatientSummary({ name: p.name, gender: p.gender, birth_date: p.birth_date });
+          onPatientSelected?.(p);
+        }}
       />
     </View>
   );
+
+  const [imageZoomVisible, setImageZoomVisible] = useState(false);
+  const [zoomImageUri, setZoomImageUri] = useState('');
 
   const renderEvaluationStep = () => {
     if (!currentQuestion) {
@@ -307,86 +461,116 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 
     const selectedValue = state.responses[currentQuestion.question_id];
     const sortedOptions = [...currentQuestion.options].sort((a, b) => a.order_index - b.order_index);
+    const questionImageUrl = currentQuestion.image_url ?? currentQuestion.imageUrl;
+    const screenWidth = Dimensions.get('window').width;
+    const imageMaxHeight = (isDesktop || isTablet) ? 360 : Math.min(screenWidth * 0.55, 280);
+
+    // Prepare options for OptionsGrid
+    const gridOptions = sortedOptions.map(opt => ({
+      label: opt.option_label,
+      value: opt.option_value,
+      description: opt.option_description,
+      id: opt.id,
+    }));
+
+    const handleOptionSelect = (value: number | string) => {
+      handleAnswerSelect(value);
+      if (autoAdvanceQuestions) {
+        setTimeout(() => {
+          handleNext();
+        }, 300);
+      }
+    };
+
+    const renderQuestionContent = () => (
+      <>
+        <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
+        {currentQuestion.description && (
+          <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
+        )}
+        {questionImageUrl && (
+          <Pressable
+            style={styles.imageWrapper}
+            onPress={() => {
+              setZoomImageUri(questionImageUrl);
+              setImageZoomVisible(true);
+            }}
+          >
+            <Image
+              source={{ uri: questionImageUrl }}
+              style={[styles.questionImage, { maxHeight: imageMaxHeight }]}
+              resizeMode="contain"
+            />
+            <View style={[styles.zoomHint, { backgroundColor: colors.card + 'DD' }]}>
+              <ZoomIn size={14} color={colors.primary} />
+              <Text style={[styles.zoomHintText, { color: colors.primary }]}>Ampliar</Text>
+            </View>
+          </Pressable>
+        )}
+        {currentQuestion.instructions && (
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsLabel}>Instrucciones:</Text>
+            <Text style={styles.instructionsText}>{currentQuestion.instructions}</Text>
+          </View>
+        )}
+      </>
+    );
 
     return (
       <View style={styles.stepContainer}>
-        {/* Progress Bar & Question Title for Mobile */}
-        {!isDesktop && !isTablet && (
-          <>
-            <View style={styles.progressWrapper}>
-              <ProgressBar
-                current={state.currentQuestionIndex + 1}
-                total={sortedQuestions.length}
-                showCounter={true}
-                showPercentage={false}
-                animated={true}
-                height={6}
-              />
-            </View>
-            <View style={styles.questionContainer}>
-              <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
-              {currentQuestion.description && (
-                <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
-              )}
-            </View>
-          </>
-        )}
-        
-        <View style={styles.evaluationGrid}>
-          {/* Question (Left Column on Desktop/Tablet) */}
-          {(isDesktop || isTablet) && (
-            <View style={styles.questionPanel}>
-              <ProgressBar
-                current={state.currentQuestionIndex + 1}
-                total={sortedQuestions.length}
-                showCounter={true}
-                showPercentage={true}
-                animated={true}
-                height={8}
-              />
-              <View style={{ marginTop: 24 }}>
-                <Text style={styles.questionTitle}>{currentQuestion.question_text}</Text>
-                {currentQuestion.description && (
-                  <Text style={styles.questionDescription}>{currentQuestion.description}</Text>
-                )}
-                {currentQuestion.instructions && (
-                  <View style={styles.instructionsContainer}>
-                    <Text style={styles.instructionsLabel}>Instrucciones:</Text>
-                    <Text style={styles.instructionsText}>{currentQuestion.instructions}</Text>
-                  </View>
-                )}
+        {/* SINGLE ScrollView — no nested scroll */}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Progress Bar */}
+          <View style={styles.progressWrapper}>
+            <ProgressBar
+              current={state.currentQuestionIndex + 1}
+              total={sortedQuestions.length}
+              showCounter={true}
+              showPercentage={isDesktop || isTablet}
+              animated={true}
+              height={isDesktop || isTablet ? 8 : 6}
+            />
+          </View>
+
+          {(isDesktop || isTablet) ? (
+            /* Desktop/Tablet: Two-column layout */
+            <View style={styles.evaluationGrid}>
+              <View style={styles.questionPanel}>
+                {renderQuestionContent()}
+              </View>
+              <View style={styles.optionsPanel}>
+                <OptionsGrid
+                  options={gridOptions}
+                  selectedValue={selectedValue}
+                  onSelect={handleOptionSelect}
+                  colors={colors}
+                  fontSizeMultiplier={fontSizeMultiplier}
+                />
               </View>
             </View>
+          ) : (
+            /* Mobile: Single column, question then options */
+            <View>
+              <View style={styles.questionContainer}>
+                {renderQuestionContent()}
+              </View>
+              <OptionsGrid
+                options={gridOptions}
+                selectedValue={selectedValue}
+                onSelect={handleOptionSelect}
+                colors={colors}
+                fontSizeMultiplier={fontSizeMultiplier}
+              />
+            </View>
           )}
+        </ScrollView>
 
-          {/* Options (Right Column on Desktop/Tablet) */}
-          <ScrollView style={styles.optionsPanel} showsVerticalScrollIndicator={false}>
-            {sortedOptions.map((option) => {
-              const isSelected = selectedValue === option.option_value;
-
-              return (
-                <OptionCard
-                  key={option.id}
-                  label={option.option_label}
-                  description={option.option_description}
-                  value={option.option_value}
-                  selected={isSelected}
-                  showValue={true}
-                  onPress={() => {
-                    handleAnswerSelect(option.option_value);
-                    if (autoAdvanceQuestions) {
-                      setTimeout(() => {
-                        handleNext();
-                      }, 300);
-                    }
-                  }}
-                />
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* Navigation */}
+        {/* Fixed Navigation Bar */}
         <View style={styles.navigationContainer}>
           <TouchableOpacity
             style={[
@@ -411,26 +595,37 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
             style={[
               styles.navButton,
               styles.navButtonPrimary,
-              !selectedValue && styles.navButtonDisabled,
+              selectedValue == null && styles.navButtonDisabled,
             ]}
             onPress={handleNext}
-            disabled={!selectedValue}
+            disabled={selectedValue == null}
           >
             <Text style={[
               styles.navButtonText,
               styles.navButtonTextPrimary,
-              !selectedValue && { color: colors.mutedText },
+              selectedValue == null && { color: colors.mutedText },
             ]}>
               {state.currentQuestionIndex === sortedQuestions.length - 1 ? 'Finalizar' : 'Siguiente'}
             </Text>
-            <ArrowRight size={18} color={!selectedValue ? colors.mutedText : colors.buttonPrimaryText} />
+            <ArrowRight size={18} color={selectedValue == null ? colors.mutedText : colors.buttonPrimaryText} />
           </TouchableOpacity>
         </View>
+
+        {/* Image zoom modal */}
+        {zoomImageUri ? (
+          <ImageZoomModal
+            visible={imageZoomVisible}
+            imageUri={zoomImageUri}
+            onClose={() => setImageZoomVisible(false)}
+          />
+        ) : null}
       </View>
     );
   };
 
-  const renderResultsStep = () => (
+  const renderResultsStep = () => {
+    console.log('renderResultsStep called, patientSummary:', patientSummary, 'doctorName:', doctorName);
+    return (
     <View style={styles.stepContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <LinearGradient
@@ -440,6 +635,35 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           <Text style={styles.resultsTitle}>Evaluación Completada</Text>
           <Text style={styles.scaleName}>{scale.name}</Text>
         </LinearGradient>
+
+        {/* Datos del Paciente */}
+        <View style={styles.summaryContainer}>
+          <Text style={styles.summaryTitle}>Datos del Paciente [DEBUG]</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Nombre:</Text>
+            <Text style={styles.summaryValue}>
+              {patientSummary.name || patient?.name || selectedPatient?.name || 'VACÍO'}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Edad:</Text>
+            <Text style={styles.summaryValue}>
+              {calcAgeFromBirthDate(patientSummary.birth_date || patient?.birth_date || selectedPatient?.birth_date) ?? 'VACÍO'}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Género:</Text>
+            <Text style={styles.summaryValue}>
+              {patientSummary.gender || patient?.gender || selectedPatient?.gender || 'VACÍO'}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Médico:</Text>
+            <Text style={styles.summaryValue}>
+              {doctorName || 'VACÍO'}
+            </Text>
+          </View>
+        </View>
 
         {/* Score Display */}
         <View style={styles.scoreContainer}>
@@ -472,6 +696,66 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
                 </Text>
               </View>
             )}
+          </View>
+        )}
+
+        {/* Lawton & Brody detailed area analysis */}
+        {scale.id === 'lawton-brody' && (
+          <View style={styles.summaryContainer}>
+            <Text style={styles.summaryTitle}>📋 Análisis Detallado por Área</Text>
+            {scale.questions?.map((question, idx) => {
+              const response = state.responses[question.question_id];
+              const selectedOption = question.options?.find(opt => opt.option_value === response);
+              const score = selectedOption?.option_value || 0;
+              const isIndependent = score === 1;
+              
+              // @ts-ignore - areaInterpretations is custom metadata
+              const areaInterp = scale.areaInterpretations?.[question.question_id];
+              
+              return (
+                <View key={question.id} style={styles.lawtonAreaRow}>
+                  <View style={styles.lawtonAreaHeader}>
+                    <Text style={styles.lawtonAreaIcon}>
+                      {isIndependent ? '✅' : '❌'}
+                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.lawtonAreaTitle}>
+                        {question.question_text}
+                      </Text>
+                      <Text style={styles.lawtonAreaScore}>
+                        {score} punto{score !== 1 ? 's' : ''} - {isIndependent ? 'Independiente' : 'Dependiente'}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  {selectedOption && (
+                    <Text style={styles.lawtonSelectedOption}>
+                      Respuesta: {selectedOption.option_label}
+                    </Text>
+                  )}
+                  
+                  {areaInterp && (
+                    <View style={[
+                      styles.lawtonInterpretation,
+                      { backgroundColor: isIndependent ? '#10B98115' : '#EF444415' }
+                    ]}>
+                      <Text style={styles.lawtonInterpretationText}>
+                        {isIndependent ? areaInterp.independent : areaInterp.dependent}
+                      </Text>
+                      
+                      {!isIndependent && areaInterp.intervention && (
+                        <View style={styles.lawtonIntervention}>
+                          <Text style={styles.lawtonInterventionLabel}>💡 Intervención Sugerida:</Text>
+                          <Text style={styles.lawtonInterventionText}>
+                            {areaInterp.intervention}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -616,7 +900,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
                                       Number(answer) <= 3 ? '#F59E0B' : '#EF4444'
                               }
                             ]}>
-                              {answer} pts
+                              {`${answer} pts`}
                             </Text>
                           </View>
                         </View>
@@ -658,7 +942,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
                                       Number(answer) <= 3 ? '#F59E0B' : '#EF4444'
                               }
                             ]}>
-                              {answer} pts
+                              {`${answer} pts`}
                             </Text>
                           </View>
                         </View>
@@ -911,6 +1195,20 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           </View>
         </View>
 
+        {/* Guardar en historial del paciente */}
+        {/* Acciones finales */}
+        {/* DEBUG BLOCK - justo antes de Actions */}
+        <View style={{ marginTop: 16, padding: 12, backgroundColor: '#ffeb3b', borderRadius: 8, borderWidth: 2, borderColor: '#ff9800' }}>
+          <Text style={{ fontSize: 12, color: '#000', fontWeight: 'bold' }}>
+            🐛 DEBUG INFO:{'\n'}
+            patientSummary: {JSON.stringify(patientSummary)}{'\n'}
+            patient prop: {JSON.stringify(patient)}{'\n'}
+            selectedPatient: {JSON.stringify(selectedPatient)}{'\n'}
+            doctorName: "{doctorName}"{'\n'}
+            effectivePatientId: {effectivePatientId}
+          </Text>
+        </View>
+
         {/* Actions */}
         <ResultsActions
           assessment={{
@@ -925,10 +1223,40 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           }}
           scale={{ id: scale.id, name: scale.name } as any}
           containerStyle={{ marginTop: 12 }}
+          onSave={onSaveToHistory ? async () => {
+            if (saveToHistoryLoading || state.totalScore == null) return;
+            if (!effectivePatientId) {
+              Alert.alert('Selecciona un paciente', 'Asocia un paciente antes de guardar en el historial.');
+              return;
+            }
+            setSaveToHistoryLoading(true);
+            try {
+              const interpretationText = (scale.id === 'boston' && state.bostonSubscores)
+                ? `SSS: ${state.bostonSubscores.sssLevel} (${state.bostonSubscores.sssAvg}) | FSS: ${state.bostonSubscores.fssLevel} (${state.bostonSubscores.fssAvg})`
+                : (scale.id === 'sf36' && state.sf36Scores)
+                ? getSF36DetailedResults(state.sf36Scores)
+                : state.interpretation?.text ?? '';
+              await onSaveToHistory({
+                patient_id: effectivePatientId,
+                scale_slug: scale.id,
+                responses: state.responses,
+                total_score: state.totalScore,
+                interpretation: interpretationText,
+                subscale_scores: (state.bostonSubscores ?? state.sf36Scores ?? undefined) as any,
+              });
+              setSaveToHistoryDone(true);
+              Alert.alert('Guardado', 'La evaluación se guardó en el historial del paciente.');
+            } finally {
+              setSaveToHistoryLoading(false);
+            }
+          } : undefined}
+          canSave={!!effectivePatientId}
+          saving={saveToHistoryLoading}
         />
       </ScrollView>
     </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1051,6 +1379,34 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     color: colors.mutedText,
     lineHeight: 24 * fontMultiplier,
     marginBottom: 16,
+  },
+  questionImage: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    borderRadius: 10,
+    marginBottom: 16,
+    backgroundColor: colors.surface,
+  },
+  imageWrapper: {
+    position: 'relative' as const,
+    marginBottom: 16,
+    borderRadius: 10,
+    overflow: 'hidden' as const,
+  },
+  zoomHint: {
+    position: 'absolute' as const,
+    bottom: 24,
+    right: 8,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  zoomHintText: {
+    fontSize: 11 * fontMultiplier,
+    fontWeight: '600' as const,
   },
   instructionsContainer: {
     backgroundColor: colors.surface,
@@ -1306,6 +1662,67 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
   progressBarFill: {
     height: '100%',
     borderRadius: 4,
+  },
+  // Lawton & Brody Area Styles
+  lawtonAreaRow: {
+    marginBottom: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  lawtonAreaHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  lawtonAreaIcon: {
+    fontSize: 20 * fontMultiplier,
+    marginRight: 12,
+  },
+  lawtonAreaTitle: {
+    fontSize: 15 * fontMultiplier,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  lawtonAreaScore: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  lawtonSelectedOption: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 8,
+    paddingLeft: 32,
+  },
+  lawtonInterpretation: {
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  lawtonInterpretationText: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.text,
+    lineHeight: 19,
+  },
+  lawtonIntervention: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border + '40',
+  },
+  lawtonInterventionLabel: {
+    fontSize: 12 * fontMultiplier,
+    fontWeight: '600',
+    color: colors.primary,
+    marginBottom: 6,
+  },
+  lawtonInterventionText: {
+    fontSize: 12 * fontMultiplier,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
   // MMSE Answer Details
   answerDetailRow: {

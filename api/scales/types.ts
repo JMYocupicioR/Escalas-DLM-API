@@ -79,6 +79,8 @@ export interface ScaleQuestion {
   is_required: boolean;
   category?: string;
   instructions?: string;
+  image_url?: string;
+  imageUrl?: string;
   options: QuestionOption[];
   created_at: string;
   updated_at: string;
@@ -102,7 +104,17 @@ export interface ScaleScoring {
   min_score?: number;
   max_score?: number;
   ranges: ScoringRange[];
+  domains?: ScoringDomain[];
   created_at: string;
+}
+
+export interface ScoringDomain {
+  id: string;
+  label: string;
+  question_ids: string[];
+  engine: 'sum' | 'average' | 'json-logic';
+  ranges?: ScoringRange[];
+  custom_rules?: any;
 }
 
 export interface ScoringRange {
@@ -130,7 +142,7 @@ export interface ScaleReference {
   doi?: string;
   pmid?: string;
   url?: string;
-  reference_type: 'original' | 'validation' | 'review' | 'meta-analysis';
+  reference_type: 'original' | 'validation' | 'review' | 'meta-analysis' | 'clinical_trial';
   is_primary: boolean;
   created_at: string;
 }
@@ -155,7 +167,13 @@ export interface ScaleAssessmentRequest {
   scale_id: string;
   patient_id?: string;
   responses: Record<string, number | string>;
+  total_score?: number;
+  interpretation?: string;
+  subscale_scores?: Record<string, any>;
+  duration_seconds?: number;
   session_id?: string;
+  assessor_name?: string | null;
+  assessment_date?: string | null;
   device_info?: Record<string, any>;
   ip_address?: string;
 }
@@ -250,7 +268,7 @@ export interface CreateReferenceRequest {
   doi?: string;
   pmid?: string;
   url?: string;
-  reference_type?: 'original' | 'validation' | 'review' | 'meta-analysis';
+  reference_type?: 'original' | 'validation' | 'review' | 'meta-analysis' | 'clinical_trial';
   is_primary?: boolean;
 }
 
@@ -285,16 +303,16 @@ export interface APIEndpoints {
   // Public endpoints
   'GET /api/scales': GetScalesParams;
   'GET /api/scales/:id': { id: string; language?: string };
-  'GET /api/scales/categories': {};
-  'GET /api/scales/specialties': {};
+  'GET /api/scales/categories': Record<string, never>;
+  'GET /api/scales/specialties': Record<string, never>;
   'GET /api/scales/popular': { limit?: number };
   
   // Authenticated endpoints
   'POST /api/assessments': ScaleAssessmentRequest;
   'GET /api/assessments': { scale_id?: string; patient_id?: string };
-  'POST /api/favorites/:scale_id': {};
-  'DELETE /api/favorites/:scale_id': {};
-  'GET /api/favorites': {};
+  'POST /api/favorites/:scale_id': Record<string, never>;
+  'DELETE /api/favorites/:scale_id': Record<string, never>;
+  'GET /api/favorites': Record<string, never>;
   
   // Admin endpoints
   'POST /api/scales': CreateScaleRequest;

@@ -150,7 +150,7 @@ export default function PrivacySettings() {
             </View>
             <View style={styles.sectionContent}>
               <Text style={styles.paragraph}>
-                DeepLuxMed cumple con las regulaciones HIPAA, GDPR y la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) de México.
+                Escalas DLM cumple con las regulaciones HIPAA, GDPR y la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) de México.
               </Text>
               <View style={styles.bulletPoint}>
                 <Text style={styles.bullet}>•</Text>

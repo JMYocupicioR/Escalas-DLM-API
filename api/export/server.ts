@@ -10,8 +10,7 @@ type ServerPdfResponse = {
 };
 
 const getPdfServiceUrl = (): string | null => {
-  const url = process.env.EXPO_PUBLIC_PDF_SERVICE_URL || '';
-  return url ? url.replace(/\/$/, '') : null;
+  return null;
 };
 
 /**

@@ -75,7 +75,7 @@ export const generateHtml = (payload: LequesnePayload): string => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reporte Índice de Lequesne - DeepLuxMed</title>
+  <title>Reporte Índice de Lequesne - Escalas DLM</title>
   <style>
     @page { size: A4; margin: 18mm; }
     html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -151,10 +151,10 @@ export const generateHtml = (payload: LequesnePayload): string => {
     </div>
 
     <div class="footer">
-      <div class="logo">DeepLuxMed.mx</div>
+      <div class="logo">escalas.deeplux.org</div>
       <p>Escalas Médicas Digitales</p>
       <p>Reporte generado el ${formattedDate} a las ${formattedTime}</p>
-      <p style="font-size: 12px; margin-top: 15px;">Este reporte ha sido generado automáticamente por el sistema de evaluación Lequesne de DeepLuxMed. <br />Para uso clínico profesional únicamente.</p>
+      <p style="font-size: 12px; margin-top: 15px;">Este reporte ha sido generado automáticamente por Escalas DLM — DeepLux Med. <br />Para uso clínico profesional únicamente.</p>
     </div>
   </body>
   </html>`;

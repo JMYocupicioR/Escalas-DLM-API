@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "DeepLuxMed - Escalas Médicas",
-    "slug": "deepluxmed-escalas",
+    "name": "Escalas DLM",
+    "slug": "escalas-dlm",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "deepluxmed",
+    "scheme": "escalas-dlm",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "description": "Aplicación médica profesional para evaluación de escalas clínicas y calculadoras especializadas.",
-    "keywords": ["medicina", "escalas", "evaluacion", "clinica", "salud"],
+    "newArchEnabled": false,
+    "description": "Escalas médicas clínicas validadas científicamente — DeepLux Med",
+    "keywords": ["medicina", "escalas", "evaluacion", "clinica", "salud", "DLM"],
     "privacy": "unlisted",
     "ios": {
       "supportsTablet": true,
@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#0891b2"
+        "backgroundColor": "#0ea5e9"
       },
       "package": "com.deepluxmed.escalas"
     },
@@ -27,11 +27,11 @@
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "DeepLuxMed - Escalas Médicas",
-      "shortName": "DeepLuxMed",
-      "description": "Escalas médicas y calculadoras profesionales",
-      "themeColor": "#0891b2",
-      "backgroundColor": "#f8fafc"
+      "name": "Escalas DLM — DeepLux Med",
+      "shortName": "Escalas DLM",
+      "description": "Escalas médicas y calculadoras profesionales — DeepLux Med",
+      "themeColor": "#0ea5e9",
+      "backgroundColor": "#0f172a"
     },
     "plugins": ["expo-router"],
     "experiments": {

@@ -8,6 +8,8 @@ export interface Patient {
   name: string;
   age: number;
   gender: string;
+  attendingPhysician?: string;
+  medicalRecordNumber?: string;
   notes?: string;
   createdAt: number;
   updatedAt: number;

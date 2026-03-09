@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 
 const calculators = [
@@ -22,8 +22,6 @@ export default function CalculatorsIndex() {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true }} />
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.content}>
           {calculators.map(calc => (
@@ -40,7 +38,6 @@ export default function CalculatorsIndex() {
           ))}
         </ScrollView>
       </SafeAreaView>
-    </>
   );
 }
 

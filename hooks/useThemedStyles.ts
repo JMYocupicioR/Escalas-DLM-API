@@ -109,13 +109,13 @@ export const useThemedStyles = () => {
       painExtreme: medicalColors.pain.extreme,
 
       // Colores para elementos específicos
-      iconMuted: baseTheme.mutedText || baseTheme.textTertiary,
+      iconMuted: baseTheme.mutedText,
       linkText: palette.primary,
-      placeholderText: baseTheme.mutedText || baseTheme.textSecondary,
+      placeholderText: baseTheme.mutedText,
 
       // Estados de interacción
-      hover: baseTheme.hover || (effectiveDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'),
-      pressed: baseTheme.pressed || (effectiveDarkMode ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.08)'),
+      hover: effectiveDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+      pressed: effectiveDarkMode ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.08)',
 
       // Indicadores de contraste
       isHighContrast,

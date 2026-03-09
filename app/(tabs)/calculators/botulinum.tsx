@@ -11,7 +11,6 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useLocalSearchParams } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { dosisData, puntosMotoresData } from '@/data/botulinum';
@@ -36,8 +35,7 @@ interface MusculoSeleccionado {
 }
 
 export default function BotulinumCalculator() {
-  const params = useLocalSearchParams();
-  // const id = params.id; // Not currently used
+  // const params = useLocalSearchParams(); // Commented out: not currently used
   const { colors } = useThemedStyles();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -236,8 +234,6 @@ export default function BotulinumCalculator() {
   );
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: 'Toxina Botulínica' }} />
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.title}>Calculadora de Dosis de Toxina Botulínica</Text>
@@ -420,17 +416,6 @@ export default function BotulinumCalculator() {
               </View>
               <ResultsActions
                 assessment={{
-                  medico,
-                  pacienteNombre,
-                  pacienteEdad,
-                  pacientePeso,
-                  marca,
-                  musculos,
-                  totalDosisAjustada,
-                  advertencia,
-                  dilucion,
-                  puntosMotoresData,
-                  dosisDataComplete: dosisData,
                   patientData: {
                     name: pacienteNombre,
                     age: pacienteEdad,
@@ -446,7 +431,10 @@ export default function BotulinumCalculator() {
                     value: m.dosisAjustada ?? m.dosisBase ?? '',
                     points: m.dosisAjustada ?? '',
                   })),
-                }}
+                  // Additional data for botulinum template
+                  puntosMotoresData,
+                  dosisDataComplete: dosisData,
+                } as any}
                 scale={{ id: 'botulinum', name: 'Calculadora de Toxina Botulínica' } as any}
                 containerStyle={{ marginTop: 12 }}
               />
@@ -460,7 +448,6 @@ export default function BotulinumCalculator() {
 
         </ScrollView>
       </SafeAreaView>
-    </>
   );
 }
 
