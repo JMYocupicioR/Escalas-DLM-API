@@ -15,6 +15,7 @@ import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { useScalesStore } from '@/store/scalesStore';
 import { calculateGridConfig, shouldUseListView } from '@/utils/responsiveGrid';
 import type { Scale } from '@/types/scale';
+import { getScales } from '@/api/scales';
 import { useTaxonomyFilters, TaxonomyFilterState } from '@/hooks/useTaxonomyFilters';
 import { TaxonomyFilterBar } from '@/components/TaxonomyFilterBar';
 
@@ -135,6 +136,7 @@ export default function SearchScreen() {
   const [showFilters, setShowFilters] = useState(initialFilter);
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [dbScales, setDbScales] = useState<Scale[]>([]);
   const [scales, setScales] = useState(allScales);
   const [taxonomyFilters, setTaxonomyFilters] = useState<TaxonomyFilterState>({
     categoryId: null,
@@ -159,10 +161,37 @@ export default function SearchScreen() {
   const columns = gridConfig.columns;
   const useListView = shouldUseListView(width);
 
-  // Update scales when store changes
+  // Fetch database scales on mount
   useEffect(() => {
-    setScales(allScales);
-  }, [allScales]);
+    const fetchDbScales = async () => {
+      try {
+        const response = await getScales({ limit: 100 });
+        if (!response.error && response.data) {
+          // Mark DB scales with a source flag for routing
+          const dbScalesWithSource = response.data.map(s => ({
+            ...s,
+            _source: 'supabase' as const,
+          }));
+          setDbScales(dbScalesWithSource);
+        }
+      } catch (err) {
+        console.warn('[Search] Failed to fetch DB scales:', err);
+      }
+    };
+    fetchDbScales();
+  }, []);
+
+  // Merge local + DB scales, deduplicating by ID (DB scales take priority)
+  const mergedScales = useMemo(() => {
+    const localIds = new Set(allScales.map(s => s.id));
+    const uniqueDbScales = dbScales.filter(s => !localIds.has(s.id));
+    return [...allScales, ...uniqueDbScales];
+  }, [allScales, dbScales]);
+
+  // Update scales when merged set changes
+  useEffect(() => {
+    setScales(mergedScales);
+  }, [mergedScales]);
 
   // Manejar cambios en la búsqueda
   const handleSearch = useCallback((text: string) => {
@@ -336,7 +365,12 @@ export default function SearchScreen() {
         <ScaleCard
           scale={scaleData}
           layout={useListView ? 'list' : 'grid'}
-          onPress={() => router.push(`/new-scales/${item.id}` as any)}
+          onPress={() => {
+            // Route DB scales to /new-scales/[id], local scales to /scales/[id]
+            const isDbScale = (item as any)._source === 'supabase';
+            const route = isDbScale ? `/new-scales/${item.id}` : `/new-scales/${item.id}`;
+            router.push(route as any);
+          }}
           showStats={true}
           showCategory={true}
           rightElement={

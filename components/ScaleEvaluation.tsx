@@ -521,7 +521,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
         {/* SINGLE ScrollView — no nested scroll */}
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -611,6 +611,11 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
           </TouchableOpacity>
         </View>
 
+        {/* Cancel link */}
+        <TouchableOpacity onPress={onCancel} style={styles.cancelLink}>
+          <Text style={styles.cancelLinkText}>Cancelar evaluación</Text>
+        </TouchableOpacity>
+
         {/* Image zoom modal */}
         {zoomImageUri ? (
           <ImageZoomModal
@@ -638,7 +643,7 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 
         {/* Datos del Paciente */}
         <View style={styles.summaryContainer}>
-          <Text style={styles.summaryTitle}>Datos del Paciente [DEBUG]</Text>
+          <Text style={styles.summaryTitle}>Datos del Paciente</Text>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Nombre:</Text>
             <Text style={styles.summaryValue}>
@@ -1197,18 +1202,6 @@ export const ScaleEvaluation: React.FC<ScaleEvaluationProps> = ({
 
         {/* Guardar en historial del paciente */}
         {/* Acciones finales */}
-        {/* DEBUG BLOCK - justo antes de Actions */}
-        <View style={{ marginTop: 16, padding: 12, backgroundColor: '#ffeb3b', borderRadius: 8, borderWidth: 2, borderColor: '#ff9800' }}>
-          <Text style={{ fontSize: 12, color: '#000', fontWeight: 'bold' }}>
-            🐛 DEBUG INFO:{'\n'}
-            patientSummary: {JSON.stringify(patientSummary)}{'\n'}
-            patient prop: {JSON.stringify(patient)}{'\n'}
-            selectedPatient: {JSON.stringify(selectedPatient)}{'\n'}
-            doctorName: "{doctorName}"{'\n'}
-            effectivePatientId: {effectivePatientId}
-          </Text>
-        </View>
-
         {/* Actions */}
         <ResultsActions
           assessment={{
@@ -1289,19 +1282,19 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: isLargeScreen ? 12 : 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.headerBackground,
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -1311,14 +1304,14 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     fontWeight: 'bold',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: isLargeScreen ? 18 : 16,
     fontWeight: '600',
     color: colors.text,
     flex: 1,
   },
   stepContainer: {
     flex: 1,
-    padding: isLargeScreen ? 24 : 16,
+    padding: isLargeScreen ? 24 : 12,
     justifyContent: 'space-between',
   },
   evaluationGrid: {
@@ -1336,17 +1329,17 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     flex: 1,
   },
   stepTitle: {
-    fontSize: 28 * fontMultiplier,
+    fontSize: (isLargeScreen ? 28 : 22) * fontMultiplier,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 16,
+    marginBottom: isLargeScreen ? 16 : 10,
   },
   progressWrapper: {
-    marginBottom: 24,
-    paddingHorizontal: isLargeScreen ? 0 : 4,
+    marginBottom: isLargeScreen ? 20 : 12,
+    paddingHorizontal: isLargeScreen ? 0 : 2,
   },
   progressContainer: {
-    marginBottom: 24,
+    marginBottom: isLargeScreen ? 24 : 12,
   },
   progressTrack: {
     height: 6,
@@ -1365,20 +1358,20 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     textAlign: 'right',
   },
   questionContainer: {
-    marginBottom: 24,
+    marginBottom: isLargeScreen ? 20 : 10,
   },
   questionTitle: {
-    fontSize: 24 * fontMultiplier,
+    fontSize: (isLargeScreen ? 24 : 19) * fontMultiplier,
     fontWeight: '600',
     color: colors.text,
-    lineHeight: 32 * fontMultiplier,
-    marginBottom: 12,
+    lineHeight: (isLargeScreen ? 32 : 26) * fontMultiplier,
+    marginBottom: isLargeScreen ? 12 : 8,
   },
   questionDescription: {
-    fontSize: 16 * fontMultiplier,
+    fontSize: (isLargeScreen ? 16 : 14) * fontMultiplier,
     color: colors.mutedText,
-    lineHeight: 24 * fontMultiplier,
-    marginBottom: 16,
+    lineHeight: (isLargeScreen ? 24 : 20) * fontMultiplier,
+    marginBottom: isLargeScreen ? 16 : 10,
   },
   questionImage: {
     width: '100%',
@@ -1410,21 +1403,22 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
   },
   instructionsContainer: {
     backgroundColor: colors.surface,
-    padding: 16,
+    padding: isLargeScreen ? 16 : 10,
     borderRadius: 8,
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
     borderLeftColor: colors.primary,
+    marginBottom: isLargeScreen ? 0 : 8,
   },
   instructionsLabel: {
-    fontSize: 14 * fontMultiplier,
+    fontSize: (isLargeScreen ? 14 : 12) * fontMultiplier,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   instructionsText: {
-    fontSize: 14 * fontMultiplier,
+    fontSize: (isLargeScreen ? 14 : 12) * fontMultiplier,
     color: colors.mutedText,
-    lineHeight: 20 * fontMultiplier,
+    lineHeight: (isLargeScreen ? 20 : 17) * fontMultiplier,
   },
   optionsContainer: {
     flex: 1,
@@ -1499,18 +1493,22 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
   navigationContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 16,
+    gap: 10,
+    paddingTop: isLargeScreen ? 16 : 10,
+    paddingHorizontal: isLargeScreen ? 0 : 0,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.background,
   },
   navButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 14,
+    flex: 1,
+    paddingHorizontal: isLargeScreen ? 24 : 12,
+    paddingVertical: isLargeScreen ? 14 : 12,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   navButtonPrimary: {
     backgroundColor: colors.primary,
@@ -1519,10 +1517,10 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
     backgroundColor: colors.surface,
   },
   navButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   navButtonText: {
-    fontSize: 16 * fontMultiplier,
+    fontSize: (isLargeScreen ? 16 : 14) * fontMultiplier,
     fontWeight: '600',
   },
   navButtonTextPrimary: {
@@ -1530,6 +1528,15 @@ const createStyles = (colors: any, isLargeScreen: boolean, fontMultiplier: numbe
   },
   navButtonTextSecondary: {
     color: colors.buttonSecondaryText,
+  },
+  cancelLink: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  cancelLinkText: {
+    fontSize: 13 * fontMultiplier,
+    color: colors.mutedText,
+    textDecorationLine: 'underline',
   },
   resultsHeader: {
     padding: 24,

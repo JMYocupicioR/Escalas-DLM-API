@@ -152,7 +152,7 @@ export async function getScaleById(id: string, _language: string = 'es'): Promis
             .from('scale_questions')
             .select(`
                 *,
-                question_options!question_id(*)
+                question_options!question_options_question_id_fkey(*)
             `)
             .eq('scale_id', id)
             .order('order_index');

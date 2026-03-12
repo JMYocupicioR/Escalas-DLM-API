@@ -18,37 +18,31 @@ export default function ScalesListScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  
-  const addLog = (msg: string) => {
-    console.log(msg);
-    setDebugLogs(prev => [msg, ...prev].slice(0, 20));
-  };
 
   const fetchScales = React.useCallback(async () => {
     try {
-      addLog('[UI] fetchScales started');
+      console.log('[UI] fetchScales started');
       setError(null);
       const startTime = Date.now();
       const response = await getScales({ 
         query: searchQuery,
         limit: 50 
       });
-      addLog(`[UI] getScales response: error=${response.error} count=${response.count}`);
+      console.log(`[UI] getScales response: error=${response.error} count=${response.count}`);
       
       // Artificial delay for smooth UX if too fast
       const elapsed = Date.now() - startTime;
       if (elapsed < 300) await new Promise(r => setTimeout(r, 300 - elapsed));
       
       if (response.error) {
-        addLog(`[UI] Error loading scales: ${response.message}`);
+        console.log(`[UI] Error loading scales: ${response.message}`);
         setError(response.message || 'Error al cargar las escalas');
       } else {
-        addLog(`[UI] Scales loaded: ${response.data?.length}`);
+        console.log(`[UI] Scales loaded: ${response.data?.length}`);
         setScales(response.data || []);
       }
     } catch (err) {
-      addLog(`[UI] Catch error in fetchScales: ${JSON.stringify(err)}`);
+      console.log(`[UI] Catch error in fetchScales: ${JSON.stringify(err)}`);
       setError('Error de conexión');
     } finally {
       setLoading(false);
@@ -138,12 +132,6 @@ export default function ScalesListScreen() {
           }
         />
       )}
-      <View style={{ marginTop: 20, padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}>
-        <Text style={{ fontWeight: 'bold' }}>Debug Logs:</Text>
-        {debugLogs.map((log, index) => (
-          <Text key={index} style={{ fontSize: 10, fontFamily: 'monospace' }}>{log}</Text>
-        ))}
-      </View>
     </View>
   );
 }

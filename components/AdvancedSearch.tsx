@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Modal,
   Animated,
+  Platform,
 } from 'react-native';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { Scale } from '@/types/scale';
