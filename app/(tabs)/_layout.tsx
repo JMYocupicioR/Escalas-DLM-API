@@ -17,14 +17,15 @@ export default function TabLayout() {
           borderTopWidth: 1,
           ...Platform.select({
             web: {
-              height: 72,
-              paddingTop: 6,
-              paddingBottom: 14,
+              height: 85,
+              paddingTop: 8,
+              paddingBottom: 10,
+              overflow: 'visible' as const,
             },
             default: {
-              height: 60,
-              paddingTop: 4,
-              paddingBottom: 6,
+              height: 58,
+              paddingTop: 6,
+              paddingBottom: 8,
             },
           }),
         },
@@ -33,9 +34,17 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
+          lineHeight: 13,
+          marginTop: 2,
+        },
+        tabBarIconStyle: {
+          marginBottom: 0,
         },
         tabBarItemStyle: {
-          paddingVertical: 2,
+          ...Platform.select({
+            web: { overflow: 'visible' as const },
+            default: {},
+          }),
         },
         headerShown: false,
       }}>

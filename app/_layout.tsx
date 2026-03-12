@@ -14,7 +14,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { useSettingsStore } from '@/store/settingsStore';
 import { navigationDarkTheme, navigationLightTheme, paperDarkTheme, paperLightTheme } from '@/app/theme';
 import { setupDevelopmentEnvironment } from '@/config/development';
-import { Appearance } from 'react-native';
+import { Appearance, Platform } from 'react-native';
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -22,6 +22,44 @@ export default function RootLayout() {
   // Configurar entorno de desarrollo
   useEffect(() => {
     setupDevelopmentEnvironment();
+  }, []);
+
+  // Fix tab bar label clipping on web (React Navigation inline style override)
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const patchTabBar = () => {
+      const tablist = document.querySelector('[role="tablist"]') as HTMLElement | null;
+      if (!tablist) return;
+      // Patch inner container (the one with inline height set by RN Web)
+      const inner = tablist.parentElement as HTMLElement | null;
+      if (inner) {
+        inner.style.height = '85px';
+        inner.style.minHeight = '85px';
+        inner.style.overflow = 'visible';
+        inner.style.paddingTop = '8px';
+        inner.style.paddingBottom = '10px';
+        inner.style.boxSizing = 'border-box';
+      }
+      tablist.style.height = '100%';
+      tablist.style.overflow = 'visible';
+      // Patch each tab item
+      tablist.querySelectorAll('[role="tab"]').forEach((tab) => {
+        (tab as HTMLElement).style.overflow = 'visible';
+        (tab as HTMLElement).style.height = '100%';
+      });
+    };
+
+    // Try immediately and via MutationObserver for dynamic renders
+    patchTabBar();
+    const observer = new MutationObserver(patchTabBar);
+    observer.observe(document.body, { childList: true, subtree: true });
+    // After 2 seconds stop observing (tab bar is stable)
+    const timer = setTimeout(() => observer.disconnect(), 2000);
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, []);
 
   // Podríamos añadir lógica de inicialización aquí si es necesario
