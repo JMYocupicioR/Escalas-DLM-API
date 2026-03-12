@@ -231,42 +231,45 @@ export const ScaleRunner = ({
             />
           </ScrollView>
 
-          {/* Navigation + Score Footer */}
-          <Surface style={[styles.footer, { backgroundColor: colors.card }]} elevation={4}>
-            {/* Mini score display */}
-            <View style={styles.miniScoreRow}>
-              {results.domains.length > 0 ? (
-                <Text style={[styles.miniScoreText, { color: colors.mutedText }]}>
-                  {results.domains.map(d => `${d.label}: ${d.score}`).join(' · ')}
-                </Text>
-              ) : (
-                <Text style={[styles.miniScoreText, { color: colors.mutedText }]}>
-                  Puntaje: <Text style={{ color: colors.text, fontWeight: 'bold' }}>{results.total}</Text>
-                </Text>
-              )}
-            </View>
-
-            {/* Nav buttons */}
+          {/* Compact Navigation Footer */}
+          <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+            {/* Nav buttons with inline score */}
             <View style={styles.navButtonsRow}>
-              <TouchableOpacity
-                onPress={goPrev}
-                disabled={isFirstQuestion}
-                style={[
-                  styles.navButton,
-                  styles.navButtonPrev,
-                  { borderColor: colors.border, opacity: isFirstQuestion ? 0.4 : 1 }
-                ]}
-              >
-                <ChevronLeft size={20} color={colors.text} />
-                <Text style={[styles.navButtonText, { color: colors.text }]}>Anterior</Text>
-              </TouchableOpacity>
+              {isFirstQuestion && onCancel ? (
+                <TouchableOpacity
+                  onPress={onCancel}
+                  style={[styles.navButton, styles.navButtonPrev, { borderColor: colors.border }]}
+                >
+                  <Text style={[styles.navButtonText, { color: colors.mutedText, fontSize: 13 }]}>Cancelar</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={goPrev}
+                  disabled={isFirstQuestion}
+                  style={[
+                    styles.navButton,
+                    styles.navButtonPrev,
+                    { borderColor: colors.border, opacity: isFirstQuestion ? 0.4 : 1 }
+                  ]}
+                >
+                  <ChevronLeft size={18} color={colors.text} />
+                  <Text style={[styles.navButtonText, { color: colors.text }]}>Anterior</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Inline score badge */}
+              <View style={[styles.inlineScoreBadge, { backgroundColor: colors.primary + '15' }]}>
+                <Text style={[styles.inlineScoreText, { color: colors.primary }]}>
+                  {results.total}
+                </Text>
+              </View>
 
               {isLastQuestion ? (
                 <TouchableOpacity
                   onPress={handleSubmit(handleFormSubmit)}
                   style={[styles.navButton, styles.navButtonFinish, { backgroundColor: colors.primary }]}
                 >
-                  <CheckCircle2 size={20} color="#fff" />
+                  <CheckCircle2 size={18} color="#fff" />
                   <Text style={[styles.navButtonText, { color: '#fff', fontWeight: 'bold' }]}>Finalizar</Text>
                 </TouchableOpacity>
               ) : (
@@ -275,17 +278,11 @@ export const ScaleRunner = ({
                   style={[styles.navButton, styles.navButtonNext, { backgroundColor: colors.primary }]}
                 >
                   <Text style={[styles.navButtonText, { color: '#fff' }]}>Siguiente</Text>
-                  <ChevronRight size={20} color="#fff" />
+                  <ChevronRight size={18} color="#fff" />
                 </TouchableOpacity>
               )}
             </View>
-
-            {onCancel && (
-              <TouchableOpacity onPress={onCancel} style={styles.cancelLink}>
-                <Text style={[styles.cancelLinkText, { color: colors.mutedText }]}>Cancelar evaluación</Text>
-              </TouchableOpacity>
-            )}
-          </Surface>
+          </View>
         </View>
       </FormProvider>
     );
@@ -454,16 +451,17 @@ const styles = StyleSheet.create({
   // --- Nav Buttons ---
   navButtonsRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
+    alignItems: 'center',
   },
   navButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 12,
-    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 4,
   },
   navButtonPrev: {
     borderWidth: 1,
@@ -471,30 +469,26 @@ const styles = StyleSheet.create({
   navButtonNext: {},
   navButtonFinish: {},
   navButtonText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '500',
   },
-  cancelLink: {
-    alignItems: 'center',
-    marginTop: 12,
-    paddingVertical: 8,
-  },
-  cancelLinkText: {
-    fontSize: 13,
-  },
-  miniScoreRow: {
-    marginBottom: 12,
+  inlineScoreBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    minWidth: 40,
     alignItems: 'center',
   },
-  miniScoreText: {
-    fontSize: 13,
+  inlineScoreText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   // --- Footer ---
   footer: {
-    padding: 16,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderTopWidth: 1,
   },
   domainSummary: {
     marginBottom: 16,
