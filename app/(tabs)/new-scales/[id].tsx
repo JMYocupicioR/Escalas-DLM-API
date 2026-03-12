@@ -256,8 +256,8 @@ export default function ScaleRunnerScreen() {
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingBottom: 12,
+        paddingHorizontal: 12,
+        paddingBottom: 6,
         borderBottomWidth: 1,
         borderBottomColor: colors.border,
     },
@@ -266,14 +266,14 @@ export default function ScaleRunnerScreen() {
         marginRight: 8,
     },
     headerTitle: {
-        fontSize: 18 * fontSizeMultiplier,
+        fontSize: 16 * fontSizeMultiplier,
         fontWeight: 'bold',
         color: colors.text,
         flex: 1,
     },
     content: {
         flex: 1,
-        padding: 16,
+        padding: 0,
     },
     sectionTitle: {
         fontSize: 20 * fontSizeMultiplier,

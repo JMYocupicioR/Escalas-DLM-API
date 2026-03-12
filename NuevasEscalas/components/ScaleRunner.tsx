@@ -1,12 +1,12 @@
 import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useForm, FormProvider } from 'react-hook-form';
 import { MedicalScale, ScaleQuestion } from '../medical-scale.schema';
 import { QuestionRenderer } from './QuestionRenderer';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useSettingsStore } from '@/store/settingsStore';
-import { Button, Surface, ProgressBar } from 'react-native-paper';
-import { ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Zap } from 'lucide-react-native';
+import { Button, Surface } from 'react-native-paper';
+import { ChevronLeft, ChevronRight, CheckCircle2, AlertCircle } from 'lucide-react-native';
 
 interface ScaleRunnerProps {
   scaleData: MedicalScale;
@@ -31,6 +31,7 @@ export const ScaleRunner = ({
 
   // --- Stepper state ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [instructionsCollapsed, setInstructionsCollapsed] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
     
   const version = scaleData.current_version;
@@ -182,46 +183,32 @@ export const ScaleRunner = ({
   // RENDER: One Question at a Time (Stepper)
   // ==========================================
   if (oneQuestionAtATime && currentQuestion) {
-    const progress = totalQuestions > 0 ? (currentQuestionIndex + 1) / totalQuestions : 0;
-    const answeredCount = sortedQuestions.filter(q => allAnswers[q.id] !== undefined && allAnswers[q.id] !== null).length;
-
     return (
       <FormProvider {...methods}>
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-          {/* Progress header */}
-          <View style={[styles.stepperHeader, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-            <View style={styles.progressRow}>
-              <Text style={[styles.progressText, { color: colors.mutedText }]}>
-                Pregunta {currentQuestionIndex + 1} de {totalQuestions}
-              </Text>
-              <Text style={[styles.answeredText, { color: colors.primary }]}>
-                {answeredCount} respondidas
-              </Text>
-            </View>
-            <ProgressBar 
-              progress={progress} 
-              color={colors.primary} 
-              style={[styles.progressBar, { backgroundColor: colors.border }]} 
-            />
-            {/* Auto-advance badge */}
-            {autoAdvanceQuestions && (
-              <View style={[styles.autoAdvanceBadge, { backgroundColor: colors.primary + '15' }]}>
-                <Zap size={12} color={colors.primary} />
-                <Text style={[styles.autoAdvanceBadgeText, { color: colors.primary }]}>Avance automático</Text>
-              </View>
-            )}
-          </View>
-
-          {/* Instructions (first question only) */}
+          {/* Collapsible Instructions (only on first question) */}
           {currentQuestionIndex === 0 && version.config?.instructions && (
-            <View style={[styles.instructionsBox, { backgroundColor: colors.infoBackground + '20', borderColor: colors.info }]}>
-              <Text style={[styles.instructionsText, { color: colors.text, fontSize: 13 * fontSizeMultiplier }]}>
-                {version.config.instructions}
-              </Text>
-            </View>
+            <TouchableOpacity
+              onPress={() => setInstructionsCollapsed(!instructionsCollapsed)}
+              activeOpacity={0.7}
+              style={[styles.instructionsToggle, { backgroundColor: colors.infoBackground + '20', borderColor: colors.info }]}
+            >
+              {instructionsCollapsed ? (
+                <Text style={[styles.instructionsCollapsedText, { color: colors.info }]} numberOfLines={1}>
+                  ℹ️ Instrucciones (toca para ver)
+                </Text>
+              ) : (
+                <View>
+                  <Text style={[styles.instructionsText, { color: colors.text, fontSize: 12 * fontSizeMultiplier }]}>
+                    {version.config.instructions}
+                  </Text>
+                  <Text style={[styles.instructionsHideHint, { color: colors.info }]}>▲ Toca para ocultar</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           )}
 
-          {/* Single question */}
+          {/* Single question — maximum scroll area */}
           <ScrollView ref={scrollRef} style={styles.scrollArea} contentContainerStyle={styles.stepperContent}>
             <QuestionRenderer 
               key={currentQuestion.id} 
@@ -389,9 +376,28 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   stepperContent: {
-    padding: 16,
-    paddingBottom: 24,
+    padding: 12,
+    paddingTop: 8,
+    paddingBottom: 16,
     flexGrow: 1,
+  },
+  instructionsToggle: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    marginBottom: 4,
+    padding: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  instructionsCollapsedText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  instructionsHideHint: {
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
+    fontWeight: '500',
   },
   instructionsBox: {
     padding: 12,
@@ -409,44 +415,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 
-  // --- Stepper Header ---
-  stepperHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  progressText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  answeredText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  progressBar: {
-    height: 4,
-    borderRadius: 2,
-  },
-  autoAdvanceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-    marginTop: 8,
-    gap: 4,
-  },
-  autoAdvanceBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
+
 
   // --- Nav Buttons ---
   navButtonsRow: {
