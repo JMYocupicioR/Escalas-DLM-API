@@ -167,8 +167,8 @@ export function QuickActions({ onActionPress }: QuickActionsProps) {
                     <IconComponent size={20} color="#ffffff" />
                   </View>
                   <View style={styles.actionText}>
-                    <Text style={styles.actionTitle}>{action.title}</Text>
-                    <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
+                    <Text style={styles.actionTitle} numberOfLines={1}>{action.title}</Text>
+                    <Text style={styles.actionSubtitle} numberOfLines={1}>{action.subtitle}</Text>
                   </View>
                 </View>
               </LinearGradient>
@@ -283,8 +283,10 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     // Removed specific margins
   },
   actionGradient: {
-    padding: 16,
-    minHeight: 88,
+    ...Platform.select({
+      default: { padding: 12, minHeight: 80 },
+      web: { padding: 16, minHeight: 88 },
+    }),
     justifyContent: 'center',
   },
   actionContent: {
@@ -310,6 +312,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   actionText: {
     flex: 1,
+    minWidth: 0,
   },
   actionTitle: {
     fontSize: 15,

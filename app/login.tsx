@@ -101,10 +101,12 @@ export default function LoginScreen() {
     link: {
       marginTop: 20,
       alignItems: 'center',
+      paddingHorizontal: 8,
     },
     linkText: {
       fontSize: 14,
       color: colors.primary,
+      textAlign: 'center',
     },
     divider: {
       flexDirection: 'row',

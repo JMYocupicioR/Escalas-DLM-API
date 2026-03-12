@@ -176,8 +176,8 @@ function HomeScreen() {
                 <AppIcon size={isDesktop ? 64 : 56} />
               </View>
               <View style={styles.heroTextContainer}>
-                <Text style={styles.heroTitle}>Escalas y Calculadoras Médicas</Text>
-                <Text style={styles.heroSubtitle}>
+                <Text style={styles.heroTitle} numberOfLines={2}>Escalas y Calculadoras Médicas</Text>
+                <Text style={styles.heroSubtitle} numberOfLines={2}>
                   {isDesktop 
                     ? 'Busca, explora y evalúa escalas médicas en segundos con nuestra plataforma profesional' 
                     : 'Busca, explora y evalúa en segundos'}
@@ -384,25 +384,26 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   heroContent: {
     gap: Platform.select({ default: 16, web: 20 }),
-    // On web: lay hero icon+text and action pills side-by-side
+    // On wide screens (tablet/desktop web): side-by-side layout
     ...(Platform.OS === 'web'
-      ? { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const }
+      ? { flexDirection: 'column' as const }
       : {}),
   },
   heroLeft: { 
     flexDirection: 'row', 
     alignItems: 'center', 
     gap: 16,
+    flex: 1,
     ...Platform.select({
       default: {
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 12,
       },
       web: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 20,
+        gap: 16,
       },
     }),
   },
@@ -415,12 +416,13 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   heroTextContainer: {
     flex: 1,
+    minWidth: 0,
   },
   heroTitle: { 
-    fontSize: Platform.select({ default: 20, web: 24 }), 
+    fontSize: Platform.select({ default: 18, web: 24 }), 
     fontWeight: '800', 
     color: colors.text,
-    lineHeight: Platform.select({ default: 26, web: 32 }),
+    lineHeight: Platform.select({ default: 24, web: 32 }),
     marginBottom: 6,
     letterSpacing: -0.5,
   },
