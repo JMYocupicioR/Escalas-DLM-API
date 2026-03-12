@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,8 +14,10 @@ import { TextInput, Button } from 'react-native-paper';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { supabase } from '@/api/config/supabase';
 import { SplashLogo } from '@/components/AppLogo';
+import { useGuestStore } from '@/store/guestStore';
 
 export default function LoginScreen() {
+  const enterGuestMode = useGuestStore((s) => s.enterGuestMode);
   const { colors } = useThemedStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -105,6 +106,36 @@ export default function LoginScreen() {
       fontSize: 14,
       color: colors.primary,
     },
+    divider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 28,
+      marginBottom: 4,
+      gap: 12,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    dividerText: {
+      fontSize: 13,
+      color: colors.mutedText,
+    },
+    guestButton: {
+      marginTop: 12,
+      paddingVertical: 14,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      backgroundColor: 'transparent',
+      alignItems: 'center',
+    },
+    guestButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.mutedText,
+    },
   });
 
   return (
@@ -175,6 +206,23 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <Text style={styles.linkText}>¿No tienes cuenta? Regístrate</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>o</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={() => {
+              enterGuestMode();
+              router.replace('/(tabs)');
+            }}
+            disabled={loading}
+          >
+            <Text style={styles.guestButtonText}>Continuar sin cuenta</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

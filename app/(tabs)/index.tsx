@@ -16,6 +16,7 @@ import { useScalesStore } from '@/store/scales';
 import { scalesById, scales as allScales } from '@/data/_scales';
 import { getScales } from '@/api/scales';
 import { calculateGridConfig, getLayoutMode, shouldUseListView } from '@/utils/responsiveGrid';
+import { GuestBanner } from '@/components/GuestBanner';
 import { Activity, Brain, Star, Calculator, Compass, Heart, TrendingUp, Users, Clock, Zap, Search as SearchIcon } from 'lucide-react-native';
 
 const calculators = [
@@ -160,6 +161,8 @@ function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        {/* Guest Mode Banner */}
+        <GuestBanner />
         {/* Hero - Enhanced */}
         <LinearGradient 
           colors={[`${colors.primary}18`, `${colors.primary}08`, `${colors.primary}02`]} 

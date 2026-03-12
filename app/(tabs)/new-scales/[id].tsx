@@ -11,6 +11,7 @@ import { PatientPicker, PickedPatient } from '@/components/PatientPicker';
 import { StickyPatientHeader } from '@/components/ui/StickyPatientHeader';
 import { ArrowLeft, User } from 'lucide-react-native';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { useGuestMode } from '@/hooks/useGuestMode';
 
 const calculateAge = (birthDate?: string | null) => {
     if (!birthDate) return undefined;
@@ -30,13 +31,14 @@ export default function ScaleRunnerScreen() {
   const { colors, fontSizeMultiplier } = useThemedStyles();
   const insets = useSafeAreaInsets();
   const { session } = useAuthSession();
+  const { isGuest, canSave } = useGuestMode();
   const doctorName = useMemo(() => session?.user?.user_metadata?.full_name || 'Médico', [session]);
 
   const [scale, setScale] = useState<ScaleWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [patient, setPatient] = useState<PickedPatient | null>(null);
-  const [step, setStep] = useState<'select_patient' | 'run_scale' | 'show_results'>('select_patient');
+  const [step, setStep] = useState<'select_patient' | 'run_scale' | 'show_results'>(isGuest ? 'run_scale' : 'select_patient');
   const [results, setResults] = useState<any | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [saveErrorMsg, setSaveErrorMsg] = useState<string | undefined>();
@@ -432,7 +434,7 @@ export default function ScaleRunnerScreen() {
                             gender: patient.gender,
                             birth_date: patient.birth_date
                         } : null}
-                        onSave={handleSaveAssessment}
+                        onSave={canSave ? handleSaveAssessment : undefined}
                         onReset={handleReset}
                         saveStatus={saveStatus}
                         errorMessage={saveErrorMsg}

@@ -26,12 +26,14 @@ import {
 import { useSettingsStore } from '@/store/settingsStore';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { useGuestMode } from '@/hooks/useGuestMode';
 import { HeaderLogo } from '@/components/AppLogo';
-import { LogOut } from 'lucide-react-native';
+import { LogOut, LogIn } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { colors, isDark, themeMode, contrastLevel, fontSize } = useThemedStyles();
   const { signOut, session } = useAuthSession();
+  const { isGuest, exitGuestMode } = useGuestMode();
 
   const handleSignOut = async () => {
     await signOut();
@@ -379,49 +381,68 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Notificaciones */}
-          <View style={themedStyles.section}>
-            <Text style={themedStyles.sectionTitle}>Notificaciones</Text>
-            <View style={themedStyles.sectionContent}>
-              <SettingItem
-                icon={Bell}
-                title="Notificaciones"
-                showToggle
-                isToggled={notifications}
-                onPress={toggleNotifications}
-                description="Activar todas las notificaciones"
-              />
-              <SettingItem
-                icon={Bell}
-                title="Configuración detallada"
-                onPress={() => navigateToSubpage('notifications')}
-                description="Configurar tipos específicos de notificaciones"
-                isLast
-              />
+          {/* Notificaciones - solo para usuarios autenticados */}
+          {!isGuest && (
+            <View style={themedStyles.section}>
+              <Text style={themedStyles.sectionTitle}>Notificaciones</Text>
+              <View style={themedStyles.sectionContent}>
+                <SettingItem
+                  icon={Bell}
+                  title="Notificaciones"
+                  showToggle
+                  isToggled={notifications}
+                  onPress={toggleNotifications}
+                  description="Activar todas las notificaciones"
+                />
+                <SettingItem
+                  icon={Bell}
+                  title="Configuración detallada"
+                  onPress={() => navigateToSubpage('notifications')}
+                  description="Configurar tipos específicos de notificaciones"
+                  isLast
+                />
+              </View>
             </View>
-          </View>
+          )}
 
           {/* Cuenta */}
           <View style={themedStyles.section}>
             <Text style={themedStyles.sectionTitle}>Cuenta</Text>
             <View style={themedStyles.sectionContent}>
-              {session?.user?.email && (
-                <SettingItem
-                  icon={User}
-                  title="Sesión"
-                  value={session.user.email}
-                  showChevron={false}
-                  onPress={() => {}}
-                  isLast={false}
-                />
+              {isGuest ? (
+                <>
+                  <SettingItem
+                    icon={LogIn}
+                    title="Iniciar sesión"
+                    value="Accede para guardar evaluaciones y pacientes"
+                    onPress={() => {
+                      exitGuestMode();
+                      router.replace('/login');
+                    }}
+                    isLast
+                  />
+                </>
+              ) : (
+                <>
+                  {session?.user?.email && (
+                    <SettingItem
+                      icon={User}
+                      title="Sesión"
+                      value={session.user.email}
+                      showChevron={false}
+                      onPress={() => {}}
+                      isLast={false}
+                    />
+                  )}
+                  <SettingItem
+                    icon={LogOut}
+                    title="Cerrar sesión"
+                    onPress={handleSignOut}
+                    description="Salir de tu cuenta"
+                    isLast
+                  />
+                </>
               )}
-              <SettingItem
-                icon={LogOut}
-                title="Cerrar sesión"
-                onPress={handleSignOut}
-                description="Salir de tu cuenta"
-                isLast
-              />
             </View>
           </View>
 
@@ -442,13 +463,23 @@ export default function SettingsScreen() {
                 title="Política de privacidad"
                 onPress={() => navigateToSubpage('privacy')}
               />
-              <SettingItem
-                icon={User}
-                title="Gestión de datos"
-                onPress={() => navigateToSubpage('data-management')}
-                description="Exportar, importar o eliminar datos"
-                isLast
-              />
+              {!isGuest && (
+                <SettingItem
+                  icon={User}
+                  title="Gestión de datos"
+                  onPress={() => navigateToSubpage('data-management')}
+                  description="Exportar, importar o eliminar datos"
+                  isLast
+                />
+              )}
+              {isGuest && (
+                <SettingItem
+                  icon={Shield}
+                  title="Política de privacidad"
+                  onPress={() => navigateToSubpage('privacy')}
+                  isLast
+                />
+              )}
             </View>
           </View>
 

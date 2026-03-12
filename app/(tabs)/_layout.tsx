@@ -2,9 +2,11 @@ import { Tabs } from 'expo-router/tabs';
 import { Chrome as Home, Settings, Users } from 'lucide-react-native';
 import { useTheme } from '@react-navigation/native';
 import { Calculator } from 'lucide-react-native';
+import { useGuestMode } from '@/hooks/useGuestMode';
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { canAccessPatients } = useGuestMode();
   return (
     <Tabs
       screenOptions={{
@@ -58,6 +60,7 @@ export default function TabLayout() {
         options={{
           title: 'Pacientes',
           tabBarIcon: ({ size, color }: { size: number; color: string }) => <Users size={size} color={color} />,
+          href: canAccessPatients ? undefined : null,
         }}
       />
       <Tabs.Screen

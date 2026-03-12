@@ -3,6 +3,7 @@ import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import * as ExpoRouter from 'expo-router';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useThemedStyles } from '@/hooks/useThemedStyles';
+import { useGuestStore } from '@/store/guestStore';
 
 const FALLBACK_BG = '#F9FAFB';
 const FALLBACK_PRIMARY = '#0EA5E9';
@@ -16,6 +17,7 @@ export default function App() {
     // useRouter puede no estar disponible
   }
   const { session, loading } = useAuthSession();
+  const isGuest = useGuestStore((s) => s.isGuest);
   const { colors } = useThemedStyles();
   const bg = colors?.background ?? FALLBACK_BG;
   const primary = colors?.primary ?? FALLBACK_PRIMARY;
@@ -24,15 +26,15 @@ export default function App() {
   useEffect(() => {
     if (loading || !router) return;
     try {
-      if (!session) {
-        router.replace('/login');
-      } else {
+      if (session || isGuest) {
         router.replace('/(tabs)');
+      } else {
+        router.replace('/login');
       }
     } catch (_) {
       // fallback silencioso
     }
-  }, [loading, session, router]);
+  }, [loading, session, isGuest, router]);
 
   return (
     <View style={[styles.center, { backgroundColor: bg }]}>

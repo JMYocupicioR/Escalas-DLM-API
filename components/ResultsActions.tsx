@@ -5,6 +5,7 @@ import { generatePdfFromService } from '@/api/export/pdf';
 import { exportAssessmentServerPDF } from '@/api/export/server';
 import { GenericAssessmentForPDF, PdfOptions } from '@/api/export/types';
 import { Scale } from '@/types/scale';
+import { useGuestMode } from '@/hooks/useGuestMode';
 import * as FileSystem from 'expo-file-system';
 import { shareAsync } from 'expo-sharing';
 
@@ -19,6 +20,7 @@ interface ResultsActionsProps {
 
 export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scale, containerStyle, onSave, canSave = true, saving = false }) => {
   const { colors, isDark } = useThemedStyles();
+  const { isGuest } = useGuestMode();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   
@@ -315,32 +317,34 @@ export const ResultsActions: React.FC<ResultsActionsProps> = ({ assessment, scal
 
   return (
     <View style={[{ gap: 12, marginTop: 12 }, containerStyle]}>
-      {/* Guardar en historial - full width */}
-      <TouchableOpacity
-        style={[
-          styles.saveButton,
-          { backgroundColor: colors.primary, opacity: onSave ? (saving ? 0.7 : canSave ? 1 : 0.5) : 0.5 },
-        ]}
-        onPress={async () => {
-          if (!onSave) {
-            Alert.alert('Inicia sesión', 'Debes iniciar sesión para guardar en el historial.');
-            return;
-          }
-          if (saving || !canSave) return;
-          try {
-            await onSave();
-          } catch (e) {
-            Alert.alert('Error', e instanceof Error ? e.message : 'No se pudo guardar en el historial.');
-          }
-        }}
-        accessibilityLabel="Guardar en historial del paciente"
-      >
-        {saving ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={[styles.buttonText, { color: '#fff' }]}>Guardar en historial del paciente</Text>
-        )}
-      </TouchableOpacity>
+      {/* Guardar en historial - only for authenticated users */}
+      {!isGuest && (
+        <TouchableOpacity
+          style={[
+            styles.saveButton,
+            { backgroundColor: colors.primary, opacity: onSave ? (saving ? 0.7 : canSave ? 1 : 0.5) : 0.5 },
+          ]}
+          onPress={async () => {
+            if (!onSave) {
+              Alert.alert('Inicia sesión', 'Debes iniciar sesión para guardar en el historial.');
+              return;
+            }
+            if (saving || !canSave) return;
+            try {
+              await onSave();
+            } catch (e) {
+              Alert.alert('Error', e instanceof Error ? e.message : 'No se pudo guardar en el historial.');
+            }
+          }}
+          accessibilityLabel="Guardar en historial del paciente"
+        >
+          {saving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Guardar en historial del paciente</Text>
+          )}
+        </TouchableOpacity>
+      )}
 
       {/* Export row */}
       <View style={styles.container}>
