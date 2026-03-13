@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   View, 
   TextInput, 
@@ -25,6 +25,7 @@ import { useRouter } from 'expo-router';
 import { useScalesStore } from '@/store/scales';
 import { useAutoUpdatingScales } from '@/hooks/useAutoUpdatingScales';
 import { DEV_CONFIG } from '@/config/development';
+import { getScales } from '@/api/scales';
 
 interface SearchSuggestion {
   id: string;
@@ -75,6 +76,21 @@ export function SearchWidget({
     enableAutoUpdate: true,
     enableLogging: DEV_CONFIG.SCALES.ENABLE_LOGGING
   });
+
+  // Fetch Supabase (DB) scales for unified search
+  const [dbScales, setDbScales] = useState<any[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getScales({ limit: 100 });
+        if (!cancelled && res.data) setDbScales(res.data);
+      } catch (e) {
+        // Silently fall back to local-only search
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   
   // Animation values
   const focusScale = useSharedValue(1);
@@ -153,37 +169,61 @@ export function SearchWidget({
     setSuggestions(recentSuggestions);
   }, [recentlyViewed, realScales]);
 
-  // Generate search suggestions using the advanced hook
+  // Generate search suggestions using the advanced hook + Supabase
   const generateSuggestions = useCallback((searchQuery: string) => {
     if (!searchQuery.trim()) {
       generateRecentSuggestions();
       return;
     }
 
-    if (!realScales || realScales.length === 0) {
-      setSuggestions([]);
-      return;
-    }
-
     setIsLoading(true);
     
-    // Simulate API delay with cleanup
     const timer = setTimeout(() => {
       try {
-        // Use the advanced search function from the hook
-        const scaleSuggestions: SearchSuggestion[] = hookSearchScales(searchQuery)
+        const q = searchQuery.toLowerCase();
+
+        // 1. Search LOCAL scales via hook
+        const localResults: SearchSuggestion[] = (realScales && realScales.length > 0)
+          ? hookSearchScales(searchQuery)
+              .slice(0, 4)
+              .map(scale => ({
+                id: scale.id,
+                type: 'scale' as const,
+                title: scale.name,
+                subtitle: scale.description,
+              }))
+          : [];
+
+        // 2. Search DB scales
+        const dbResults: SearchSuggestion[] = dbScales
+          .filter(s => {
+            const name = (s.name || '').toLowerCase();
+            const desc = (s.description || '').toLowerCase();
+            const cat = (s.category || '').toLowerCase();
+            const acronym = (s.acronym || '').toLowerCase();
+            return name.includes(q) || desc.includes(q) || cat.includes(q) || acronym.includes(q);
+          })
           .slice(0, 4)
-          .map(scale => ({
-            id: scale.id,
+          .map(s => ({
+            id: s.id,
             type: 'scale' as const,
-            title: scale.name,
-            subtitle: scale.description,
+            title: s.name || s.acronym || 'Escala',
+            subtitle: s.description,
           }));
 
+        // 3. Merge & deduplicate (DB first, then local)
+        const seenIds = new Set<string>();
+        const merged: SearchSuggestion[] = [];
+        for (const item of [...dbResults, ...localResults]) {
+          if (!seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            merged.push(item);
+          }
+        }
+
+        // 4. Category suggestions
         const categorySuggestions: SearchSuggestion[] = categories
-          .filter(cat => 
-            cat.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+          .filter(cat => cat.toLowerCase().includes(q))
           .slice(0, 2)
           .map(category => ({
             id: category.toLowerCase(),
@@ -192,8 +232,7 @@ export function SearchWidget({
             subtitle: 'Categoría',
           }));
 
-        const allSuggestions = [...scaleSuggestions, ...categorySuggestions];
-        setSuggestions(allSuggestions);
+        setSuggestions([...merged.slice(0, 5), ...categorySuggestions]);
       } catch (error) {
         console.error('Error generating suggestions:', error);
         setSuggestions([]);
@@ -202,9 +241,8 @@ export function SearchWidget({
       }
     }, 300);
 
-    // Return cleanup function
     return () => clearTimeout(timer);
-  }, [generateRecentSuggestions, realScales, categories, hookSearchScales]);
+  }, [generateRecentSuggestions, realScales, categories, hookSearchScales, dbScales]);
 
   // Handle text change with debouncing
   const handleTextChange = useCallback((text: string) => {
@@ -228,19 +266,16 @@ export function SearchWidget({
 
   // Handle suggestion tap
   const handleSuggestionTap = useCallback((suggestion: SearchSuggestion) => {
-    // Immediately hide keyboard and suggestions
     Keyboard.dismiss();
     setIsFocused(false);
     setSuggestions([]);
     inputRef.current?.blur();
 
-    // Navigate based on suggestion type
     try {
       if (suggestion.type === 'scale' || suggestion.type === 'recent') {
-        // Navigate to scale detail page
-        router.push(`/scales/${suggestion.id}`);
+        // Route to new-scales for all scales (works for both local and DB)
+        router.push(`/new-scales/${suggestion.id}`);
       } else if (suggestion.type === 'category') {
-        // Navigate to search with category filter
         router.push(`/search?category=${encodeURIComponent(suggestion.id)}`);
       }
     } catch (error) {
