@@ -1,0 +1,1448 @@
+app/(tabs)/calculators/botulinum.tsx(14,1): error TS6133: 'useLocalSearchParams' is declared but its value is never read.
+app/(tabs)/calculators/botulinum.tsx(14,10): error TS2305: Module '"expo-router"' has no exported member 'useLocalSearchParams'.
+app/(tabs)/calculators/botulinum.tsx(239,8): error TS2304: Cannot find name 'Stack'.
+app/(tabs)/calculators/index.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/calculators/plexus-educativo.tsx(30,8): error TS2304: Cannot find name 'Stack'.
+app/(tabs)/index.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/index.tsx(17,80): error TS6133: 'Clock' is declared but its value is never read.
+app/(tabs)/index.tsx(118,9): error TS6133: 'layoutMode' is declared but its value is never read.
+app/(tabs)/index.tsx(140,9): error TS6133: 'isCompact' is declared but its value is never read.
+app/(tabs)/index.tsx(144,19): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+  Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(145,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ScrollViewProps): ScrollView', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ScrollViewProps, context: any): ScrollView', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(149,11): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: LinearGradientProps): LinearGradient', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: LinearGradientProps, context: any): LinearGradient', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(153,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(154,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(155,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(158,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(159,23): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(160,23): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(167,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(169,25): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(169,38): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(174,18): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(177,17): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+  Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(182,23): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(189,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(202,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(203,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(204,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(207,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(209,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(214,46): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+  Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(215,27): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(224,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(225,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(226,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(228,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(231,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(249,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(261,64): error TS2349: This expression is not callable.
+  No constituent of type 'ViewStyle | TextStyle | ImageStyle' is callable.
+app/(tabs)/index.tsx(281,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(282,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(283,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(285,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(288,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(297,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: FlatListProps<{ id: string; title: string; description: string; }>): FlatList<{ id: string; title: string; description: string; }>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: FlatListProps<{ id: string; title: string; description: string; }>, context: any): FlatList<{ id: string; title: string; description: string; }>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(299,33): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+  Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(300,31): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(304,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(305,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(313,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/index.tsx(314,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<TextStyle>'.
+      Type 'ViewStyle' is not assignable to type 'StyleProp<TextStyle>'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/index.tsx(369,5): error TS2783: 'flexDirection' is specified more than once, so this usage will be overwritten.
+app/(tabs)/index.tsx(370,5): error TS2783: 'alignItems' is specified more than once, so this usage will be overwritten.
+app/(tabs)/index.tsx(371,5): error TS2783: 'gap' is specified more than once, so this usage will be overwritten.
+app/(tabs)/index.tsx(407,33): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(specifics: ({ ios?: number | undefined; android?: number | undefined; windows?: number | undefined; macos?: number | undefined; web?: number | undefined; native?: number | undefined; } & { ...; }) | { ...; }): number', gave the following error.
+    Type 'string' is not assignable to type 'number'.
+  Overload 2 of 2, '(specifics: { ios?: number | undefined; android?: number | undefined; windows?: number | undefined; macos?: number | undefined; web?: number | undefined; native?: number | undefined; }): number | undefined', gave the following error.
+    Object literal may only specify known properties, and 'default' does not exist in type '{ ios?: number | undefined; android?: number | undefined; windows?: number | undefined; macos?: number | undefined; web?: number | undefined; native?: number | undefined; }'.
+app/(tabs)/index.tsx(542,3): error TS2322: Type '(cols: number) => { paddingHorizontal: number; width: string; }' is not assignable to type 'ViewStyle | TextStyle | ImageStyle'.
+app/(tabs)/index.tsx(543,5): error TS2783: 'width' is specified more than once, so this usage will be overwritten.
+app/(tabs)/scales/[id].tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'useLocalSearchParams'.
+app/(tabs)/scales/[id].tsx(3,32): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/[id].tsx(3,43): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/alfabetico.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/alfabetico.tsx(5,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/barthel.tsx(2,22): error TS6133: 'TextInput' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(2,75): error TS6133: 'Platform' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(2,85): error TS6133: 'Alert' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(4,1): error TS6133: 'Print' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(5,1): error TS6133: 'shareAsync' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(6,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/barthel.tsx(6,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/barthel.tsx(8,25): error TS6133: 'AlertCircle' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(8,49): error TS6133: 'ArrowRight' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(8,61): error TS6133: 'FileText' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(8,71): error TS6133: 'User' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(127,19): error TS6133: 'getScoreColor' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(134,5): error TS6133: 'handlePatientDataChange' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(138,5): error TS6133: 'validateForm' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(142,5): error TS6133: 'resetAssessment' is declared but its value is never read.
+app/(tabs)/scales/barthel.tsx(271,32): error TS2339: Property 'interpretationText' does not exist on type '{ container: { flex: number; backgroundColor: any; }; content: { padding: number; }; formContainer: { backgroundColor: any; borderRadius: number; padding: number; shadowColor: string; shadowOffset: { ...; }; shadowOpacity: number; shadowRadius: number; elevation: number; }; ... 22 more ...; detailItem: { ...; }; }'.
+app/(tabs)/scales/barthel.tsx(271,61): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/berg.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/berg.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/berg.tsx(3,17): error TS6133: 'useRouter' is declared but its value is never read.
+app/(tabs)/scales/berg.tsx(79,5): error TS6133: 'patientData' is declared but its value is never read.
+app/(tabs)/scales/berg.tsx(90,5): error TS6133: 'updatePatientData' is declared but its value is never read.
+app/(tabs)/scales/berg.tsx(388,30): error TS2339: Property 'medicalRecordNumber' does not exist on type 'Patient'.
+app/(tabs)/scales/berg.tsx(391,71): error TS2339: Property 'medicalRecordNumber' does not exist on type 'Patient'.
+app/(tabs)/scales/berg.tsx(404,45): error TS2339: Property 'attendingPhysician' does not exist on type 'Patient'.
+app/(tabs)/scales/berg.tsx(407,15): error TS2322: Type '{ level: string; description: string; risk: string; color: string; }' is not assignable to type 'string'.
+app/(tabs)/scales/borg.tsx(2,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/denver2.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/denver2.tsx(194,12): error TS2367: This comparison appears to be unintentional because the types '"Personal-Social" | "Motor Fino-Adaptativo" | "Lenguaje" | "Motor Grueso"' and '"results"' have no overlap.
+app/(tabs)/scales/denver2.tsx(200,8): error TS2367: This comparison appears to be unintentional because the types '"form" | "Personal-Social" | "Motor Fino-Adaptativo" | "Lenguaje" | "Motor Grueso"' and '"results"' have no overlap.
+app/(tabs)/scales/especialidad.tsx(2,64): error TS6133: 'Platform' is declared but its value is never read.
+app/(tabs)/scales/especialidad.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/especialidad.tsx(5,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/scales/especialidad.tsx(74,10): error TS6133: 'selectedSpecialty' is declared but its value is never read.
+app/(tabs)/scales/especialidad.tsx(110,38): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<null>'.
+app/(tabs)/scales/favorites.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/favorites.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/favorites.tsx(87,12): error TS2322: Type 'LucideIcon' is not assignable to type 'ReactNode'.
+app/(tabs)/scales/fim.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/fim.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/fim.tsx(5,21): error TS6133: 'ArrowRight' is declared but its value is never read.
+app/(tabs)/scales/fim.tsx(10,1): error TS6133: 'Print' is declared but its value is never read.
+app/(tabs)/scales/fim.tsx(11,1): error TS6133: 'shareAsync' is declared but its value is never read.
+app/(tabs)/scales/fim.tsx(74,7): error TS6133: 'ScoreButton' is declared but its value is never read.
+app/(tabs)/scales/fim.tsx(93,9): error TS2304: Cannot find name 'styles'.
+app/(tabs)/scales/fim.tsx(101,21): error TS2304: Cannot find name 'styles'.
+app/(tabs)/scales/fim.tsx(117,5): error TS6133: 'patientData' is declared but its value is never read.
+app/(tabs)/scales/fim.tsx(148,11): error TS2322: Type '(data: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/(tabs)/scales/fim.tsx(148,24): error TS7006: Parameter 'data' implicitly has an 'any' type.
+app/(tabs)/scales/fim.tsx(217,54): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/funcional.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/funcional.tsx(5,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/scales/funcional.tsx(12,30): error TS7031: Binding element 'uri' implicitly has an 'any' type.
+app/(tabs)/scales/funcional.tsx(12,35): error TS7031: Binding element 'style' implicitly has an 'any' type.
+app/(tabs)/scales/gas.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/gas.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/gas.tsx(12,29): error TS2440: Import declaration conflicts with local declaration of 'GASCategory'.
+app/(tabs)/scales/gas.tsx(16,6): error TS6196: 'PathologyProfile' is declared but never used.
+app/(tabs)/scales/gas.tsx(42,7): error TS6133: 'CATEGORY_LABELS' is declared but its value is never read.
+app/(tabs)/scales/gas.tsx(259,34): error TS2339: Property 'danger' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/glasgow.tsx(2,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/hine.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/hine.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/index.tsx(2,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/index.tsx(2,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/scales/index.tsx(7,20): error TS6133: 'Brain' is declared but its value is never read.
+app/(tabs)/scales/index.tsx(7,27): error TS6133: 'Heart' is declared but its value is never read.
+app/(tabs)/scales/index.tsx(7,53): error TS6133: 'Baby' is declared but its value is never read.
+app/(tabs)/scales/katz.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/katz.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/katz.tsx(3,17): error TS6133: 'useRouter' is declared but its value is never read.
+app/(tabs)/scales/katz.tsx(93,5): error TS6133: 'patientData' is declared but its value is never read.
+app/(tabs)/scales/katz.tsx(104,5): error TS6133: 'updatePatientData' is declared but its value is never read.
+app/(tabs)/scales/katz.tsx(430,85): error TS6133: 'i' is declared but its value is never read.
+app/(tabs)/scales/katz.tsx(471,30): error TS2339: Property 'medicalRecordNumber' does not exist on type 'Patient'.
+app/(tabs)/scales/katz.tsx(474,71): error TS2339: Property 'medicalRecordNumber' does not exist on type 'Patient'.
+app/(tabs)/scales/katz.tsx(487,45): error TS2339: Property 'attendingPhysician' does not exist on type 'Patient'.
+app/(tabs)/scales/katz.tsx(490,15): error TS2322: Type '{ score: number; level: string; description: string; interpretation: string; color: string; }' is not assignable to type 'string'.
+app/(tabs)/scales/lequesne.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/lequesne.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/lequesne.tsx(11,1): error TS6133: 'Print' is declared but its value is never read.
+app/(tabs)/scales/lequesne.tsx(12,1): error TS6133: 'shareAsync' is declared but its value is never read.
+app/(tabs)/scales/lequesne.tsx(20,9): error TS6133: 'addRecentlyViewed' is declared but its value is never read.
+app/(tabs)/scales/lequesne.tsx(81,7): error TS2304: Cannot find name 'styles'.
+app/(tabs)/scales/lequesne.tsx(88,7): error TS2304: Cannot find name 'styles'.
+app/(tabs)/scales/lequesne.tsx(129,11): error TS2322: Type '(data: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/(tabs)/scales/lequesne.tsx(129,24): error TS7006: Parameter 'data' implicitly has an 'any' type.
+app/(tabs)/scales/lequesne.tsx(202,67): error TS2339: Property 'white' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/lequesne.tsx(203,41): error TS2339: Property 'white' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/lequesne.tsx(261,11): error TS2322: Type '{ scale: any; assessment: { score: number; interpretation: string; answers: { id: string; question: string; value: number; }[]; patientData: { name: string; age: string; }; }; onRestart: () => void; onExport: () => Promise<...>; }' is not assignable to type 'IntrinsicAttributes & ResultsActionsProps'.
+  Property 'onRestart' does not exist on type 'IntrinsicAttributes & ResultsActionsProps'.
+app/(tabs)/scales/moca.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/moca.tsx(267,38): error TS2339: Property 'doctorName' does not exist on type 'Patient'.
+app/(tabs)/scales/moca.tsx(440,77): error TS2339: Property 'textMuted' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/moca.tsx(464,82): error TS2339: Property 'textMuted' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/moca.tsx(478,47): error TS2339: Property 'textMuted' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/moca.tsx(479,69): error TS2339: Property 'textMuted' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/scales/moca.tsx(567,13): error TS2322: Type '{ scaleId: string; scaleName: string; scaleAcronym: string; results: MontrealResults; patientData: PatientData; responses: Record<string, number>; }' is not assignable to type 'IntrinsicAttributes & ResultsActionsProps'.
+  Property 'scaleId' does not exist on type 'IntrinsicAttributes & ResultsActionsProps'. Did you mean 'scale'?
+app/(tabs)/scales/moca.tsx(602,11): error TS2322: Type '{ scaleInfo: ScaleInfoData; visible: true; onClose: () => void; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'scaleInfo' does not exist on type 'IntrinsicAttributes & Props'.
+app/(tabs)/scales/norton.tsx(2,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/ogs.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/ogs.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/ogs.tsx(12,1): error TS6192: All imports in import declaration are unused.
+app/(tabs)/scales/ogs.tsx(23,5): error TS6133: 'responses' is declared but its value is never read.
+app/(tabs)/scales/ogs.tsx(26,5): error TS6133: 'isComplete' is declared but its value is never read.
+app/(tabs)/scales/ogs.tsx(75,9): error TS6133: 'getColor' is declared but its value is never read.
+app/(tabs)/scales/ogs.tsx(88,11): error TS2322: Type '(data: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/(tabs)/scales/ogs.tsx(758,3): error TS1117: An object literal cannot have multiple properties with the same name.
+app/(tabs)/scales/recent.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/recent.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/scales/recent.tsx(18,27): error TS2339: Property 'clearRecentlyViewed' does not exist on type 'ScalesState'.
+app/(tabs)/scales/recent.tsx(88,12): error TS2322: Type 'LucideIcon' is not assignable to type 'ReactNode'.
+app/(tabs)/scales/segmento.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/scales/segmento.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/scales/vas.tsx(2,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/search.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Link'.
+app/(tabs)/search.tsx(4,10): error TS6133: 'Link' is declared but its value is never read.
+app/(tabs)/search.tsx(4,16): error TS2305: Module '"expo-router"' has no exported member 'useLocalSearchParams'.
+app/(tabs)/search.tsx(4,38): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/search.tsx(5,54): error TS6133: 'ChevronRight' is declared but its value is never read.
+app/(tabs)/search.tsx(5,104): error TS6133: 'Zap' is declared but its value is never read.
+app/(tabs)/search.tsx(117,19): error TS6133: 'isDark' is declared but its value is never read.
+app/(tabs)/search.tsx(284,21): error TS2339: Property 'rating' does not exist on type 'Scale'.
+app/(tabs)/search.tsx(298,57): error TS2349: This expression is not callable.
+  No constituent of type 'ViewStyle | TextStyle | ImageStyle' is callable.
+app/(tabs)/search.tsx(326,29): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(329,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(330,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(333,25): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(335,31): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(352,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(354,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(362,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: FlatListProps<Scale>, context: any): FlatList<Scale>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: FlatListProps<Scale>, context: any): FlatList<Scale>', gave the following error.
+    Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(385,27): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(387,23): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(388,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(389,49): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/search.tsx(391,23): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextInputProps): TextInput', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextInputProps, context: any): TextInput', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(393,44): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/search.tsx(406,44): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/search.tsx(413,19): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(415,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(421,19): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(427,54): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+app/(tabs)/search.tsx(438,21): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'false | "" | ViewStyle | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | ... 11 more ... | undefined'.
+  Type 'TextStyle' is not assignable to type 'false | "" | ViewStyle | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | ... 11 more ... | undefined'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle | { backfaceVisibility?: MaybeSharedValue<"visible"> | MaybeSharedValue<"hidden"> | undefined; backgroundColor?: string | ... 4 more ... | undefined; ... 166 more ...; translateY?: number | ... 4 more ... | undefined; }'.
+      Type 'TextStyle' is not assignable to type '{ backfaceVisibility?: MaybeSharedValue<"visible"> | MaybeSharedValue<"hidden"> | undefined; backgroundColor?: string | OpaqueColorValue | SharedValueDisableContravariance<...> | SharedValueDisableContravariance<...> | { ...; } | undefined; ... 166 more ...; translateY?: number | ... 4 more ... | undefined; }'.
+        Types of property 'cursor' are incompatible.
+          Type 'string | undefined' is not assignable to type '"auto" | "pointer" | SharedValueDisableContravariance<"auto"> | SharedValueDisableContravariance<"pointer"> | undefined'.
+            Type 'string' is not assignable to type '"auto" | "pointer" | SharedValueDisableContravariance<"auto"> | SharedValueDisableContravariance<"pointer"> | undefined'.
+app/(tabs)/search.tsx(440,27): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(444,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: FlatListProps<CategoryOption>): FlatList<CategoryOption>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: FlatListProps<CategoryOption>, context: any): FlatList<CategoryOption>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(450,19): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(451,19): error TS2322: Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(459,18): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(471,25): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TextProps): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(472,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(477,19): error TS2322: Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(478,19): error TS2322: Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+  Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+    Type 'TextStyle' is not assignable to type 'ViewStyle'.
+      Types of property 'cursor' are incompatible.
+        Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+          Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(486,18): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+  Overload 2 of 2, '(props: TextProps, context: any): Text', gave the following error.
+    Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'ViewStyle' is not assignable to type 'TextStyle | Falsy | RegisteredStyle<TextStyle> | RecursiveArray<TextStyle | Falsy | RegisteredStyle<TextStyle>> | readonly (TextStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'ViewStyle' is not assignable to type 'TextStyle'.
+          Types of property 'userSelect' are incompatible.
+            Type 'string | undefined' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+              Type 'string' is not assignable to type '"text" | "none" | "auto" | "contain" | "all" | undefined'.
+app/(tabs)/search.tsx(501,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(503,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+      Type 'TextStyle' is not assignable to type 'StyleProp<ViewStyle>'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(511,12): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: FlatListProps<Scale>, context: any): FlatList<Scale>', gave the following error.
+    Type 'ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+  Overload 2 of 2, '(props: FlatListProps<Scale>, context: any): FlatList<Scale>', gave the following error.
+    Type 'false | ViewStyle | TextStyle | ImageStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+      Type 'TextStyle' is not assignable to type 'ViewStyle | Falsy | RegisteredStyle<ViewStyle> | RecursiveArray<ViewStyle | Falsy | RegisteredStyle<ViewStyle>> | readonly (ViewStyle | ... 1 more ... | RegisteredStyle<...>)[]'.
+        Type 'TextStyle' is not assignable to type 'ViewStyle'.
+          Types of property 'cursor' are incompatible.
+            Type 'string | undefined' is not assignable to type 'CursorValue | undefined'.
+              Type 'string' is not assignable to type 'CursorValue | undefined'.
+app/(tabs)/search.tsx(789,3): error TS2322: Type '(columns: number) => { width: string; }' is not assignable to type 'ViewStyle | TextStyle | ImageStyle'.
+app/(tabs)/search.tsx(790,5): error TS2783: 'width' is specified more than once, so this usage will be overwritten.
+app/(tabs)/settings/data-management.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/data-management.tsx(5,36): error TS6133: 'Database' is declared but its value is never read.
+app/(tabs)/settings/data-management.tsx(5,46): error TS6133: 'Shield' is declared but its value is never read.
+app/(tabs)/settings/datetime.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/datetime.tsx(5,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/settings/font-size.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/font-size.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/settings/font-size.tsx(4,17): error TS6133: 'router' is declared but its value is never read.
+app/(tabs)/settings/help.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/index.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/index.tsx(3,17): error TS2305: Module '"expo-router"' has no exported member 'router'.
+app/(tabs)/settings/index.tsx(7,3): error TS6133: 'Moon' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(31,19): error TS6133: 'isDark' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(31,27): error TS6133: 'themeMode' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(31,38): error TS6133: 'contrastLevel' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(31,53): error TS6133: 'fontSize' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(35,5): error TS6133: 'darkMode' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(49,5): error TS6133: 'toggleDarkMode' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(53,5): error TS6133: 'setFontSize' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(163,11): error TS7031: Binding element 'Icon' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(164,5): error TS7031: Binding element 'title' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(165,5): error TS7031: Binding element 'value' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(166,5): error TS7031: Binding element 'onPress' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(167,5): error TS7031: Binding element 'showToggle' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(168,5): error TS7031: Binding element 'isToggled' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(171,5): error TS7031: Binding element 'description' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(209,30): error TS7006: Parameter 'page' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(213,32): error TS7006: Parameter 'mode' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(222,9): error TS6133: 'getContrastDisplayName' is declared but its value is never read.
+app/(tabs)/settings/index.tsx(222,35): error TS7006: Parameter 'level' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(230,35): error TS7006: Parameter 'size' implicitly has an 'any' type.
+app/(tabs)/settings/index.tsx(257,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; onPress: () => void; description: string; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled
+app/(tabs)/settings/index.tsx(270,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(278,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; onPress: () => void; description: string; isLast: true; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled
+app/(tabs)/settings/index.tsx(293,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(301,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(309,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; isLast: true; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(325,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; isLast: true; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(341,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; onPress: () => void; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(347,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; onPress: () => void; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(353,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; onPress: () => void; isLast: true; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(367,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(375,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; description: string; isLast: true; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled
+app/(tabs)/settings/index.tsx(389,16): error TS2741: Property 'value' is missing in type '{ icon: LucideIcon; title: string; showToggle: true; isToggled: boolean; onPress: () => void; description: string; }' but required in type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }'.
+app/(tabs)/settings/index.tsx(397,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(402,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; description: string; isLast: true; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled
+app/(tabs)/settings/index.tsx(416,16): error TS2739: Type '{ icon: LucideIcon; title: string; value: string; showChevron: false; onPress: () => void; description: string; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': showToggle, isToggled
+app/(tabs)/settings/index.tsx(424,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(429,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled, description
+app/(tabs)/settings/index.tsx(434,16): error TS2739: Type '{ icon: LucideIcon; title: string; onPress: () => void; isLast: true; }' is missing the following properties from type '{ icon: any; title: any; value: any; onPress: any; showToggle: any; isToggled: any; showChevron?: boolean | undefined; isLast?: boolean | undefined; description: any; }': value, showToggle, isToggled, description
+app/(tabs)/settings/language.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/language.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/settings/language.tsx(5,17): error TS6133: 'Globe' is declared but its value is never read.
+app/(tabs)/settings/language.tsx(35,9): error TS6133: 'router' is declared but its value is never read.
+app/(tabs)/settings/notifications.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/privacy.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/privacy.tsx(151,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/privacy.tsx(177,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/privacy.tsx(207,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/privacy.tsx(237,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/privacy.tsx(271,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/privacy.tsx(297,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ lineHeight: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+app/(tabs)/settings/support.tsx(2,91): error TS6133: 'Platform' is declared but its value is never read.
+app/(tabs)/settings/support.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/support.tsx(4,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/(tabs)/settings/terms.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/units.tsx(5,10): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/(tabs)/settings/units.tsx(5,17): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+app/+not-found.tsx(1,10): error TS2305: Module '"expo-router"' has no exported member 'Link'.
+app/+not-found.tsx(1,16): error TS2305: Module '"expo-router"' has no exported member 'Stack'.
+app/landing.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+components/AdvancedSearch.tsx(9,3): error TS6133: 'Modal' is declared but its value is never read.
+components/AdvancedSearch.tsx(13,1): error TS6133: 'Scale' is declared but its value is never read.
+components/AdvancedSearch.tsx(85,3): error TS6133: 'isLoading' is declared but its value is never read.
+components/AdvancedSearch.tsx(202,42): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/AdvancedSearch.tsx(481,8): error TS2304: Cannot find name 'Platform'.
+components/AdvancedSearch.tsx(499,8): error TS2304: Cannot find name 'Platform'.
+components/AdvancedSearch.tsx(540,8): error TS2304: Cannot find name 'Platform'.
+components/AdvancedSearch.tsx(624,8): error TS2304: Cannot find name 'Platform'.
+components/AdvancedSearch.tsx(642,8): error TS2304: Cannot find name 'Platform'.
+components/AdvancedSearch.tsx(702,8): error TS2304: Cannot find name 'Platform'.
+components/AppIcon.tsx(31,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: FeDropShadowProps & FilterPrimitiveCommonProps): FeDropShadow', gave the following error.
+    Type '{ dx: string; dy: string; stdDeviation: string; floodColor: string; floodOpacity: string; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<FeDropShadow> & Pick<Readonly<FeDropShadowProps & FilterPrimitiveCommonProps>, keyof FeDropShadowProps> & InexactPartial<...> & InexactPartial<...>'.
+      Property 'floodColor' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<FeDropShadow> & Pick<Readonly<FeDropShadowProps & FilterPrimitiveCommonProps>, keyof FeDropShadowProps> & InexactPartial<...> & InexactPartial<...>'.
+  Overload 2 of 2, '(props: FeDropShadowProps & FilterPrimitiveCommonProps, context: any): FeDropShadow', gave the following error.
+    Type '{ dx: string; dy: string; stdDeviation: string; floodColor: string; floodOpacity: string; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<FeDropShadow> & Pick<Readonly<FeDropShadowProps & FilterPrimitiveCommonProps>, keyof FeDropShadowProps> & InexactPartial<...> & InexactPartial<...>'.
+      Property 'floodColor' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<FeDropShadow> & Pick<Readonly<FeDropShadowProps & FilterPrimitiveCommonProps>, keyof FeDropShadowProps> & InexactPartial<...> & InexactPartial<...>'.
+components/Card.tsx(2,55): error TS6133: 'Animated' is declared but its value is never read.
+components/Card.tsx(61,22): error TS6133: 'isTablet' is declared but its value is never read.
+components/Card.tsx(190,23): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/Card.tsx(196,10): error TS6133: 'pressed' is declared but its value is never read.
+components/errors/ErrorBoundary.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+components/FavoriteButton.tsx(8,3): error TS6133: 'interpolate' is declared but its value is never read.
+components/GASValidation.tsx(93,23): error TS6133: 'colors' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(2,82): error TS6133: 'Platform' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(4,26): error TS6133: 'Stethoscope' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(4,39): error TS6133: 'Baby' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(4,45): error TS6133: 'Info' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(4,77): error TS6133: 'Clock' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(29,3): error TS6133: 'scaleId' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(209,9): error TS6133: 'validateAllFields' is declared but its value is never read.
+components/ImprovedPatientForm.tsx(215,33): error TS2345: Argument of type 'string | number | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+components/ImprovedPatientForm.tsx(271,53): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/ImprovedPatientForm.tsx(278,57): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/ImprovedPatientForm.tsx(285,60): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/ImprovedPatientForm.tsx(353,97): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/ImprovedPatientForm.tsx(380,94): error TS2339: Property 'textSecondary' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/Menu/index.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+components/Menu/index.tsx(49,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(62,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(70,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(78,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(86,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(94,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(107,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(115,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(123,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(131,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(139,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(147,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(160,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(168,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(176,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(184,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(192,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(200,9): error TS2322: Type 'LucideIcon' is not assignable to type 'ComponentType<{ size: number; color: string; }>'.
+  Type 'ForwardRefExoticComponent<LucideProps>' is not assignable to type 'FunctionComponent<{ size: number; color: string; }>'.
+    Types of property 'propTypes' are incompatible.
+      Type 'WeakValidationMap<LucideProps> | undefined' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }> | undefined'.
+        Type 'WeakValidationMap<LucideProps>' is not assignable to type 'WeakValidationMap<{ size: number; color: string; }>'.
+          Types of property 'size' are incompatible.
+            Type 'Validator<string | number | null | undefined> | undefined' is not assignable to type 'Validator<number> | undefined'.
+              Type 'Validator<string | number | null | undefined>' is not assignable to type 'Validator<number>'.
+                Type 'string | number | null | undefined' is not assignable to type 'number'.
+                  Type 'undefined' is not assignable to type 'number'.
+components/Menu/index.tsx(218,7): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ children: Element; style: { flexDirection: "row"; alignItems: "center"; padding: number; backgroundColor: string; borderRadius: number; shadowColor: string; shadowOffset: { width: number; height: number; }; shadowOpacity: number; shadowRadius: number; elevation: number; }; onClick: () => void | null; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<View> & Readonly<ViewProps>'.
+      Property 'onClick' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<View> & Readonly<ViewProps>'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ children: Element; style: { flexDirection: "row"; alignItems: "center"; padding: number; backgroundColor: string; borderRadius: number; shadowColor: string; shadowOffset: { width: number; height: number; }; shadowOpacity: number; shadowRadius: number; elevation: number; }; onClick: () => void | null; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<View> & Readonly<ViewProps>'.
+      Property 'onClick' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<View> & Readonly<ViewProps>'.
+components/Menu/index.tsx(250,9): error TS6133: 'height' is declared but its value is never read.
+components/MuscleSummaryPanel.tsx(31,19): error TS2339: Property 'errorDark' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/plexo-calculator/ResultsDisplay.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+components/plexo-calculator/ResultsDisplay.tsx(413,11): error TS2322: Type '{ id: string; question: string; label: string; value: unknown; points: unknown; }[]' is not assignable to type '{ id: string; question?: string | undefined; label?: string | undefined; value?: string | number | undefined; points?: string | number | undefined; }[] | Record<string, unknown> | undefined'.
+  Type '{ id: string; question: string; label: string; value: unknown; points: unknown; }[]' is not assignable to type '{ id: string; question?: string | undefined; label?: string | undefined; value?: string | number | undefined; points?: string | number | undefined; }[]'.
+    Type '{ id: string; question: string; label: string; value: unknown; points: unknown; }' is not assignable to type '{ id: string; question?: string | undefined; label?: string | undefined; value?: string | number | undefined; points?: string | number | undefined; }'.
+      Types of property 'value' are incompatible.
+        Type 'unknown' is not assignable to type 'string | number | undefined'.
+components/plexo-calculator/Step1MuscleEvaluation.tsx(2,52): error TS6133: 'StyleSheet' is declared but its value is never read.
+components/plexo-calculator/Step1MuscleEvaluation.tsx(4,1): error TS6133: 'useThemedStyles' is declared but its value is never read.
+components/PlexusBrachialisSVG.tsx(27,3): error TS6133: 'diagnosis' is declared but its value is never read.
+components/PlexusBrachialisSVG.tsx(36,13): error TS7030: Not all code paths return a value.
+components/PlexusBrachialisSVG.tsx(86,51): error TS2339: Property 'errorLight' does not exist on type '{ primary: string; iconBackground: string; searchBackground: string; shadowColor: string; inputBackground: string; inputBorder: string; sectionBackground: string; headerBackground: string; ... 54 more ...; onSurfaceVariant: string; }'.
+components/QuickActions.tsx(4,10): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+components/QuickActions.tsx(8,3): error TS6133: 'Clock' is declared but its value is never read.
+components/QuickActions.tsx(149,36): error TS6133: 'index' is declared but its value is never read.
+components/QuickActions.tsx(160,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: LinearGradientProps): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [string, string, ...string[]]'.
+      Source provides no match for required element at position 0 in target.
+  Overload 2 of 2, '(props: LinearGradientProps, context: any): LinearGradient', gave the following error.
+    Type 'string[]' is not assignable to type 'readonly [string, string, ...string[]]'.
+      Source provides no match for required element at position 0 in target.
+components/ScaleEvaluation.tsx(23,1): error TS6133: 'ScoreCircle' is declared but its value is never read.
+components/ScaleEvaluation.tsx(482,46): error TS6133: 'idx' is declared but its value is never read.
+components/ScalesDebugger.tsx(65,36): error TS1323: Dynamic imports are only supported when the '--module' flag is set to 'es2020', 'es2022', 'esnext', 'commonjs', 'amd', 'system', 'umd', 'node16', or 'nodenext'.
+components/SearchBar.tsx(3,10): error TS2305: Module '"expo-router"' has no exported member 'router'.
+components/SearchWidget.tsx(24,10): error TS2305: Module '"expo-router"' has no exported member 'useRouter'.
+components/SMARTValidationIndicator.tsx(97,23): error TS6133: 'colors' is declared but its value is never read.
+components/ui/ScoreCircle.tsx(17,7): error TS6133: 'AnimatedCircle' is declared but its value is never read.
+data/ogs.ts(141,3): error TS2322: Type '({ id: string; question: string; description: string; question_type: string; order_index: number; instructions: string; options: { option_value: number; option_label: string; option_description: string; }[]; } | { ...; })[]' is not assignable to type 'CreateQuestionRequest[]'.
+  Type '{ id: string; question: string; description: string; question_type: string; order_index: number; instructions: string; options: { option_value: number; option_label: string; option_description: string; }[]; } | { ...; }' is not assignable to type 'CreateQuestionRequest'.
+    Type '{ id: string; question: string; description: string; question_type: string; order_index: number; instructions: string; options: { option_value: number; option_label: string; option_description: string; }[]; }' is missing the following properties from type 'CreateQuestionRequest': question_id, question_text
+hooks/useHineAssessment.ts(3,29): error TS6133: 'hineScale' is declared but its value is never read.
+hooks/useHineAssessment.ts(481,11): error TS2322: Type 'number | null' is not assignable to type 'null'.
+  Type 'number' is not assignable to type 'null'.
+hooks/useKatzAssessment.ts(1,42): error TS6133: 'useEffect' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(1,20): error TS6133: 'useMemo' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(3,3): error TS6133: 'CONFIG' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(4,3): error TS6133: 'CONFIG_CONTEXTUAL' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(5,3): error TS6133: 'AJUSTES_TEMPORALES' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(6,3): error TS6133: 'LESIONES' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(7,3): error TS6133: 'INERVACION_DUAL' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(14,8): error TS6133: 'CasoClinico' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(15,8): error TS6133: 'SeveridadLesion' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(16,8): error TS6133: 'AnalisisTemporal' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(17,8): error TS6133: 'IndicadoresConfianza' is declared but its value is never read.
+hooks/usePlexoBraquialAssessment.ts(50,9): error TS6133: 'ajustarLesionPorTipoPlexo' is declared but its value is never read.
+hooks/useScaleDetails.ts(2,1): error TS6133: 'getScaleById' is declared but its value is never read.
+hooks/useScaleDetails.ts(2,10): error TS2305: Module '"@/api/scales"' has no exported member 'getScaleById'.
+hooks/useScaleDetails.ts(11,36): error TS1323: Dynamic imports are only supported when the '--module' flag is set to 'es2020', 'es2022', 'esnext', 'commonjs', 'amd', 'system', 'umd', 'node16', or 'nodenext'.
+hooks/useSimpleScales.ts(22,38): error TS1323: Dynamic imports are only supported when the '--module' flag is set to 'es2020', 'es2022', 'esnext', 'commonjs', 'amd', 'system', 'umd', 'node16', or 'nodenext'.
+netlify/functions/pdf-export.ts(4,7): error TS6133: 'path' is declared but its value is never read.
+utils/responsiveGrid.ts(36,24): error TS6133: 'isPhone' is declared but its value is never read.
+utils/responsiveGrid.ts(81,35): error TS6133: 'screenWidth' is declared but its value is never read.
+utils/responsiveGrid.ts(97,38): error TS6133: 'screenWidth' is declared but its value is never read.

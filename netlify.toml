@@ -1,0 +1,35 @@
+[build]
+  command = "npm run build:web && (npm run build:functions || echo 'Functions build skipped') && cp public/_redirects dist/_redirects && cp public/404.html dist/404.html"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20.18.0"
+  NPM_VERSION = "10.8.0"
+  SECRETS_SCAN_ENABLED = "false"
+
+# API redirects (before catch-all)
+[[redirects]]
+  from = "/api/pdf/export"
+  to = "/.netlify/functions/pdf-export"
+  status = 200
+
+# Catch-all for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
+  # Force external modules to prevent bundling issues
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core", "puppeteer"]
+  included_files = [
+    "api/export/templates-dist/**/*",
+    "node_modules/@sparticuz/chromium/**/*",
+    "dist-functions/**"
+  ]
+
+[functions."pdf-export"]
+  timeout = 30
+  memory = 1536

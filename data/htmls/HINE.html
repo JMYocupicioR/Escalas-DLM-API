@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escala HINE Profesional - Evaluación Neurológica de Hammersmith</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .question-card {
+      display: none;
+    }
+    .question-card.active {
+      display: block;
+    }
+    .radio-label input[type="radio"] {
+        display: none;
+    }
+    .radio-label span {
+        display: block;
+        padding: 12px 16px;
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+        text-align: center;
+    }
+    .radio-label span:hover {
+        background-color: #F3F4F6;
+        border-color: #6B7280;
+    }
+    .radio-label input[type="radio"]:checked + span {
+        background-color: #E0F2FE;
+        border-color: #0284C7;
+        color: #0369A1;
+        font-weight: 500;
+        box-shadow: 0 0 0 2px #38BDF8;
+    }
+    @media print {
+      body {
+        background-color: white;
+      }
+      #app-container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+      #inicio, #formularioHINE, #botones-resultado {
+        display: none;
+      }
+      #resultado {
+        display: block !important;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <div id="app-container" class="max-w-4xl mx-auto p-4 md:p-8">
+    
+    <!-- Pantalla de Inicio -->
+    <div id="inicio" class="bg-white p-8 rounded-xl shadow-lg">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-sky-800">Evaluación Neurológica de Hammersmith (HINE)</h1>
+        <p class="text-gray-600 mt-2">Herramienta de evaluación para lactantes de 2 a 24 meses.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Paciente</label>
+          <input type="text" id="nombre" class="w-full p-2 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500">
+        </div>
+        <div>
+          <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+          <input type="date" id="fecha_nacimiento" class="w-full p-2 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500">
+        </div>
+        <div>
+          <label for="edad_gestacional" class="block text-sm font-medium text-gray-700 mb-1">Edad Gestacional (semanas)</label>
+          <input type="number" id="edad_gestacional" min="23" max="42" class="w-full p-2 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500">
+        </div>
+        <div>
+          <label for="fecha_examen" class="block text-sm font-medium text-gray-700 mb-1">Fecha del Examen</label>
+          <input type="date" id="fecha_examen" class="w-full p-2 border border-gray-300 rounded-md bg-gray-50">
+        </div>
+         <div>
+          <label for="perimetro" class="block text-sm font-medium text-gray-700 mb-1">Perímetro Cefálico (cm)</label>
+          <input type="number" step="0.1" id="perimetro" class="w-full p-2 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500">
+        </div>
+        <div>
+          <label for="examinador" class="block text-sm font-medium text-gray-700 mb-1">Examinador</label>
+          <input type="text" id="examinador" class="w-full p-2 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500">
+        </div>
+      </div>
+      <div id="error-message" class="text-red-600 mt-4 text-center font-medium hidden"></div>
+      <div class="mt-8 text-center">
+        <button onclick="iniciarExamen()" class="bg-sky-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-800 transition-colors shadow-md">
+          Iniciar Examen
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario de Examen -->
+    <div id="formularioHINE" class="hidden">
+      <div class="bg-white p-6 rounded-xl shadow-lg mb-6 sticky top-4 z-10">
+        <h2 class="text-2xl font-bold text-sky-800">Evaluación HINE</h2>
+        <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5">
+          <div id="progress-bar" class="bg-sky-600 h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+        <p id="progress-text" class="text-center text-sm text-gray-600 mt-2">Sección 1 de 8</p>
+      </div>
+
+      <div id="questions-container">
+        <!-- Las preguntas se generarán con JavaScript -->
+      </div>
+
+      <div class="flex justify-between mt-8">
+        <button id="prev-btn" onclick="mostrarPreguntaAnterior()" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition-colors">Anterior</button>
+        <button id="next-btn" onclick="mostrarPreguntaSiguiente()" class="bg-sky-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-800 transition-colors">Siguiente</button>
+        <button id="finish-btn" onclick="finalizarExamen()" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition-colors hidden">Finalizar y Ver Resultados</button>
+      </div>
+    </div>
+
+    <!-- Pantalla de Resultados -->
+    <div id="resultado" class="hidden bg-white p-8 rounded-xl shadow-lg">
+      <h2 class="text-3xl font-bold text-sky-800 text-center mb-2">Informe de Evaluación Neurológica HINE</h2>
+      <p class="text-center text-gray-500 mb-6">Generado el <span id="fecha-informe"></span></p>
+      
+      <div class="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Datos del Paciente</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+              <div><strong>Nombre:</strong> <span id="res-nombre"></span></div>
+              <div><strong>F. Nacimiento:</strong> <span id="res-fecha_nacimiento"></span></div>
+              <div><strong>F. Examen:</strong> <span id="res-fecha_examen"></span></div>
+              <div><strong>Edad Cronológica:</strong> <span id="res-edad_crono"></span></div>
+              <div><strong>Edad Corregida:</strong> <span id="res-edad_corregida"></span></div>
+              <div><strong>Perímetro Cefálico:</strong> <span id="res-perimetro"></span> cm</div>
+          </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="flex flex-col items-center justify-center bg-sky-50 p-6 rounded-lg border border-sky-200">
+              <h3 class="text-lg font-semibold text-sky-900">Puntuación Global HINE</h3>
+              <p class="text-6xl font-bold text-sky-700 my-2" id="res-puntuacion_total"></p>
+              <p class="text-gray-600">de 78 puntos máximos</p>
+          </div>
+          <div class="space-y-3">
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">Desglose de Puntuaciones</h3>
+              <div class="flex justify-between items-center p-3 bg-gray-100 rounded-md"><span>Pares Craneales:</span> <span class="font-bold text-lg" id="res-puntuacion_craneales"></span></div>
+              <div class="flex justify-between items-center p-3 bg-gray-100 rounded-md"><span>Postura:</span> <span class="font-bold text-lg" id="res-puntuacion_postura"></span></div>
+              <div class="flex justify-between items-center p-3 bg-gray-100 rounded-md"><span>Movimientos:</span> <span class="font-bold text-lg" id="res-puntuacion_movimientos"></span></div>
+              <div class="flex justify-between items-center p-3 bg-gray-100 rounded-md"><span>Tono Muscular:</span> <span class="font-bold text-lg" id="res-puntuacion_tono"></span></div>
+              <div class="flex justify-between items-center p-3 bg-gray-100 rounded-md"><span>Reflejos y Reacciones:</span> <span class="font-bold text-lg" id="res-puntuacion_reflejos"></span></div>
+          </div>
+      </div>
+      
+      <div class="mt-8 p-4 rounded-lg" id="asimetria-container">
+          <h3 class="text-xl font-semibold text-gray-800">Puntuación de Asimetría</h3>
+          <p class="text-4xl font-bold my-2" id="res-puntuacion_asimetria"></p>
+          <p id="res-interpretacion_asimetria" class="mt-2 text-sm"></p>
+      </div>
+
+      <div class="mt-8 p-6 rounded-lg border-2" id="interpretacion-container">
+          <h3 class="text-xl font-semibold mb-2" id="interpretacion-titulo">Interpretación Clínica</h3>
+          <p id="res-interpretacion_global" class="text-gray-700"></p>
+      </div>
+
+      <div class="mt-8">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Hitos Motores Registrados</h3>
+          <div id="res-hitos_motores" class="space-y-2"></div>
+      </div>
+      
+       <div class="mt-8">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Conducta Durante el Examen</h3>
+          <div id="res-conducta" class="space-y-2"></div>
+      </div>
+      
+      <div class="mt-8" id="res-comentarios-container">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Otros Comentarios del Examinador</h3>
+          <p id="res-comentarios" class="text-gray-700 whitespace-pre-wrap p-4 bg-gray-50 rounded-md border"></p>
+      </div>
+
+      <div id="botones-resultado" class="mt-10 text-center space-x-4">
+          <button onclick="window.print()" class="bg-sky-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-800 transition-colors">Imprimir / Guardar PDF</button>
+          <button onclick="reiniciarExamen()" class="bg-gray-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition-colors">Realizar Nueva Evaluación</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const secciones = [
+      {
+        titulo: "Pares Craneales",
+        items: [
+          { pregunta: "Apariencia facial", name: "apariencia_facial", opciones: [ { texto: "Sonríe y/o reacciona a los estímulos...", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Cierra los ojos, pero no completamente. Pobre expresividad facial", valor: 1 }, { texto: "Facies inexpresiva. No reacciona a los estímulos", valor: 0 } ] },
+          { pregunta: "Apariencia ocular", name: "apariencia_ocular", opciones: [ { texto: "Movimientos oculares conjugados normales", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Desviación intermitente de los ojos o nistagmo", valor: 1 }, { texto: "Desviación fija o nistagmo persistente", valor: 0 } ] },
+          { pregunta: "Respuesta auditiva", name: "respuesta_auditiva", opciones: [ { texto: "Respuesta normal en ambos lados", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Respuesta asimétrica", valor: 1 }, { texto: "Sin respuesta", valor: 0 } ] },
+          { pregunta: "Succión y deglución", name: "succion_deglucion", opciones: [ { texto: "Succión fuerte y rítmica", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Succión débil o no rítmica", valor: 1 }, { texto: "Ausente", valor: 0 } ] },
+          { pregunta: "Vocalización y llanto", name: "vocalizacion_llanto", opciones: [ { texto: "Llanto fuerte y variado, vocalización adecuada para la edad", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Llanto agudo, ronco o débil", valor: 1 }, { texto: "Sin llanto o vocalización", valor: 0 } ] }
+        ]
+      },
+      {
+        titulo: "Postura",
+        asimetria: true,
+        items: [
+          { pregunta: "Postura en reposo", name: "postura_reposo", opciones: [ { texto: "Postura relajada en flexión o extensión, adecuada para la edad", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Postura anormal persistente (ej. opistótonos)", valor: 1 }, { texto: "Postura anormal fija", valor: 0 } ] },
+          { pregunta: "Brazos", name: "postura_brazos", opciones: [ { texto: "Posición variable, movimientos fluidos", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Postura distónica o puños cerrados persistentemente", valor: 1 }, { texto: "Postura anormal fija", valor: 0 } ] },
+          { pregunta: "Piernas", name: "postura_piernas", opciones: [ { texto: "Posición variable, pataleo alternante", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Extensión o flexión persistente", valor: 1 }, { texto: "Postura anormal fija (ej. en tijera)", valor: 0 } ] },
+          { pregunta: "Tronco", name: "postura_tronco", opciones: [ { texto: "Tronco alineado", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Opistótonos intermitente o tendencia a arquearse", valor: 1 }, { texto: "Opistótonos persistente", valor: 0 } ] },
+          { pregunta: "Cabeza", name: "postura_cabeza", opciones: [ { texto: "Predominantemente en la línea media", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Giro preferencial persistente de la cabeza", valor: 1 }, { texto: "Retracción persistente o cabeza caída", valor: 0 } ] },
+          { pregunta: "Suspensión ventral", name: "suspension_ventral", opciones: [ { texto: "Cabeza y tronco en línea horizontal", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Cabeza por debajo de la horizontal", valor: 1 }, { texto: "Cabeza y extremidades cuelgan flácidas", valor: 0 } ] }
+        ]
+      },
+      {
+        titulo: "Movimientos",
+        asimetria: false,
+        items: [
+          { pregunta: "Cantidad", name: "mov_cantidad", opciones: [ { texto: "Movimientos continuos y fluidos cuando está despierto", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Movimientos escasos", valor: 1 }, { texto: "Ausencia de movimientos espontáneos", valor: 0 } ] },
+          { pregunta: "Calidad", name: "mov_calidad", opciones: [ { texto: "Movimientos fluidos y complejos", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Movimientos bruscos, clónicos, distónicos o atetósicos", valor: 1 }, { texto: "Movimientos predominantemente anormales", valor: 0 } ] }
+        ]
+      },
+      {
+        titulo: "Tono Muscular",
+        asimetria: true,
+        items: [
+          { pregunta: "Tono axial", name: "tono_axial", opciones: [ { texto: "Tono apropiado, permite movimientos activos", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Hipertonía o hipotonía leve a moderada", valor: 1 }, { texto: "Hipertonía o hipotonía grave", valor: 0 } ] },
+          { pregunta: "Tono de extremidades (Brazos)", name: "tono_brazos", opciones: [ { texto: "Resistencia leve y elástica a la movilización pasiva", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Hipertonía o hipotonía leve a moderada", valor: 1 }, { texto: "Hipertonía o hipotonía grave", valor: 0 } ] },
+          { pregunta: "Tono de extremidades (Piernas)", name: "tono_piernas", opciones: [ { texto: "Resistencia leve y elástica a la movilización pasiva", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Hipertonía o hipotonía leve a moderada", valor: 1 }, { texto: "Hipertonía o hipotonía grave", valor: 0 } ] },
+          { pregunta: "Signo de la bufanda", name: "signo_bufanda", opciones: [ { texto: "El codo no sobrepasa la línea media", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "El codo sobrepasa la línea media", valor: 1 }, { texto: "El codo alcanza el hombro opuesto", valor: 0 } ] },
+          { pregunta: "Ángulo poplíteo", name: "angulo_popliteo", opciones: [ { texto: "90-110 grados", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Ángulo disminuido o aumentado", valor: 1 }, { texto: "Ángulo muy disminuido (<90) o muy aumentado (>150)", valor: 0 } ] },
+          { pregunta: "Ángulo aductor", name: "angulo_aductor", opciones: [ { texto: "70-110 grados", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Ángulo disminuido o aumentado", valor: 1 }, { texto: "Ángulo muy disminuido (<70) o muy aumentado (>130)", valor: 0 } ] },
+          { pregunta: "Dorsiflexión del pie", name: "dorsiflexion_pie", opciones: [ { texto: "Flexión completa", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Limitación leve", valor: 1 }, { texto: "Limitación grave o clonus", valor: 0 } ] },
+          { pregunta: "Tracción a la sedestación", name: "traccion_sedestacion", opciones: [ { texto: "La cabeza acompaña al tronco o con un ligero retraso", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Retraso cefálico significativo", valor: 1 }, { texto: "Retraso cefálico completo", valor: 0 } ] }
+        ]
+      },
+      {
+        titulo: "Reflejos y Reacciones",
+        asimetria: true,
+        items: [
+          { pregunta: "Reflejos tendinosos (Bíceps, rodilla)", name: "reflejos_tendinosos", opciones: [ { texto: "Respuestas vivas y simétricas", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Hiperreflexia, hiporreflexia o asimetría", valor: 1 }, { texto: "Arreflexia o clonus persistente", valor: 0 } ] },
+          { pregunta: "Reacción de apoyo plantar", name: "apoyo_plantar", opciones: [ { texto: "Apoya el talón o la planta completa (si > 6m)", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Apoyo en puntillas o ausencia de apoyo", valor: 1 }, { texto: "Extensión tónica o en tijera", valor: 0 } ] },
+          { pregunta: "Reacción de apoyo palmar", name: "apoyo_palmar", opciones: [ { texto: "Soporta peso con manos abiertas", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "No soporta peso o lo hace con puños cerrados", valor: 1 }, { texto: "Retracción de brazos", valor: 0 } ] },
+          { pregunta: "Reacciones de enderezamiento de la cabeza", name: "enderezamiento_cabeza", opciones: [ { texto: "Cabeza se alinea con el cuerpo en todas las direcciones", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Respuesta inconsistente o ausente en una dirección", valor: 1 }, { texto: "Ausente en todas las direcciones", valor: 0 } ] },
+          { pregunta: "Paracaídas lateral", name: "paracaidas_lateral", opciones: [ { texto: "Presente y simétrico (si > 6-8m)", valor: 3 }, { texto: "Respuesta subóptima", valor: 2 }, { texto: "Respuesta asimétrica o ausente", valor: 1 }, { texto: "Ausente bilateralmente (si corresponde por edad)", valor: 0 } ] }
+        ]
+      },
+      {
+        titulo: "Hitos Motores (Funcional)",
+        tipo: "hitos",
+        items: [
+          { texto: "Control de cabeza (sostenida en sedestación)", name: "hito_cabeza" },
+          { texto: "Rueda de supino a prono y viceversa", name: "hito_rodar" },
+          { texto: "Sedestación sin apoyo", name: "hito_sedestacion" },
+          { texto: "Se arrastra sobre el abdomen", name: "hito_arrastre" },
+          { texto: "Gatea sobre manos y rodillas", name: "hito_gateo" },
+          { texto: "Se pone de pie agarrándose", name: "hito_bipedestacion_apoyo" },
+          { texto: "Camina con apoyo", name: "hito_camina_apoyo" },
+          { texto: "Se mantiene de pie sin apoyo", name: "hito_bipedestacion_solo" },
+          { texto: "Camina sin apoyo", name: "hito_camina_solo" }
+        ]
+      },
+       {
+        titulo: "Conducta",
+        tipo: "checkbox",
+        items: [
+            { texto: "Estado de alerta apropiado", id: "conducta_alerta" },
+            { texto: "Contacto visual y seguimiento", id: "conducta_visual" },
+            { texto: "Consolable", id: "conducta_consolable" },
+            { texto: "Irritable o letárgico", id: "conducta_irritable" }
+        ]
+      },
+      {
+        titulo: "Otros Comentarios",
+        tipo: "comentarios"
+      }
+    ];
+
+    const hitosEdad = {
+      "hito_cabeza": "Normal a los 3-4 meses",
+      "hito_rodar": "Normal a los 6-7 meses",
+      "hito_sedestacion": "Normal a los 7-8 meses",
+      "hito_arrastre": "Normal a los 7-8 meses",
+      "hito_gateo": "Normal a los 9-10 meses",
+      "hito_bipedestacion_apoyo": "Normal a los 9-10 meses",
+      "hito_camina_apoyo": "Normal a los 10-11 meses",
+      "hito_bipedestacion_solo": "Normal a los 11-12 meses",
+      "hito_camina_solo": "Normal a los 12-15 meses"
+    };
+    
+    let currentQuestionIndex = 0;
+    let datosPaciente = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('fecha_examen').valueAsDate = new Date();
+      generarPreguntas();
+    });
+
+    function generarPreguntas() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+        secciones.forEach((seccion, index) => {
+            const card = document.createElement('div');
+            card.className = 'question-card bg-white p-8 rounded-xl shadow-lg';
+            card.id = `question-${index}`;
+            
+            let content = `<h3 class="text-xl font-semibold text-gray-800 mb-6">${seccion.titulo}</h3>`;
+            
+            if (seccion.tipo === 'checkbox') {
+                content += '<div class="space-y-4">';
+                seccion.items.forEach(item => {
+                    content += `
+                    <label for="${item.id}" class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" id="${item.id}" name="${seccion.titulo.toLowerCase()}" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                        <span class="ml-3 text-gray-700">${item.texto}</span>
+                    </label>`;
+                });
+                content += '</div>';
+            } else if (seccion.tipo === 'hitos') {
+                seccion.items.forEach(item => {
+                    content += `<div class="mb-6 p-4 border rounded-lg">
+                        <p class="font-medium text-gray-700 mb-3">${item.texto}</p>
+                        <div class="flex space-x-4">
+                            <label class="radio-label flex-1"><input type="radio" name="${item.name}" value="no_presente" checked><span>No Presente</span></label>
+                            <label class="radio-label flex-1"><input type="radio" name="${item.name}" value="observado"><span>Observado</span></label>
+                            <label class="radio-label flex-1"><input type="radio" name="${item.name}" value="referido"><span>Referido</span></label>
+                        </div>
+                    </div>`;
+                });
+            } else if (seccion.tipo === 'comentarios') {
+                content += `
+                <div>
+                    <label for="comentarios_adicionales" class="block text-sm font-medium text-gray-700 mb-2">Añada cualquier observación cualitativa relevante.</label>
+                    <textarea id="comentarios_adicionales" rows="6" class="w-full p-3 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500"></textarea>
+                </div>`;
+            } else { // tipo puntuación
+                seccion.items.forEach(item => {
+                    content += `<div class="mb-8">
+                                <p class="font-medium text-gray-700 mb-4">${item.pregunta}</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">`;
+                    item.opciones.forEach(opcion => {
+                        content += `<label class="radio-label"><input type="radio" name="${item.name}" value="${opcion.valor}"><span>${opcion.texto}</span></label>`;
+                    });
+                    content += `</div>`;
+                    if (seccion.asimetria) {
+                        content += `<div class="mt-4"><label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="asimetria_${item.name}" class="asimetria-check h-5 w-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"><span class="ml-2 text-gray-600 font-medium">Observar Asimetría</span></label></div>`;
+                    }
+                    content += `</div>`;
+                });
+            }
+            card.innerHTML = content;
+            container.appendChild(card);
+        });
+    }
+
+    function iniciarExamen() {
+      const nombre = document.getElementById('nombre').value;
+      const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+      const edadGestacional = document.getElementById('edad_gestacional').value;
+      const errorDiv = document.getElementById('error-message');
+      const hoy = new Date().toISOString().split('T')[0];
+
+      if (!nombre || !fechaNacimiento || !edadGestacional) {
+        errorDiv.textContent = 'Por favor, complete todos los campos requeridos.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (fechaNacimiento > hoy) {
+        errorDiv.textContent = 'La fecha de nacimiento no puede ser en el futuro.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      errorDiv.classList.add('hidden');
+
+      const fechaExamen = document.getElementById('fecha_examen').value;
+      const [edadCrono, edadCorregida, edadCorregidaMeses] = calcularEdades(fechaNacimiento, edadGestacional, fechaExamen);
+      
+      datosPaciente = {
+        nombre, fechaNacimiento, edadGestacional, fechaExamen,
+        perimetro: document.getElementById('perimetro').value,
+        examinador: document.getElementById('examinador').value,
+        edadCrono, edadCorregida, edadCorregidaMeses
+      };
+      
+      document.getElementById('inicio').classList.add('hidden');
+      document.getElementById('formularioHINE').classList.remove('hidden');
+      mostrarPregunta(0);
+    }
+    
+    function calcularEdades(fechaNac, edadGest, fechaEx) {
+        const dob = new Date(fechaNac);
+        const examDate = new Date(fechaEx);
+        const diffTime = Math.abs(examDate - dob);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const edadCronoTexto = `${Math.floor(diffDays / 7)} semanas y ${diffDays % 7} días`;
+
+        const diasPrematuro = (40 - parseInt(edadGest)) * 7;
+        const edadCorregidaTotalDias = diffDays - diasPrematuro;
+        const edadCorregidaSemanas = Math.floor(edadCorregidaTotalDias / 7);
+        const edadCorregidaTexto = edadCorregidaSemanas >= 0 ? `${edadCorregidaSemanas} semanas y ${edadCorregidaTotalDias % 7} días` : 'No aplica';
+        const edadCorregidaMeses = edadCorregidaTotalDias / 30.44;
+
+        return [edadCronoTexto, edadCorregidaTexto, edadCorregidaMeses];
+    }
+
+    function mostrarPregunta(index) {
+      document.querySelectorAll('.question-card').forEach(card => card.classList.remove('active'));
+      document.getElementById(`question-${index}`).classList.add('active');
+      currentQuestionIndex = index;
+      actualizarProgreso();
+      
+      document.getElementById('prev-btn').style.visibility = index === 0 ? 'hidden' : 'visible';
+      document.getElementById('next-btn').style.display = index === secciones.length - 1 ? 'none' : 'block';
+      document.getElementById('finish-btn').style.display = index === secciones.length - 1 ? 'block' : 'none';
+      window.scrollTo(0, 0);
+    }
+
+    function mostrarPreguntaSiguiente() { if (currentQuestionIndex < secciones.length - 1) mostrarPregunta(currentQuestionIndex + 1); }
+    function mostrarPreguntaAnterior() { if (currentQuestionIndex > 0) mostrarPregunta(currentQuestionIndex - 1); }
+    
+    function actualizarProgreso() {
+      const progreso = ((currentQuestionIndex + 1) / secciones.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progreso}%`;
+      document.getElementById('progress-text').textContent = `Sección ${currentQuestionIndex + 1} de ${secciones.length}: ${secciones[currentQuestionIndex].titulo}`;
+    }
+
+    function finalizarExamen() {
+      let puntuaciones = { total: 0, craneales: 0, postura: 0, movimientos: 0, tono: 0, reflejos: 0, asimetria: 0 };
+      const keys = ['craneales', 'postura', 'movimientos', 'tono', 'reflejos'];
+      
+      secciones.slice(0, 5).forEach((seccion, seccionIndex) => {
+        let puntajeSeccion = 0;
+        seccion.items.forEach(item => {
+          const valor = document.querySelector(`input[name="${item.name}"]:checked`)?.value;
+          if (valor) puntajeSeccion += parseInt(valor);
+          const asimetriaCheckbox = document.querySelector(`input[name="asimetria_${item.name}"]`);
+          if (asimetriaCheckbox && asimetriaCheckbox.checked) puntuaciones.asimetria++;
+        });
+        puntuaciones[keys[seccionIndex]] = puntajeSeccion;
+        puntuaciones.total += puntajeSeccion;
+      });
+
+      const hitosSeleccionados = [];
+      secciones.find(s => s.tipo === 'hitos').items.forEach(item => {
+        const estado = document.querySelector(`input[name="${item.name}"]:checked`)?.value;
+        if(estado && estado !== 'no_presente') hitosSeleccionados.push({texto: item.texto, estado, name: item.name});
+      });
+
+      const conductaSeleccionada = [];
+      secciones.find(s => s.tipo === 'checkbox').items.forEach(item => {
+        if(document.getElementById(item.id).checked) conductaSeleccionada.push(item.texto);
+      });
+      
+      const comentarios = document.getElementById('comentarios_adicionales').value;
+
+      mostrarResultados(puntuaciones, hitosSeleccionados, conductaSeleccionada, comentarios);
+    }
+    
+    function mostrarResultados(puntuaciones, hitos, conducta, comentarios) {
+        document.getElementById('formularioHINE').classList.add('hidden');
+        document.getElementById('resultado').classList.remove('hidden');
+
+        document.getElementById('fecha-informe').textContent = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Datos paciente
+        Object.keys(datosPaciente).forEach(key => {
+            const el = document.getElementById(`res-${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`);
+            if (el) el.textContent = datosPaciente[key];
+        });
+        
+        document.getElementById('res-puntuacion_total').textContent = puntuaciones.total;
+        document.getElementById('res-puntuacion_craneales').textContent = `${puntuaciones.craneales} / 15`;
+        document.getElementById('res-puntuacion_postura').textContent = `${puntuaciones.postura} / 18`;
+        document.getElementById('res-puntuacion_movimientos').textContent = `${puntuaciones.movimientos} / 6`;
+        document.getElementById('res-puntuacion_tono').textContent = `${puntuaciones.tono} / 24`;
+        document.getElementById('res-puntuacion_reflejos').textContent = `${puntuaciones.reflejos} / 15`;
+        
+        const asimetriaPunt = document.getElementById('res-puntuacion_asimetria');
+        const asimetriaInterp = document.getElementById('res-interpretacion_asimetria');
+        const asimetriaCont = document.getElementById('asimetria-container');
+        asimetriaPunt.textContent = puntuaciones.asimetria;
+        if (puntuaciones.asimetria > 2) {
+             asimetriaInterp.textContent = "Puntuación de asimetría clínicamente significativa (≥3 hallazgos). Sugiere un patrón de asimetría que requiere seguimiento cuidadoso por posible lesión unilateral.";
+             asimetriaPunt.className = "text-4xl font-bold my-2 text-amber-600";
+             asimetriaCont.className = "mt-8 p-4 rounded-lg bg-amber-50 border-amber-200 border";
+        } else {
+             asimetriaInterp.textContent = `Se observaron ${puntuaciones.asimetria} hallazgos asimétricos. No se considera un patrón clínicamente significativo.`;
+             asimetriaPunt.className = "text-4xl font-bold my-2 text-emerald-600";
+             asimetriaCont.className = "mt-8 p-4 rounded-lg bg-emerald-50 border-emerald-200 border";
+        }
+
+        const [interpretacion, colorClass] = interpretarResultado(puntuaciones.total, datosPaciente.edadCorregidaMeses);
+        document.getElementById('res-interpretacion_global').textContent = interpretacion;
+        document.getElementById('interpretacion-container').className = `mt-8 p-6 rounded-lg border-2 ${colorClass.border}`;
+        document.getElementById('interpretacion-titulo').className = `text-xl font-semibold mb-2 ${colorClass.text}`;
+
+        const hitosContainer = document.getElementById('res-hitos_motores');
+        hitosContainer.innerHTML = hitos.length > 0 ? '' : '<p class="text-gray-500">No se registraron hitos motores como presentes.</p>';
+        hitos.forEach(hito => {
+            const estadoLabel = hito.estado === 'observado' ? 'Observado' : 'Referido';
+            const colorBadge = hito.estado === 'observado' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+            hitosContainer.innerHTML += `<div class="flex justify-between items-center p-2 bg-gray-50 rounded-md"><span>✔ ${hito.texto}</span><div class="text-xs font-medium"><span class="mr-2 text-gray-500">${hitosEdad[hito.name]}</span><span class="px-2 py-1 rounded-full ${colorBadge}">${estadoLabel}</span></div></div>`;
+        });
+
+        const conductaContainer = document.getElementById('res-conducta');
+        conductaContainer.innerHTML = conducta.length > 0 ? '' : '<p class="text-gray-500">No se seleccionaron observaciones de conducta.</p>';
+        conducta.forEach(c => { conductaContainer.innerHTML += `<p class="p-2 bg-gray-50 rounded-md">✔ ${c}</p>`; });
+        
+        const comentariosContainer = document.getElementById('res-comentarios-container');
+        if (comentarios) {
+            document.getElementById('res-comentarios').textContent = comentarios;
+            comentariosContainer.style.display = 'block';
+        } else {
+            comentariosContainer.style.display = 'none';
+        }
+    }
+
+    function interpretarResultado(puntuacion, edadMeses) {
+      const puntosDeCortePC = { 3: 47, 6: 51, 9: 64, 12: 70 };
+      let mensaje = "", colorClass = { border: "border-gray-300", text: "text-gray-800" }, edadReferencia = 0;
+
+      if(edadMeses <= 4.5) edadReferencia = 3; // Ampliamos rangos para cubrir todo el espectro
+      else if (edadMeses <= 7.5) edadReferencia = 6;
+      else if (edadMeses <= 10.5) edadReferencia = 9;
+      else if (edadMeses <= 18) edadReferencia = 12;
+
+      if (puntuacion > 72) {
+          mensaje = "Puntuación Óptima: El desarrollo neurológico parece excelente para la edad. Se recomienda seguimiento de rutina.";
+          colorClass = { border: "border-emerald-500", text: "text-emerald-700" };
+      } else if (puntuacion >= 60) {
+          mensaje = "Desarrollo Normal: La puntuación se encuentra dentro del rango esperado para la edad. Continuar con la vigilancia del desarrollo estándar.";
+          colorClass = { border: "border-green-500", text: "text-green-700" };
+      } else if (edadReferencia > 0) {
+          const umbral = puntosDeCortePC[edadReferencia];
+          if (puntuacion < umbral) {
+              mensaje = `Riesgo Elevado: La puntuación (${puntuacion}) está por debajo del umbral de riesgo (${umbral}) para un niño de ~${edadReferencia} meses de edad corregida. Esto indica una alta probabilidad de Parálisis Cerebral. Se recomienda derivación urgente a atención temprana y seguimiento especializado.`;
+              colorClass = { border: "border-red-500", text: "text-red-700" };
+          } else {
+              mensaje = `Zona de Vigilancia: La puntuación (${puntuacion}) es subóptima. Aunque está por encima del umbral de alto riesgo (${umbral}), indica una necesidad de seguimiento neurológico cercano y reevaluación periódica para monitorizar la trayectoria del desarrollo.`;
+              colorClass = { border: "border-yellow-500", text: "text-yellow-700" };
+          }
+      } else { 
+           if (puntuacion < 40) {
+               mensaje = "Riesgo Muy Elevado: Una puntuación global por debajo de 40 es un fuerte indicador de alteraciones motoras significativas y un alto riesgo de Parálisis Cerebral, independientemente de la edad. Se requiere intervención y manejo especializado inmediato.";
+               colorClass = { border: "border-red-500", text: "text-red-700" };
+           } else {
+               mensaje = "Puntuación Subóptima: La puntuación es baja. Se recomienda un seguimiento neurológico cercano para monitorizar la evolución y considerar la necesidad de intervenciones de apoyo.";
+               colorClass = { border: "border-yellow-500", text: "text-yellow-700" };
+           }
+      }
+      return [mensaje, colorClass];
+    }
+
+    function reiniciarExamen() {
+      datosPaciente = {};
+      currentQuestionIndex = 0;
+      document.getElementById('formularioHINE').reset();
+      document.getElementById('resultado').classList.add('hidden');
+      document.getElementById('inicio').classList.remove('hidden');
+    }
+
+  </script>
+</body>
+</html>

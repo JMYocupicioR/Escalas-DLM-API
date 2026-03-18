@@ -1,0 +1,92 @@
+export const functionalCategories = {
+  dolor: {
+    title: 'Dolor',
+    description: 'Medición de la intensidad del dolor.',
+    image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&auto=format&fit=crop&q=60',
+    scales: ['vas'],
+  },
+  cognicion: {
+    title: 'Estado mental (cognición)',
+    description: 'Cribado y evaluación del estado cognitivo.',
+    image: 'https://images.unsplash.com/photo-1559757175-7a07110cb5d8?w=800&auto=format&fit=crop&q=60',
+    scales: ['mmse', 'moca'],
+  },
+  funcionalidad_avd: {
+    title: 'Nivel funcional / AVD',
+    description: 'Independencia funcional en actividades de la vida diaria.',
+    image: 'https://images.unsplash.com/photo-1584516150909-c43483ee7932?w=800&auto=format&fit=crop&q=60',
+    scales: ['barthel', 'katz', 'lawton-brody', 'fim', 'weefim'],
+  },
+  equilibrio_caidas: {
+    title: 'Equilibrio y caídas',
+    description: 'Riesgo de caída y control postural.',
+    image: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=800&auto=format&fit=crop&q=60',
+    scales: ['berg', 'tinetti'],
+  },
+  marcha_movilidad: {
+    title: 'Marcha y movilidad',
+    description: 'Evaluación observacional de la marcha y movilidad.',
+    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?w=800&auto=format&fit=crop&q=60',
+    scales: ['ogs'],
+  },
+  capacidad_ejercicio_esfuerzo: {
+    title: 'Capacidad de ejercicio y esfuerzo',
+    description: 'Capacidad funcional y percepción de esfuerzo.',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop&q=60',
+    scales: ['6mwt', 'borg'],
+  },
+  calidad_vida: {
+    title: 'Calidad de vida',
+    description: 'Percepción global de salud y bienestar.',
+    image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&auto=format&fit=crop&q=60',
+    scales: ['sf36'],
+  },
+  metas_terapeuticas: {
+    title: 'Metas terapéuticas',
+    description: 'Consecución y seguimiento de objetivos terapéuticos.',
+    image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=800&auto=format&fit=crop&q=60',
+    scales: ['gas'],
+  },
+  riesgo_ulceras: {
+    title: 'Riesgo de úlceras por presión',
+    description: 'Riesgo y prevención de lesiones por presión.',
+    image: 'https://images.unsplash.com/photo-1504814532849-cff240bbc503?w=800&auto=format&fit=crop&q=60',
+    scales: ['norton'],
+  },
+  consciencia: {
+    title: 'Nivel de consciencia',
+    description: 'Valoración del estado de consciencia.',
+    image: 'https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?w=800&auto=format&fit=crop&q=60',
+    scales: ['glasgow'],
+  },
+  desarrollo_infantil: {
+    title: 'Desarrollo infantil',
+    description: 'Cribado del desarrollo y examen neuromotor.',
+    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&auto=format&fit=crop&q=60',
+    scales: ['denver2', 'hine'],
+  },
+  funcion_manual: {
+    title: 'Función manual',
+    description: 'Síntomas y función de la mano.',
+    image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=800&auto=format&fit=crop&q=60',
+    scales: ['boston'],
+  },
+  discapacidad_musculoesqueletica: {
+    title: 'Discapacidad musculoesquelética',
+    description: 'Limitación funcional relacionada con la columna.',
+    image: 'https://images.unsplash.com/photo-1522335789203-9f9a6b63b5fc?w=800&auto=format&fit=crop&q=60',
+    scales: ['oswestry'],
+  },
+  funcion_articular: {
+    title: 'Función articular',
+    description: 'Resultado funcional en articulaciones.',
+    image: 'https://images.unsplash.com/photo-1594824804732-5eaaea6da8e7?w=800&auto=format&fit=crop&q=60',
+    scales: ['lequesne-rodilla-es-v1', 'constant', 'harris', 'koos'],
+  },
+  funcion_facial: {
+    title: 'Función facial',
+    description: 'Evaluación de la función facial.',
+    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&auto=format&fit=crop&q=60',
+    scales: ['house-brackmann'],
+  },
+};

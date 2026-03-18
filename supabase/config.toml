@@ -1,0 +1,5 @@
+# Supabase local dev config (aligned with linked project qcelbrzjrmjxpjxllyhk)
+# https://supabase.com/docs/guides/cli/config
+
+[db]
+major_version = 15

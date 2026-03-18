@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Denver II </title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilo base y fuente personalizada */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Estilos para las transiciones de los paneles */
+        .panel {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilos de los radio buttons personalizados para las opciones de respuesta */
+        .response-label {
+            transition: all 0.2s ease-in-out;
+        }
+        .response-label.p-selected { background-color: #dcfce7; border-color: #22c55e; } /* green-100, green-500 */
+        .response-label.f-selected { background-color: #fee2e2; border-color: #ef4444; } /* red-100, red-500 */
+        .response-label.r-selected { background-color: #ffedd5; border-color: #f97316; } /* orange-100, orange-500 */
+        .response-label.no-selected { background-color: #e5e7eb; border-color: #6b7280; } /* gray-200, gray-500 */
+
+        /* Ocultar elementos no necesarios para la impresión */
+        @media print {
+            body { background-color: white; }
+            .no-print { display: none !important; }
+            .form-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            @page { size: letter; margin: 1cm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="form-container max-w-4xl mx-auto my-8 p-6 sm:p-8 bg-white rounded-2xl shadow-lg" id="printArea">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-teal-700">Test Denver II</h1>
+            <p class="text-gray-500">Tamizaje del Desarrollo</p>
+        </div>
+
+        <!-- Barra de Progreso -->
+        <div id="progress-container" class="w-full bg-gray-200 rounded-full h-2.5 mb-6 no-print">
+            <div id="progress-bar" class="bg-teal-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            <p id="progress-text" class="text-center text-sm text-gray-600 mt-2"></p>
+        </div>
+
+        <form id="denverForm">
+            <!-- Panel 1: Datos de Identificación -->
+            <fieldset class="panel active" id="panel1">
+                <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Datos de Identificación</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Paciente:</label>
+                        <input type="text" id="nombre" name="nombre" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500" required />
+                    </div>
+                    <div>
+                        <label for="examiner" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Examinador:</label>
+                        <input type="text" id="examiner" name="examiner" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500" required />
+                    </div>
+                    <div>
+                        <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento:</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500" required />
+                    </div>
+                    <div>
+                        <label for="semanasGestacion" class="block text-sm font-medium text-gray-700 mb-1">Semanas de Gestación al Nacer:</label>
+                        <input type="number" id="semanasGestacion" name="semanasGestacion" min="20" max="42" placeholder="Ej: 39" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500" required />
+                    </div>
+                    <div>
+                        <label for="genero" class="block text-sm font-medium text-gray-700 mb-1">Género:</label>
+                        <select id="genero" name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500" required>
+                            <option value="">Seleccione</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Masculino">Masculino</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Paneles de Áreas de Desarrollo -->
+            <fieldset class="panel" id="panel2" data-domain="Motor Grueso">
+                <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Área Motor Grueso</legend>
+                <div class="info-banner p-3 mb-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700"></div>
+                <div class="space-y-4 question-container"></div>
+            </fieldset>
+            
+            <fieldset class="panel" id="panel3" data-domain="Motor Fino-Adaptativo">
+                 <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Área Motor Fino-Adaptativo</legend>
+                 <div class="info-banner p-3 mb-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700"></div>
+                 <div class="space-y-4 question-container"></div>
+            </fieldset>
+
+            <fieldset class="panel" id="panel4" data-domain="Personal-Social">
+                 <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Área Personal-Social</legend>
+                 <div class="info-banner p-3 mb-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700"></div>
+                 <div class="space-y-4 question-container"></div>
+            </fieldset>
+
+            <fieldset class="panel" id="panel5" data-domain="Lenguaje">
+                 <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Área de Lenguaje</legend>
+                 <div class="info-banner p-3 mb-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700"></div>
+                 <div class="space-y-4 question-container"></div>
+            </fieldset>
+            
+            <!-- Panel 6: Resumen y Resultados -->
+            <fieldset class="panel" id="panel6">
+                <legend class="text-2xl font-semibold text-gray-700 border-b-2 border-teal-500 pb-2 mb-6">Resultados Clínicos (Simulación)</legend>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm mb-6">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Datos del Paciente</h3>
+                    <div id="summary-patient-data" class="text-sm space-y-2"></div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Interpretación General de la Prueba</h3>
+                    <div id="summary-global-result" class="space-y-3"></div>
+                </div>
+                 <p id="fechaResultado" class="text-center text-sm text-gray-500 mt-8"></p>
+                <div class="mt-8 text-center no-print">
+                    <button type="button" id="printBtn" class="px-6 py-2 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                        Imprimir Resultados
+                    </button>
+                </div>
+            </fieldset>
+
+            <!-- Botones de Navegación -->
+            <div id="navigation-buttons" class="mt-8 flex justify-between items-center no-print">
+                <button type="button" id="prevBtn" class="px-5 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Regresar
+                </button>
+                <button type="button" id="nextBtn" class="px-5 py-2 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                    Siguiente
+                </button>
+                <button type="button" id="calcBtn" class="hidden px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Calcular Resultados
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal para Notificaciones -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden no-print z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center m-4">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                 <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Atención</h3>
+            <p id="modal-message" class="text-sm text-gray-600 mb-6"></p>
+            <button id="modal-close-btn" class="w-full px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- ESTRUCTURA DE PREGUNTAS CON PERCENTILES SIMULADOS ---
+    // NOTA: Estos percentiles son SIMULADOS para propósitos de demostración.
+    // Estructura: { id, text, domain, reportable, percentiles: [p25, p50, p75, p90] en meses }
+    const questionsData = [
+        // Motor Grueso
+        { id: "mg1", text: "1. Movimientos iguales", domain: "Motor Grueso", reportable: false, percentiles: [0, 0.5, 1, 1.5] },
+        { id: "mg2", text: "2. Levantar la cabeza (R)", domain: "Motor Grueso", reportable: true, percentiles: [0.5, 1, 1.5, 2.5] },
+        { id: "mg3", text: "3. Cabeza levantada 45°", domain: "Motor Grueso", reportable: false, percentiles: [1, 1.8, 2.5, 3.5] },
+        { id: "mg4", text: "4. Se sienta sin apoyo", domain: "Motor Grueso", reportable: false, percentiles: [5, 5.8, 6.5, 8] },
+        { id: "mg5", text: "5. Se levanta para ponerse de pie", domain: "Motor Grueso", reportable: false, percentiles: [6.5, 8, 9.5, 11] },
+        { id: "mg6", text: "6. Camina bien", domain: "Motor Grueso", reportable: true, percentiles: [11, 12.2, 13.5, 15] },
+        { id: "mg7", text: "7. Salta", domain: "Motor Grueso", reportable: false, percentiles: [21, 23.5, 28, 32] },
+        { id: "mg8", text: "8. Se empina en un pie por 2 segundos", domain: "Motor Grueso", reportable: false, percentiles: [28, 30.5, 36, 42] },
+        
+        // Motor Fino-Adaptativo
+        { id: "mfa1", text: "1. Sigue con la mirada 180°", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [1, 2, 3, 4] },
+        { id: "mfa2", text: "2. Agarre de pinza pulgar-dedo", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [7, 8.2, 9.5, 11] },
+        { id: "mfa3", text: "3. Construye torre de 2 cubos", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [12, 13, 15, 18] },
+        { id: "mfa4", text: "4. Copia un círculo", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [26, 30, 34, 40] },
+        { id: "mfa5", text: "5. Dibuja una persona con 3 partes", domain: "Motor Fino-Adaptativo", reportable: true, percentiles: [40, 46, 52, 58] },
+        { id: "mfa6", text: "6. Copia un cuadrado", domain: "Motor Fino-Adaptativo", reportable: false, percentiles: [42, 48, 54, 62] },
+        
+        // Personal-Social
+        { id: "ps1", text: "1. Sonríe espontáneamente", domain: "Personal-Social", reportable: true, percentiles: [0.5, 1.2, 2, 3] },
+        { id: "ps2", text: "2. Se alimenta solo con galletas", domain: "Personal-Social", reportable: true, percentiles: [5.5, 6.5, 7.5, 9] },
+        { id: "ps3", text: "3. Dice adiós con la mano", domain: "Personal-Social", reportable: true, percentiles: [7, 9.5, 12, 14] },
+        { id: "ps4", text: "4. Se quita la ropa", domain: "Personal-Social", reportable: true, percentiles: [13, 15, 18, 22] },
+        { id: "ps5", text: "5. Se viste sin ayuda", domain: "Personal-Social", reportable: true, percentiles: [36, 42, 50, 60] },
+        { id: "ps6", text: "6. Juega a juegos de mesa", domain: "Personal-Social", reportable: true, percentiles: [40, 48, 56, 66] },
+        
+        // Lenguaje
+        { id: "len1", text: "1. Vocaliza (emite sonidos)", domain: "Lenguaje", reportable: true, percentiles: [1, 1.5, 2.5, 3.5] },
+        { id: "len2", text: "2. Dice \"papá/mamá\" (no específico)", domain: "Lenguaje", reportable: true, percentiles: [6.5, 8, 10, 12] },
+        { id: "len3", text: "3. Dice 3 palabras", domain: "Lenguaje", reportable: true, percentiles: [13, 15, 18, 21] },
+        { id: "len4", text: "4. Combina 2 palabras diferentes", domain: "Lenguaje", reportable: true, percentiles: [16, 20, 24, 28] },
+        { id: "len5", text: "5. Comprende 2 preposiciones", domain: "Lenguaje", reportable: false, percentiles: [30, 36, 40, 46] },
+        { id: "len6", text: "6. Define 5 palabras", domain: "Lenguaje", reportable: false, percentiles: [50, 56, 64, 70] },
+    ];
+
+    // --- VARIABLES GLOBALES Y ELEMENTOS DEL DOM ---
+    let panelActual = 1;
+    const totalPaneles = 6;
+    let ageAdjusted = 0; // Se almacenará la edad corregida aquí
+    const form = document.getElementById('denverForm');
+    const panels = form.querySelectorAll('.panel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const calcBtn = document.getElementById('calcBtn');
+    const navButtons = document.getElementById('navigation-buttons');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const modal = document.getElementById('modal');
+    const modalMessage = document.getElementById('modal-message');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // --- FUNCIONES ---
+
+    function renderFilteredQuestionsForPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        const container = panel.querySelector('.question-container');
+        const infoBanner = panel.querySelector('.info-banner');
+        if (!container) return;
+
+        const domain = panel.dataset.domain;
+        const allDomainQuestions = questionsData.filter(q => q.domain === domain);
+        
+        // Filtro de ítems: Mostrar ítems cuya ventana de desarrollo [p25 a p90] esté cerca de la edad del niño.
+        const relevantQuestions = allDomainQuestions.filter(q => {
+            const [p25, _, __, p90] = q.percentiles;
+            // La ventana de relevancia es desde 4 meses antes del p25 hasta 4 meses después del p90
+            return ageAdjusted >= (p25 - 4) && ageAdjusted <= (p90 + 4);
+        });
+        
+        infoBanner.textContent = `Mostrando ${relevantQuestions.length} de ${allDomainQuestions.length} ítems, filtrados por relevancia para la edad del niño.`;
+
+        const questionsHtml = relevantQuestions.map(q => `
+            <div class="question bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <p class="text-sm font-medium text-gray-800 mb-3">${q.text}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    ${generateResponseOption(q.id, 'P', 'Pase', 'p')}
+                    ${generateResponseOption(q.id, 'F', 'Fallo', 'f')}
+                    ${generateResponseOption(q.id, 'R', 'Rechazo', 'r')}
+                    ${generateResponseOption(q.id, 'NO', 'S. Oport.', 'no', !q.reportable)}
+                </div>
+            </div>
+        `).join('');
+        container.innerHTML = questionsHtml;
+        addResponseListeners();
+    }
+    
+    function generateResponseOption(id, value, label, colorClass, disabled = false) {
+        return `
+            <label for="${id}_${value}" class="response-label flex items-center justify-center text-center px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}">
+                <input class="sr-only" type="radio" id="${id}_${value}" name="${id}" value="${value}" required ${disabled ? 'disabled' : ''}>
+                <span class="text-sm font-medium">${label}</span>
+            </label>
+        `;
+    }
+    
+    function addResponseListeners() {
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const name = e.target.name;
+                const selectedValue = e.target.value;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    r.parentElement.classList.remove('p-selected', 'f-selected', 'r-selected', 'no-selected');
+                });
+                const selectedLabel = e.target.parentElement;
+                if (selectedValue === 'P') selectedLabel.classList.add('p-selected');
+                else if (selectedValue === 'F') selectedLabel.classList.add('f-selected');
+                else if (selectedValue === 'R') selectedLabel.classList.add('r-selected');
+                else if (selectedValue === 'NO') selectedLabel.classList.add('no-selected');
+            });
+        });
+    }
+
+    const showPanel = (num) => {
+        if (num > 1 && num < 6) {
+            renderFilteredQuestionsForPanel(`panel${num}`);
+        }
+        panels.forEach(panel => panel.classList.remove('active'));
+        document.getElementById(`panel${num}`)?.classList.add('active');
+        updateUI();
+        window.scrollTo(0, 0);
+    };
+
+    const updateUI = () => {
+        const progressPercentage = ((panelActual - 1) / (totalPaneles - 2)) * 100;
+        progressBar.style.width = `${panelActual < totalPaneles ? progressPercentage : 100}%`;
+        const panelTitles = ["Datos de Identificación", "Motor Grueso", "Motor Fino-Adaptativo", "Personal-Social", "Lenguaje"];
+        progressText.textContent = panelActual < totalPaneles - 1 ? `Área: ${panelTitles[panelActual-1]}` : (panelActual === totalPaneles - 1 ? `Último paso: ${panelTitles[panelActual-1]}` : 'Resultados de la Evaluación');
+        
+        prevBtn.disabled = panelActual === 1;
+
+        if (panelActual < totalPaneles - 1) {
+            nextBtn.classList.remove('hidden');
+            calcBtn.classList.add('hidden');
+        } else if (panelActual === totalPaneles - 1) {
+            nextBtn.classList.add('hidden');
+            calcBtn.classList.remove('hidden');
+        } else {
+            navButtons.classList.add('hidden');
+            document.getElementById('progress-container').classList.add('hidden');
+        }
+    };
+    
+    const validatePanel = () => {
+        const currentPanel = document.getElementById(`panel${panelActual}`);
+        // For evaluation panels, we only check inputs that are actually rendered.
+        const inputs = currentPanel.querySelectorAll('input[required], select[required]');
+        
+        for (const input of inputs) {
+            // Skip disabled inputs (like non-reportable 'NO' options)
+            if (input.disabled) continue;
+
+            if (input.type === 'radio') {
+                const radioGroup = currentPanel.querySelectorAll(`input[name="${input.name}"]`);
+                if (!Array.from(radioGroup).some(r => r.checked)) {
+                    showModal(`Por favor, responde todas las preguntas de este apartado para continuar.`);
+                    return false;
+                }
+            } else if (!input.value.trim()) {
+                showModal('Por favor, completa todos los campos de identificación.');
+                return false;
+            }
+        }
+        return true;
+    };
+    
+    const calculateAdjustedAge = () => {
+        const birthDate = new Date(document.getElementById('fechaNacimiento').value + 'T00:00:00');
+        const weeksGestation = parseInt(document.getElementById('semanasGestacion').value, 10);
+        
+        const ageChronological = calculateAge(birthDate);
+        let adjusted = ageChronological.totalInMonths;
+        const weeksPremature = 40 - weeksGestation;
+
+        if (ageChronological.totalInMonths < 24 && weeksPremature > 2) {
+            const daysToSubtract = weeksPremature * 7;
+            const adjustedDate = new Date(birthDate.getTime() + daysToSubtract * 24 * 60 * 60 * 1000);
+            adjusted = calculateAge(adjustedDate).totalInMonths;
+        }
+        return adjusted;
+    }
+    
+    const nextPanel = () => {
+        if (!validatePanel()) return;
+
+        if (panelActual === 1) {
+            ageAdjusted = calculateAdjustedAge();
+        }
+
+        if (panelActual < totalPaneles) {
+            panelActual++;
+            showPanel(panelActual);
+        }
+    };
+
+    const prevPanel = () => {
+        if (panelActual > 1) {
+            panelActual--;
+            showPanel(panelActual);
+        }
+    };
+    
+    const showModal = (message) => {
+        modalMessage.textContent = message;
+        modal.classList.remove('hidden');
+    };
+
+    const hideModal = () => modal.classList.add('hidden');
+
+    const calculateAge = (birthDate, testDate = new Date()) => {
+        let years = testDate.getFullYear() - birthDate.getFullYear();
+        let months = testDate.getMonth() - birthDate.getMonth();
+        let days = testDate.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+            months--;
+            const prevMonthLastDay = new Date(testDate.getFullYear(), testDate.getMonth(), 0).getDate();
+            days += prevMonthLastDay;
+        }
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        return { years, months, days, totalInMonths: (years * 12) + months + (days/30.44) };
+    };
+
+    const calculateAndShowSummary = () => {
+        if (!validatePanel()) return;
+        panelActual = totalPaneles;
+        showPanel(panelActual);
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        const birthDate = new Date(data.fechaNacimiento + 'T00:00:00');
+
+        // 1. Calcular Edad Cronológica y Ajustada (re-calculate for summary)
+        const ageChronological = calculateAge(birthDate);
+        let ageForEval = ageChronological.totalInMonths;
+        let ageAdjustedText = `${ageChronological.years}a ${ageChronological.months}m ${ageChronological.days}d`;
+        let weeksGestation = parseInt(data.semanasGestacion, 10);
+        let weeksPremature = 40 - weeksGestation;
+
+        if (ageChronological.totalInMonths < 24 && weeksPremature > 2) {
+            const daysToSubtract = weeksPremature * 7;
+            const adjustedDate = new Date(new Date(data.fechaNacimiento).getTime() + daysToSubtract * 24 * 60 * 60 * 1000);
+            const correctedAge = calculateAge(adjustedDate);
+            ageForEval = correctedAge.totalInMonths;
+            ageAdjustedText = `${correctedAge.years}a ${correctedAge.months}m ${correctedAge.days}d (corregida)`;
+        }
+
+        // 2. Mostrar datos del paciente
+        document.getElementById('summary-patient-data').innerHTML = `
+            <div class="flex justify-between"><span class="font-medium text-gray-600">Paciente:</span> <span>${data.nombre}</span></div>
+            <div class="flex justify-between"><span class="font-medium text-gray-600">Examinador:</span> <span>${data.examiner}</span></div>
+            <div class="flex justify-between"><span class="font-medium text-gray-600">Edad para Evaluación:</span> <span class="font-bold">${ageAdjustedText}</span></div>
+            <div class="flex justify-between"><span class="font-medium text-gray-600">Semanas de Gestación:</span> <span>${weeksGestation}</span></div>
+        `;
+
+        // 3. Calcular Retrasos y Precauciones
+        let cautions = 0;
+        let delays = 0;
+        let refusalOnDelayItem = 0;
+        let refusalOnCautionItem = 0;
+
+        questionsData.forEach(q => {
+            const answer = data[q.id];
+            if (!answer || answer === 'P' || answer === 'NO') return; // Skip passed, N.O., or un-asked items
+
+            const [p25, p50, p75, p90] = q.percentiles;
+
+            if (answer === 'F') {
+                if (ageForEval > p90) delays++;
+                else if (ageForEval > p75) cautions++;
+            } else if (answer === 'R') {
+                if (ageForEval > p90) refusalOnDelayItem++;
+                else if (ageForEval > p75) refusalOnCautionItem++;
+            }
+        });
+        
+        delays += refusalOnDelayItem;
+        cautions += refusalOnCautionItem;
+
+        // 4. Determinar interpretación final
+        let interpretation, interpretationColor, recommendation;
+        if (refusalOnDelayItem >= 1 || refusalOnCautionItem >=2) {
+            interpretation = "No Evaluable";
+            interpretationColor = "text-orange-600";
+            recommendation = "El niño se ha negado a intentar ítems clave. Se recomienda volver a administrar la prueba en 1-2 semanas para obtener un resultado válido.";
+        } else if (delays >= 2 || (delays >= 1 && cautions >= 2)) {
+             interpretation = "Sospechoso (Anormal)";
+             interpretationColor = "text-red-600";
+             recommendation = "El resultado indica una preocupación significativa en el desarrollo. Se recomienda derivar para evaluación diagnóstica completa sin demora.";
+        } else if (delays >= 1 || cautions >= 2) {
+            interpretation = "Sospechoso (Cuestionable)";
+            interpretationColor = "text-yellow-600";
+            recommendation = "El resultado indica una posible preocupación en el desarrollo. Se recomienda volver a evaluar en 1-2 semanas. Si persiste, derivar para evaluación diagnóstica completa.";
+        } else {
+            interpretation = "Normal";
+            interpretationColor = "text-green-600";
+            recommendation = "El desarrollo del niño se considera apropiado para la edad. Realizar el tamizaje de rutina en la siguiente visita de control.";
+        }
+        
+        document.getElementById('summary-global-result').innerHTML = `
+            <div class="flex justify-between items-center text-lg">
+                <span class="font-semibold">Resultado:</span>
+                <span class="font-bold ${interpretationColor}">${interpretation}</span>
+            </div>
+            <div class="text-sm mt-4 pt-4 border-t border-gray-200">
+                <p><strong>Hallazgos Clave:</strong></p>
+                <p class="ml-4">- Retrasos (Delays): <span class="font-bold">${delays}</span></p>
+                <p class="ml-4">- Precauciones (Cautions): <span class="font-bold">${cautions}</span></p>
+            </div>
+            <div class="text-sm mt-4 pt-4 border-t border-gray-200">
+                <p><strong>Acción Recomendada:</strong></p>
+                <p class="ml-4">${recommendation}</p>
+            </div>
+        `;
+
+        // 5. Mostrar fecha del resultado
+        const hoy = new Date();
+        const fechaFormateada = hoy.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('fechaResultado').textContent = `Fecha de la simulación: ${fechaFormateada}`;
+    };
+
+
+    // --- ASIGNACIÓN DE EVENTOS ---
+    prevBtn.addEventListener('click', prevPanel);
+    nextBtn.addEventListener('click', nextPanel);
+    calcBtn.addEventListener('click', calculateAndShowSummary);
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+    modalCloseBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) hideModal();
+    });
+
+    // --- INICIALIZACIÓN ---
+    showPanel(panelActual);
+});
+</script>
+
+</body>
+</html>

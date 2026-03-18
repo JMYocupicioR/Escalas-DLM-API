@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Converter</title>
+    <style>
+        body { margin: 20px; font-family: Arial, sans-serif; }
+        .icon-container { margin: 20px; display: inline-block; text-align: center; }
+        canvas { border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>DeepLuxMed Icon Converter</h1>
+    <p>Use este archivo para convertir el SVG a PNG. Clic derecho en cada canvas → "Guardar imagen como"</p>
+    
+    
+    <div class="icon-container">
+        <h3>icon (1024x1024)</h3>
+        <canvas id="icon" width="1024" height="1024"></canvas>
+    </div>
+    
+    <div class="icon-container">
+        <h3>favicon (32x32)</h3>
+        <canvas id="favicon" width="32" height="32"></canvas>
+    </div>
+    
+    <div class="icon-container">
+        <h3>icon-192 (192x192)</h3>
+        <canvas id="icon-192" width="192" height="192"></canvas>
+    </div>
+    
+    <div class="icon-container">
+        <h3>icon-512 (512x512)</h3>
+        <canvas id="icon-512" width="512" height="512"></canvas>
+    </div>
+    
+
+    <script>
+        const svg = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0891b2;" />
+      <stop offset="100%" style="stop-color:#06b6d4;" />
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <g style="filter: url(#softShadow);">
+    <circle cx="50" cy="50" r="40" fill="url(#iconGradient)"/>
+    <circle cx="50" cy="50" r="35" fill="none" stroke="white" stroke-opacity="0.2" stroke-width="1.5"/>
+    <path d="M32 50 L45 63 L68 40" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>`;
+        
+        
+        // icon
+        const canvasicon = document.getElementById('icon');
+        const ctxicon = canvasicon.getContext('2d');
+        const imgicon = new Image();
+        const svgicon = svg.replace(/width="100" height="100"/, 'width="1024" height="1024"');
+        const blobicon = new Blob([svgicon], {type: 'image/svg+xml'});
+        const urlicon = URL.createObjectURL(blobicon);
+        imgicon.onload = () => {
+            ctxicon.drawImage(imgicon, 0, 0, 1024, 1024);
+            URL.revokeObjectURL(urlicon);
+        };
+        imgicon.src = urlicon;
+        
+
+        // favicon
+        const canvasfavicon = document.getElementById('favicon');
+        const ctxfavicon = canvasfavicon.getContext('2d');
+        const imgfavicon = new Image();
+        const svgfavicon = svg.replace(/width="100" height="100"/, 'width="32" height="32"');
+        const blobfavicon = new Blob([svgfavicon], {type: 'image/svg+xml'});
+        const urlfavicon = URL.createObjectURL(blobfavicon);
+        imgfavicon.onload = () => {
+            ctxfavicon.drawImage(imgfavicon, 0, 0, 32, 32);
+            URL.revokeObjectURL(urlfavicon);
+        };
+        imgfavicon.src = urlfavicon;
+        
+
+        // icon-192
+        const canvasicon-192 = document.getElementById('icon-192');
+        const ctxicon-192 = canvasicon-192.getContext('2d');
+        const imgicon-192 = new Image();
+        const svgicon-192 = svg.replace(/width="100" height="100"/, 'width="192" height="192"');
+        const blobicon-192 = new Blob([svgicon-192], {type: 'image/svg+xml'});
+        const urlicon-192 = URL.createObjectURL(blobicon-192);
+        imgicon-192.onload = () => {
+            ctxicon-192.drawImage(imgicon-192, 0, 0, 192, 192);
+            URL.revokeObjectURL(urlicon-192);
+        };
+        imgicon-192.src = urlicon-192;
+        
+
+        // icon-512
+        const canvasicon-512 = document.getElementById('icon-512');
+        const ctxicon-512 = canvasicon-512.getContext('2d');
+        const imgicon-512 = new Image();
+        const svgicon-512 = svg.replace(/width="100" height="100"/, 'width="512" height="512"');
+        const blobicon-512 = new Blob([svgicon-512], {type: 'image/svg+xml'});
+        const urlicon-512 = URL.createObjectURL(blobicon-512);
+        imgicon-512.onload = () => {
+            ctxicon-512.drawImage(imgicon-512, 0, 0, 512, 512);
+            URL.revokeObjectURL(urlicon-512);
+        };
+        imgicon-512.src = urlicon-512;
+        
+    </script>
+</body>
+</html>

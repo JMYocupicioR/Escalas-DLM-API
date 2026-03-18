@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Sistema de Impresión - DeepLuxMed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0891b2;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            color: #0891b2;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #0891b2;
+        }
+        .test-section h2 {
+            color: #0891b2;
+            margin-top: 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(8, 145, 178, 0.3);
+        }
+        .button:active {
+            transform: translateY(0);
+        }
+        .button.secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        }
+        .button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d1f2d1;
+            color: #0f5132;
+            border: 1px solid #0f5132;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #721c24;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #0c5460;
+        }
+        .environment-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .environment-info h3 {
+            color: #0891b2;
+            margin-top: 0;
+        }
+        .environment-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .console-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0891b2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Prueba de Impresión</h1>
+            <p>Sistema de impresión mejorado para navegadores móviles y desktop</p>
+            <p><strong>Fecha:</strong> <span id="currentDate"></span></p>
+        </div>
+
+        <div class="environment-info">
+            <h3>🔍 Información del Entorno</h3>
+            <ul>
+                <li><strong>Navegador:</strong> <span id="browserInfo">Detectando...</span></li>
+                <li><strong>Plataforma:</strong> <span id="platformInfo">Detectando...</span></li>
+                <li><strong>Tipo:</strong> <span id="deviceType">Detectando...</span></li>
+                <li><strong>Resolución:</strong> <span id="resolution">Detectando...</span></li>
+                <li><strong>Capacidades:</strong> <span id="capabilities">Detectando...</span></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 1. Prueba del Servicio PDF</h2>
+            <p>Probar la generación de PDF vía servidor (Puppeteer)</p>
+            <button class="button" onclick="testPdfService()">
+                <span id="testPdfLoading"></span>Probar Servicio PDF
+            </button>
+            <div id="pdfServiceStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🖨️ 2. Prueba de Impresión Unificada</h2>
+            <p>Probar el sistema de impresión que detecta automáticamente el mejor método</p>
+            <button class="button" onclick="testUnifiedPrinting()">
+                <span id="testPrintLoading"></span>Prueba Impresión Completa
+            </button>
+            <div id="printingStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📄 3. Métodos Individuales</h2>
+            <p>Probar cada método de impresión por separado</p>
+            <button class="button secondary" onclick="testHtmlPrinting()">HTML Directo</button>
+            <button class="button secondary" onclick="testJsPdfFallback()">jsPDF Fallback</button>
+            <button class="button secondary" onclick="testServerPdf()">PDF Servidor</button>
+            <div id="individualStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 4. Datos de Prueba</h2>
+            <p>Datos simulados de evaluación médica usados en las pruebas</p>
+            <button class="button secondary" onclick="showTestData()">Ver Datos de Prueba</button>
+            <div id="testDataDisplay"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 5. Console Output</h2>
+            <p>Registro detallado de todas las operaciones</p>
+            <button class="button danger" onclick="clearConsole()">Limpiar Console</button>
+            <div class="console-output" id="consoleOutput">Consola lista para mostrar logs...</div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de prueba
+        const testAssessment = {
+            patientData: {
+                name: "Juan Pérez García",
+                age: "45",
+                gender: "Masculino", 
+                doctorName: "Dr. María González"
+            },
+            score: 85,
+            interpretation: "Dependencia moderada. El paciente requiere asistencia supervisada en múltiples actividades.",
+            answers: [
+                { id: "barthel_1", question: "Alimentación", label: "Independiente", value: "Independiente", points: 10 },
+                { id: "barthel_2", question: "Baño", label: "Dependiente", value: "Dependiente", points: 0 },
+                { id: "barthel_3", question: "Vestirse", label: "Necesita ayuda", value: "Necesita ayuda", points: 5 },
+                { id: "barthel_4", question: "Arreglarse", label: "Independiente", value: "Independiente", points: 5 },
+                { id: "barthel_5", question: "Deposiciones", label: "Continente", value: "Continente", points: 10 }
+            ]
+        };
+
+        const testScale = {
+            id: "barthel",
+            name: "Escala de Barthel"
+        };
+
+        const testOptions = {
+            theme: 'light',
+            preset: 'compact',
+            scale: 0.85,
+            headerTitle: 'Informe de Resultados - PRUEBA',
+            headerSubtitle: 'Escala de Barthel - Test de Impresión',
+            showPatientSummary: true
+        };
+
+        // Variables globales
+        let consoleOutput = '';
+
+        // Función para logging
+        function logToConsole(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            consoleOutput += `[${timestamp}] ${prefix} ${message}\\n`;
+            document.getElementById('consoleOutput').textContent = consoleOutput;
+            document.getElementById('consoleOutput').scrollTop = document.getElementById('consoleOutput').scrollHeight;
+        }
+
+        // Inicializar la página
+        function initializePage() {
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long',
+                day: 'numeric'
+            });
+
+            detectEnvironment();
+            logToConsole('Página de pruebas inicializada correctamente');
+        }
+
+        // Detectar entorno
+        function detectEnvironment() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(userAgent);
+            const platform = navigator.platform;
+            const resolution = `${screen.width}x${screen.height}`;
+            
+            // Detectar navegador
+            let browserName = 'Unknown';
+            if (userAgent.indexOf('Chrome') > -1) browserName = 'Google Chrome';
+            else if (userAgent.indexOf('Firefox') > -1) browserName = 'Mozilla Firefox';
+            else if (userAgent.indexOf('Safari') > -1) browserName = 'Safari';
+            else if (userAgent.indexOf('Edge') > -1) browserName = 'Microsoft Edge';
+
+            // Capacidades
+            const capabilities = [];
+            if (typeof window.print !== 'undefined') capabilities.push('window.print()');
+            if (typeof Blob !== 'undefined') capabilities.push('Blob API');
+            if (typeof window.open !== 'undefined') capabilities.push('window.open()');
+            if (typeof fetch !== 'undefined') capabilities.push('Fetch API');
+
+            document.getElementById('browserInfo').textContent = browserName;
+            document.getElementById('platformInfo').textContent = platform;
+            document.getElementById('deviceType').textContent = isMobile ? '📱 Móvil' : '🖥️ Desktop';
+            document.getElementById('resolution').textContent = resolution;
+            document.getElementById('capabilities').textContent = capabilities.join(', ');
+
+            logToConsole(`Entorno detectado: ${isMobile ? 'Móvil' : 'Desktop'} - ${browserName}`);
+        }
+
+        // Test 1: Servicio PDF
+        async function testPdfService() {
+            const button = document.querySelector('button[onclick="testPdfService()"]');
+            const status = document.getElementById('pdfServiceStatus');
+            const loading = document.getElementById('testPdfLoading');
+            
+            button.disabled = true;
+            loading.innerHTML = '<div class="loading"></div>';
+            status.innerHTML = '<div class="status info">🔄 Probando servicio PDF...</div>';
+            
+            logToConsole('Iniciando prueba del servicio PDF');
+
+            try {
+                const response = await fetch('http://localhost:8787/api/pdf/export?binary=1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        assessment: testAssessment,
+                        scale: testScale,
+                        options: testOptions
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const filename = `test_${Date.now()}.pdf`;
+                    
+                    status.innerHTML = `
+                        <div class="status success">
+                            ✅ PDF generado correctamente (${Math.round(blob.size/1024)}KB)
+                            <br><a href="${url}" target="_blank" style="color: #0891b2;">📖 Ver PDF</a> | 
+                            <a href="${url}" download="${filename}" style="color: #0891b2;">💾 Descargar</a>
+                        </div>
+                    `;
+                    
+                    logToConsole(`Servicio PDF exitoso: ${Math.round(blob.size/1024)}KB generados`, 'success');
+                    
+                    // Limpiar URL después de 30 segundos
+                    setTimeout(() => URL.revokeObjectURL(url), 30000);
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+                logToConsole(`Error en servicio PDF: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                loading.innerHTML = '';
+            }
+        }
+
+        // Test 2: Impresión unificada
+        async function testUnifiedPrinting() {
+            const button = document.querySelector('button[onclick="testUnifiedPrinting()"]');
+            const status = document.getElementById('printingStatus');
+            const loading = document.getElementById('testPrintLoading');
+            
+            button.disabled = true;
+            loading.innerHTML = '<div class="loading"></div>';
+            status.innerHTML = '<div class="status info">🔄 Probando sistema de impresión unificado...</div>';
+            
+            logToConsole('Iniciando prueba de impresión unificada');
+
+            try {
+                // Primero intentar servicio PDF
+                logToConsole('Intentando impresión vía servidor PDF...');
+                const serverSuccess = await printViaServer();
+                
+                if (serverSuccess) {
+                    status.innerHTML = '<div class="status success">✅ Impresión vía servidor PDF exitosa</div>';
+                    logToConsole('Impresión vía servidor PDF completada', 'success');
+                } else {
+                    logToConsole('Servidor PDF falló, probando fallback...', 'warning');
+                    
+                    // Fallback según plataforma
+                    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
+                    
+                    if (isMobile) {
+                        logToConsole('Detectado móvil - usando jsPDF...');
+                        await testJsPdfFallback();
+                        status.innerHTML = '<div class="status success">✅ Impresión móvil vía jsPDF (fallback)</div>';
+                    } else {
+                        logToConsole('Detectado desktop - usando HTML directo...');
+                        testHtmlPrinting();
+                        status.innerHTML = '<div class="status success">✅ Impresión desktop vía HTML (fallback)</div>';
+                    }
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Error en impresión: ${error.message}</div>`;
+                logToConsole(`Error en impresión unificada: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                loading.innerHTML = '';
+            }
+        }
+
+        // Impresión vía servidor
+        async function printViaServer() {
+            try {
+                const response = await fetch('http://localhost:8787/api/pdf/export?binary=1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        assessment: testAssessment,
+                        scale: testScale,
+                        options: testOptions
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const printWindow = window.open(url, '_blank');
+                    
+                    if (printWindow) {
+                        // Para móviles, no intentar print automático
+                        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
+                        if (!isMobile) {
+                            printWindow.onload = () => {
+                                printWindow.print();
+                            };
+                        }
+                        setTimeout(() => URL.revokeObjectURL(url), 30000);
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                logToConsole(`Error en servidor PDF: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test HTML directo
+        function testHtmlPrinting() {
+            logToConsole('Probando impresión HTML directa...');
+            
+            const htmlContent = generateTestHTML();
+            const printWindow = window.open('', '_blank');
+            
+            if (printWindow) {
+                printWindow.document.write(htmlContent);
+                printWindow.document.close();
+                printWindow.onload = () => {
+                    printWindow.print();
+                };
+                
+                document.getElementById('individualStatus').innerHTML = '<div class="status success">✅ Ventana HTML abierta para impresión</div>';
+                logToConsole('HTML directo: ventana creada exitosamente', 'success');
+            } else {
+                document.getElementById('individualStatus').innerHTML = '<div class="status error">❌ No se pudo abrir ventana (bloqueador de popups?)</div>';
+                logToConsole('HTML directo: falló al abrir ventana', 'error');
+            }
+        }
+
+        // Test jsPDF fallback
+        async function testJsPdfFallback() {
+            logToConsole('Probando fallback jsPDF para móviles...');
+            
+            try {
+                // Simular jsPDF (en implementación real usarías la librería)
+                const pdfContent = generateSimplePdfContent();
+                const blob = new Blob([pdfContent], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                
+                const pdfWindow = window.open(url, '_blank');
+                if (pdfWindow) {
+                    setTimeout(() => URL.revokeObjectURL(url), 30000);
+                    document.getElementById('individualStatus').innerHTML = '<div class="status success">✅ PDF móvil generado (simulado)</div>';
+                    logToConsole('jsPDF fallback: PDF generado exitosamente', 'success');
+                } else {
+                    throw new Error('No se pudo abrir ventana PDF');
+                }
+            } catch (error) {
+                document.getElementById('individualStatus').innerHTML = `<div class="status error">❌ jsPDF falló: ${error.message}</div>`;
+                logToConsole(`jsPDF fallback error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test servidor PDF individual
+        async function testServerPdf() {
+            logToConsole('Probando método servidor PDF individual...');
+            
+            try {
+                const success = await printViaServer();
+                if (success) {
+                    document.getElementById('individualStatus').innerHTML = '<div class="status success">✅ Servidor PDF funcionando</div>';
+                    logToConsole('Servidor PDF individual: exitoso', 'success');
+                } else {
+                    throw new Error('Servidor PDF no disponible');
+                }
+            } catch (error) {
+                document.getElementById('individualStatus').innerHTML = `<div class="status error">❌ Servidor PDF: ${error.message}</div>`;
+                logToConsole(`Servidor PDF individual error: ${error.message}`, 'error');
+            }
+        }
+
+        // Mostrar datos de prueba
+        function showTestData() {
+            const display = document.getElementById('testDataDisplay');
+            const data = JSON.stringify({ assessment: testAssessment, scale: testScale, options: testOptions }, null, 2);
+            
+            display.innerHTML = `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <pre style="margin: 0; font-size: 12px; overflow-x: auto;">${data}</pre>
+                </div>
+            `;
+            
+            logToConsole('Datos de prueba mostrados');
+        }
+
+        // Limpiar consola
+        function clearConsole() {
+            consoleOutput = '';
+            document.getElementById('consoleOutput').textContent = 'Consola limpia...';
+            logToConsole('Consola reiniciada');
+        }
+
+        // Generar HTML de prueba
+        function generateTestHTML() {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Prueba - ${testScale.name}</title>
+                    <style>
+                        @page { size: A4; margin: 20mm; }
+                        body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.4; }
+                        .header { text-align: center; border-bottom: 2px solid #0891b2; padding-bottom: 10px; margin-bottom: 20px; }
+                        .section { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+                        .patient-info { background-color: #f8f9fa; }
+                        .results { background-color: #e8f5e8; }
+                        .score { font-size: 18pt; font-weight: bold; color: #0891b2; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+                        th { background-color: #f1f1f1; }
+                        .no-print { position: fixed; top: 10px; right: 10px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${testOptions.headerTitle}</h1>
+                        <p>${testOptions.headerSubtitle}</p>
+                        <p>Fecha: ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <div class="section patient-info">
+                        <h2>Datos del Paciente</h2>
+                        <p><strong>Nombre:</strong> ${testAssessment.patientData.name}</p>
+                        <p><strong>Edad:</strong> ${testAssessment.patientData.age}</p>
+                        <p><strong>Género:</strong> ${testAssessment.patientData.gender}</p>
+                        <p><strong>Evaluador:</strong> ${testAssessment.patientData.doctorName}</p>
+                    </div>
+                    
+                    <div class="section results">
+                        <h2>Resultados</h2>
+                        <p class="score">Puntuación: ${testAssessment.score}</p>
+                        <p><strong>Interpretación:</strong> ${testAssessment.interpretation}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Detalle de Respuestas</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Pregunta</th><th>Respuesta</th><th>Puntos</th></tr>
+                            </thead>
+                            <tbody>
+                                ${testAssessment.answers.map(answer => `
+                                    <tr>
+                                        <td>${answer.question}</td>
+                                        <td>${answer.label}</td>
+                                        <td>${answer.points}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="no-print">
+                        <button onclick="window.print()" style="margin: 5px; padding: 8px 12px;">🖨️ Imprimir</button>
+                        <button onclick="window.close()" style="margin: 5px; padding: 8px 12px;">❌ Cerrar</button>
+                    </div>
+                    
+                    <script>
+                        console.log('Ventana de prueba HTML cargada');
+                    </script>
+                </body>
+                </html>
+            `;
+        }
+
+        // Generar contenido PDF simple (simulado)
+        function generateSimplePdfContent() {
+            return `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 50
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(Prueba PDF - ${testScale.name}) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000189 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+289
+%%EOF`;
+        }
+
+        // Inicializar cuando la página carga
+        window.onload = initializePage;
+    </script>
+</body>
+</html>

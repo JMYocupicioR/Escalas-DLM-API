@@ -1,0 +1,73 @@
+# Sistema de Logos e Iconografía — DeepLux MED
+
+Este documento explica la arquitectura visual y técnica de la marca dentro del proyecto **Expediente DLM**. El sistema está diseñado para ser coherente, dinámico y fácil de mantener.
+
+---
+
+## 1. Arquitectura de Marca (Jerarquía)
+
+El sistema visual sigue una jerarquía de tres niveles integrada en un solo componente:
+
+1.  **DeepLux.org**: La identidad corporativa principal.
+2.  **MED**: La subdivisión dedicada a soluciones médicas.
+3.  **Expediente (DLM)**: El nombre del producto específico.
+
+---
+
+## 2. El Componente Central: [DeepLuxLogo.tsx](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/src/components/Brand/DeepLuxLogo.tsx)
+
+Toda la lógica de visualización se encuentra en:
+[src/components/Brand/DeepLuxLogo.tsx](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/src/components/Brand/DeepLuxLogo.tsx)
+
+### Propiedades (Props)
+| Prop | Tipo | Por defecto | Descripción |
+| :--- | :--- | :--- | :--- |
+| `variant` | `full \| compact \| auth \| header` | `full` | Define el diseño y tamaño del logo. |
+| `showProduct` | `boolean` | `true` | Alterna la visibilidad de "Expediente (DLM)". |
+| `className` | `string` | `undefined` | Permite aplicar estilos CSS adicionales. |
+
+### Variantes de Diseño
+*   **`full` (Por defecto)**: Utilizado en la barra lateral expandida. Muestra el icono, la marca corporativa y el nombre del producto con una línea divisoria decorativa.
+*   **`compact`**: Utilizado en la barra lateral contraída. Sólo muestra el icono SVG.
+*   **`auth`**: Diseñado para pantallas de Login/Registro. Es más grande, centrado y con sombras pronunciadas.
+*   **`header`**: Una versión horizontal compacta optimizada para encabezados móviles.
+
+---
+
+## 3. Especificaciones Visuales
+
+### El Icono SVG ([LogoIcon](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/src/components/Brand/DeepLuxLogo.tsx#19-57))
+El icono no es una imagen externa (PNG/JPG), sino código SVG puro embebido en el componente para máxima nitidez en cualquier tamaño.
+
+*   **Colores y Gradientes**:
+    *   `dl-bg`: Gradiente de fondo del cuadrado redondeado (Azul cielo `#0ea5e9` a Azul oscuro `#1e3a5f`).
+    *   `dl-dot`: El "punto de luz" (lux) con gradiente celeste.
+*   **Formas**: Contiene las letras estilizadas "D" y "L".
+
+### Comportamiento Interactivo
+El logo funciona como un botón inteligente:
+*   **Hover**: El texto `.org` cambia de intensidad y el icono aumenta ligeramente de tamaño.
+*   **Click**: Redirige al usuario a la página oficial `https://deeplux.org` en una pestaña nueva.
+
+---
+
+## 4. Archivos de Recursos Estáticos
+
+| Archivo | Ubicación | Uso |
+| :--- | :--- | :--- |
+| [icon.svg](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/icon.svg) | Raíz (root) | Icono fuente original. |
+| `public/favicon.ico` | `public/` | El icono que aparece en la pestaña del navegador. |
+| [index.html](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/index.html) | Raíz (root) | Referencia el icono para el navegador. |
+
+---
+
+## 5. Mejores Prácticas para Desarrolladores
+
+1.  **No uses imágenes externas**: Si necesitas el logo, importa siempre el componente `<DeepLuxLogo />`. Esto asegura que los colores y gradientes sean consistentes.
+2.  **Uso de la utilidad `cn`**: El componente utiliza `cn()` (Tailwind Merge) para permitir que las clases pasadas por `className` no entren en conflicto con los estilos base.
+3.  **Accesibilidad**: El logo incluye atributos `aria-hidden` para el SVG y etiquetas `title` descriptivas para los botones.
+
+---
+
+> [!TIP]
+> Si deseas cambiar un color en todos los logos de la aplicación, sólo necesitas editar los valores hexadecimales dentro de las etiquetas `<linearGradient>` en el archivo [DeepLuxLogo.tsx](file:///c:/Users/JmYoc/OneDrive/Documentos/DeepLuxMed/Expediente%20DLM/ExpedienteDLM-11/src/components/Brand/DeepLuxLogo.tsx).

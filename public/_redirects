@@ -1,0 +1,5 @@
+# API redirects (processed before catch-all)
+/api/pdf/export /.netlify/functions/pdf-export 200
+
+# SPA fallback - catch all routes and serve index.html
+/* /index.html 200
