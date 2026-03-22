@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build:web && (npm run build:functions || echo 'Functions build skipped') && cp public/_redirects dist/_redirects && cp public/404.html dist/404.html"
+  command = "npm run build:web && (npm run build:functions || echo 'Functions build skipped') && cp public/_redirects dist/_redirects && cp public/404.html dist/404.html && cp public/manifest.json dist/manifest.json && cp public/sw.js dist/sw.js && cp public/offline.html dist/offline.html && cp public/register-sw.js dist/register-sw.js && cp -r public/icons dist/icons && node scripts/inject-pwa.js"
   publish = "dist"
   functions = "netlify/functions"
 
@@ -7,6 +7,29 @@
   NODE_VERSION = "20.18.0"
   NPM_VERSION = "10.8.0"
   SECRETS_SCAN_ENABLED = "false"
+
+# ─── PWA: Inject manifest, apple-touch-icon, and SW registration into HTML ───
+[[plugins]]
+
+# Inject PWA tags into <head> via snippet injection
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Link = '''</manifest.json>; rel="manifest", </icons/apple-touch-icon.png>; rel="apple-touch-icon"'''
+
+# Service worker: must not be cached by CDN
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Content-Type = "application/javascript"
+
+# Manifest
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "application/manifest+json"
 
 # API redirects (before catch-all)
 [[redirects]]

@@ -15,6 +15,8 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { navigationDarkTheme, navigationLightTheme, paperDarkTheme, paperLightTheme } from '@/app/theme';
 import { setupDevelopmentEnvironment } from '@/config/development';
 import { Appearance, Platform } from 'react-native';
+import { PWAInstallBanner } from '@/components/PWAInstallBanner';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -111,6 +113,8 @@ export default function RootLayout() {
                 </Stack>
                 <StatusBar style={effectiveDarkMode ? 'light' : 'dark'} />
                 <ToastContainer />
+                <OfflineBanner />
+                <PWAInstallBanner />
               </BottomSheetModalProvider>
             </ThemeProvider>
           </PaperProvider>
