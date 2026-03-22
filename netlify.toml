@@ -8,10 +8,7 @@
   NPM_VERSION = "10.8.0"
   SECRETS_SCAN_ENABLED = "false"
 
-# ─── PWA: Inject manifest, apple-touch-icon, and SW registration into HTML ───
-[[plugins]]
-
-# Inject PWA tags into <head> via snippet injection
+# ─── PWA Headers ───
 [[headers]]
   for = "/index.html"
   [headers.values]
